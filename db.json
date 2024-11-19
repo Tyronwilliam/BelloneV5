@@ -1,0 +1,122 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "title": "Website Redesign",
+      "description": "Redesign the company website to improve user experience.",
+      "clientId": 101,
+      "budget": 5000,
+      "startDate": "2024-01-15",
+      "endDate": "2024-03-15",
+      "status": "IN_PROGRESS",
+      "progress": 60,
+      "creator": 1,
+      "time": 0,
+      "image": "https://unsplash.com/fr/photos/personne-tenant-un-crayon-pres-dun-ordinateur-portable-5fNmWej4tAA"
+    },
+    {
+      "id": 2,
+      "title": "Mobile App Development",
+      "description": "Develop a mobile app for the online store.",
+      "clientId": 102,
+      "budget": 20000,
+      "startDate": "2024-02-01",
+      "endDate": "2024-07-01",
+      "status": "OPEN",
+      "progress": 60,
+      "creator": 1,
+      "time": 0,
+      "image": ""
+    },
+    {
+      "id": 3,
+      "title": "Marketing Campaign",
+      "description": "Launch a new marketing campaign for the product line.",
+      "clientId": 103,
+      "budget": 8000,
+      "startDate": "2024-03-01",
+      "endDate": "2024-04-30",
+      "status": "CLOSE",
+      "progress": 100,
+      "creator": 1,
+      "time": 0,
+      "image": ""
+    },
+    {
+      "id": 4,
+      "title": "Data Migration",
+      "description": "Migrate all company data to the new system.",
+      "clientId": 104,
+      "budget": 15000,
+      "startDate": "2024-04-10",
+      "endDate": "2024-06-10",
+      "status": "IN_PROGRESS",
+      "progress": 40,
+      "creator": 1,
+      "time": 0,
+      "image": ""
+    },
+    {
+      "id": 5,
+      "title": "Customer Portal",
+      "description": "Develop a portal for customers to manage their accounts.",
+      "clientId": 105,
+      "budget": 12000,
+      "startDate": "2024-05-01",
+      "endDate": "2024-08-01",
+      "status": "OPEN",
+      "progress": 60,
+      "creator": 1,
+      "time": 0,
+      "image": ""
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "project_id": 1,
+      "title": "Create wireframes",
+      "description": "Design the initial wireframes for the website.",
+      "assigned_to": 201,
+      "status": "IN_PROGRESS",
+      "priority": "high",
+      "start_date": "2024-01-16",
+      "due_date": "2024-01-20",
+      "completed_at": null,
+      "created_at": "2024-01-15T08:00:00Z",
+      "updated_at": "2024-01-18T10:00:00Z",
+      "time": 4500
+    },
+    {
+      "id": 2,
+      "project_id": 1,
+      "title": "Develop homepage",
+      "description": "Code the main homepage layout according to the design.",
+      "assigned_to": 202,
+      "status": "OPEN",
+      "priority": "medium",
+      "start_date": "2024-01-21",
+      "due_date": "2024-02-01",
+      "completed_at": null,
+      "created_at": "2024-01-15T08:00:00Z",
+      "updated_at": "2024-01-15T08:00:00Z",
+      "time": 44500
+    },
+    {
+      "id": 3,
+      "project_id": 1,
+      "title": "Setup project repository",
+      "description": "Initialize the repository and setup project structure.",
+      "assigned_to": 203,
+      "status": "CLOSE",
+      "priority": "low",
+      "start_date": "2024-02-02",
+      "due_date": "2024-02-02",
+      "completed_at": "2024-02-02",
+      "created_at": "2024-01-31T08:00:00Z",
+      "updated_at": "2024-02-02T15:00:00Z",
+      "time": 9500
+    }
+  ],
+  "clients": []
+}

@@ -12,15 +12,25 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "allowImportingTsExtensions": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@/*": ["./*", "./src/*"]
+    },
+    "baseUrl": ".",
+    "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/components/reusable/MarkDown/ComposantCustom.jsx",
+    "app/components/reusable/MarkDown/SlateEditor/Editor.jsx"
+  ],
   "exclude": ["node_modules"]
 }

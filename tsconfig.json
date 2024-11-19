@@ -30,7 +30,13 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/components/reusable/MarkDown/ComposantCustom.jsx",
-    "app/components/reusable/MarkDown/SlateEditor/Editor.jsx"
+    "app/components/reusable/MarkDown/SlateEditor/Editor.jsx",
+    "app/components/reusable/MarkDown/plugins/AutoLinkPlugin.jsx",
+    "app/components/reusable/MarkDown/plugins/CodeHighlightPlugin.jsx",
+    "app/components/reusable/MarkDown/plugins/ListMaxIndentLevelPlugin.jsx",
+    "app/components/reusable/MarkDown/plugins/PlaygroundAutoLinkPlugin.jsx",
+    "app/components/reusable/MarkDown/plugins/ToolbarPlugin.jsx",
+    "app/components/reusable/MarkDown/Editor.tsx"
   ],
   "exclude": ["node_modules"]
 }

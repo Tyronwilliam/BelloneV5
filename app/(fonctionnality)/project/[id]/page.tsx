@@ -1,7 +1,8 @@
 import Entete from "@/app/components/reusable/Entete/Entete";
 import dynamic from "next/dynamic";
+import GridLayout from "../GridLayout/GridLayout";
 
-const GridLayout = dynamic(() => import("../GridLayout/GridLayout"));
+// const GridLayout = dynamic(() => import("../GridLayout/GridLayout"));
 
 const SingleProjectPage = async ({
   params,

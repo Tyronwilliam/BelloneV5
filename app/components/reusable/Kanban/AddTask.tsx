@@ -14,13 +14,16 @@ export const AddTask: React.FC<{
   const addTask = () => {
     if (newTask.trim() !== "") {
       const updatedColumns = [...columns];
-      const index = updatedColumns?.length + 1;
+      // Generate a unique task ID using a counter
+      const taskId = updatedColumns[0].tasks.length + 1; // This will increment the task ID for each new task
+
       updatedColumns[0].tasks.push({
-        id: `task-${index}`,
+        id: taskId, // Use the unique integer as the task ID
         content: newTask,
       });
+
       setColumns(updatedColumns);
-      setNewTask("");
+      setNewTask(""); // Clear the input field after adding the task
     }
   };
 

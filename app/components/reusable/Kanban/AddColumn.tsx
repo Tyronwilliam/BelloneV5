@@ -13,13 +13,19 @@ export const AddColumn: React.FC<{
 }> = ({ newColumnTitle, setNewColumnTitle, columns, setColumns }) => {
   const addColumn = () => {
     if (newColumnTitle.trim() !== "") {
+      const updatedColumns = [...columns];
+
+      // Generate a unique column ID by using the length of the existing columns
+      const columnId = updatedColumns.length + 1; // This will give each column a unique ID
+
       const newColumn = {
-        id: `column-${newColumnTitle}`,
+        id: columnId, // Use the unique column ID
         title: newColumnTitle,
         tasks: [],
       };
-      setColumns([...columns, newColumn]);
-      setNewColumnTitle("");
+
+      setColumns([...updatedColumns, newColumn]); // Add the new column to the state
+      setNewColumnTitle(""); // Clear the input field
     }
   };
 

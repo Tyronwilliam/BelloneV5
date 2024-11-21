@@ -31,7 +31,7 @@ body {
 .other ul {
   padding: 0;
   margin: 0;
-  list-style-type: none;
+  /* list-style-type: none; */
 }
 
 .App {
@@ -259,24 +259,25 @@ h1 {
   padding-left: 16px;
 }
 
+.editor-list-default {
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+  list-style-type: disc; /* Default to bullet list */
+}
+
+.editor-list-ol {
+  padding: 0;
+  margin: 0;
+  margin-left: 20px;
+  list-style-type: decimal; /* Numbered list */
+}
+
 .editor-list-ol {
   padding: 0;
   margin: 0;
   margin-left: 16px;
-}
-
-.editor-list-ul {
-  padding: 0;
-  margin: 0;
-  margin-left: 16px;
-}
-
-.editor-listitem {
-  margin: 8px 32px 8px 32px;
-}
-
-.editor-nested-listitem {
-  list-style-type: none;
+  list-style-type: decimal;
 }
 
 pre::-webkit-scrollbar {
@@ -452,4 +453,93 @@ i.right-align {
 
 i.justify-align {
   background-image: url(../../../public/icons/justify.svg);
+}
+i.bullet {
+  background-image: url(../../../public/icons/bullet-list.svg);
+}
+i.check {
+  background-image: url(../../../public/icons/check-list.svg);
+}
+i.order {
+  background-image: url(../../../public/icons/order-list.svg);
+}
+i.link {
+  background-image: url(../../../public/icons/link.svg);
+}
+
+.editor-list-ul {
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+  list-style-position: inside;
+  list-style-type: disc;
+}
+.editor-listitem {
+  margin: 0 32px;
+}
+.editor-list-check,
+.editor-list-uncheck {
+  position: relative;
+  margin-left: 8px;
+  margin-right: 8px;
+  padding-left: 24px;
+  padding-right: 24px;
+  list-style-type: none;
+  outline: none;
+}
+.editor-list-check {
+  text-decoration: line-through;
+}
+.editor-list-uncheck:before,
+.editor-list-check:before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  top: 2px;
+  left: 0;
+  cursor: pointer;
+  display: block;
+  background-size: cover;
+  position: absolute;
+}
+.editor-list-uncheck[dir="rtl"]:before,
+.editor-list-check[dir="rtl"]:before {
+  left: auto;
+  right: 0;
+}
+.editor-list-uncheck:focus:before,
+.editor-list-check:focus:before {
+  box-shadow: 0 0 0 2px #a6cdfe;
+  border-radius: 2px;
+}
+.editor-list-uncheck:before {
+  border: 1px solid #999;
+  border-radius: 2px;
+}
+.editor-list-check:before {
+  border: 1px solid rgb(61, 135, 245);
+  border-radius: 2px;
+  background-color: #3d87f5;
+  background-repeat: no-repeat;
+}
+.editor-list-check:after {
+  content: "";
+  cursor: pointer;
+  border-color: #fff;
+  border-style: solid;
+  position: absolute;
+  display: block;
+  top: 6px;
+  width: 3px;
+  left: 7px;
+  height: 6px;
+  transform: rotate(45deg);
+  border-width: 0 2px 2px 0;
+}
+.editor-nested-listitem {
+  list-style-type: none;
+}
+.editor-nested-listitem:before,
+.editor-nested-listitem:after {
+  display: none;
 }

@@ -11,12 +11,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import dynamic from "next/dynamic";
 import { ReactNode } from "react";
 import Editor from "../MarkDown/Editor.tsx";
+// const Editor = dynamic(() => import("../MarkDown/Editor.tsx"));
 
-export function DialogCustom({ children }: { children: ReactNode }) {
+export function DialogCustom({
+  children,
+  id,
+}: {
+  children: ReactNode;
+  id: string;
+}) {
   return (
-    <Dialog>
+    <Dialog key={id}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         className="min-w-[800px]"

@@ -1,11 +1,18 @@
 "use client";
 
+import { AutoLinkNode } from "@lexical/link";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { AutoLinkPlugin } from "@lexical/react/LexicalAutoLinkPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { ClickableLinkPlugin } from "@lexical/react/LexicalClickableLinkPlugin";
+import { ListItemNode, ListNode } from "@lexical/list";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
+import { LinkNode } from "@lexical/link";
 import {
   $isTextNode,
   DOMConversionMap,
@@ -17,12 +24,15 @@ import {
   ParagraphNode,
   TextNode,
 } from "lexical";
-import { LinkNode } from "@lexical/link";
 import ExampleTheme from "./ExampleTheme";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
 import TreeViewPlugin from "./plugins/TreeViewPlugin";
-import { parseAllowedColor, parseAllowedFontSize } from "./styleConfig";
 import "./style.css";
+import {
+  MATCHERS,
+  parseAllowedColor,
+  parseAllowedFontSize,
+} from "./styleConfig";
 const placeholder = "Enter some rich text...";
 
 const removeStylesExportDOM = (
@@ -128,7 +138,14 @@ const editorConfig = {
     import: constructImportMap(),
   },
   namespace: "React.js Demo",
-  nodes: [ParagraphNode, TextNode, LinkNode],
+  nodes: [
+    ParagraphNode,
+    TextNode,
+    LinkNode,
+    AutoLinkNode,
+    ListNode,
+    ListItemNode,
+  ],
   onError(error: Error) {
     throw error;
   },
@@ -156,6 +173,10 @@ export default function Editor() {
           <HistoryPlugin />
           <AutoFocusPlugin />
           <TreeViewPlugin />
+          <ClickableLinkPlugin />
+          <AutoLinkPlugin matchers={MATCHERS} /> <ListPlugin />
+          <CheckListPlugin />
+          {/* <ListPlugin /> */}
         </div>
       </div>
     </LexicalComposer>

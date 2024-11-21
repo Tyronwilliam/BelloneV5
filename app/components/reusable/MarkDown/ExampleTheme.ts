@@ -19,6 +19,8 @@ export default {
   link: "editor-link",
   list: {
     listitem: "editor-listitem",
+    listitemChecked: "editor-list-check",
+    listitemUnchecked: "editor-list-uncheck",
     nested: {
       listitem: "editor-nested-listitem",
     },

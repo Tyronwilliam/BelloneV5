@@ -1,5 +1,5 @@
 "use client";
-import KanbanBoard from "@/app/components/reusable/DragBox/KanbanBoard";
+import KanbanBoard from "@/app/components/reusable/Kanban/KanbanBoard";
 import {
   ResizableHandle,
   ResizablePanel,

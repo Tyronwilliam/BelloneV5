@@ -1,4 +1,5 @@
-import { useState } from "react";
+"use client";
+import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 // DnD
@@ -21,28 +22,56 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 
-import { Inter } from "next/font/google";
-import Input from "./Input";
-import Modal from "./Modal";
-import { Button } from "@/components/ui/button";
+import { AddColumn } from "./AddColumn";
 import Container from "./Container";
 import Items from "./Item";
+import { AddTasks } from "./AddTasks";
+import { useToggle } from "@/hooks/useToggle";
+import { DialogCustom } from "../Dialog/DialogCustom";
 
 // Components
-
-const inter = Inter({ subsets: ["latin"] });
 
 type DNDType = {
   id: UniqueIdentifier;
   title: string;
+  color: string;
   items: {
     id: UniqueIdentifier;
     title: string;
   }[];
 };
+const columns: DNDType[] = [
+  {
+    id: `container-${uuidv4()}`, // Unique identifier for the column
+    title: "To Do", // Column name
+    color: "",
+    items: [
+      { id: `item-${uuidv4()}`, title: "Task 1" },
+      { id: `item-${uuidv4()}`, title: "Task 2" },
+    ],
+  },
+  {
+    id: `container-${uuidv4()}`, // Unique identifier for the column
+    title: "In Progress", // Column name
+    color: "",
 
+    items: [
+      { id: `item-${uuidv4()}`, title: "Task 3" },
+      { id: `item-${uuidv4()}`, title: "Task 4" },
+    ],
+  },
+  {
+    id: `container-${uuidv4()}`, // Unique identifier for the column
+    title: "Done", // Column name
+    color: "",
+    items: [
+      { id: `item-${uuidv4()}`, title: "Task 5" },
+      { id: `item-${uuidv4()}`, title: "Task 6" },
+    ],
+  },
+];
 export default function KanbanBoard() {
-  const [containers, setContainers] = useState<DNDType[]>([]);
+  const [containers, setContainers] = useState<DNDType[]>(columns);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [currentContainerId, setCurrentContainerId] =
     useState<UniqueIdentifier>();
@@ -50,7 +79,14 @@ export default function KanbanBoard() {
   const [itemName, setItemName] = useState("");
   const [showAddContainerModal, setShowAddContainerModal] = useState(false);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
-
+  const [containerTitle, setContainerTitle] = useState("");
+  const { value: openChangeTitle, toggleValue: toggleChangeTitle } =
+    useToggle();
+  const { value: openEditor, toggleValue: toggleOpenEditor } = useToggle();
+  const [currentIdTitle, setCurrentIdTitle] = useState<UniqueIdentifier | null>(
+    null
+  );
+  const [currentIdTask, setCurrentIdTask] = useState<UniqueIdentifier>();
   const onAddContainer = () => {
     if (!containerName) return;
     const id = `container-${uuidv4()}`;
@@ -60,10 +96,24 @@ export default function KanbanBoard() {
         id,
         title: containerName,
         items: [],
+        color: "",
       },
     ]);
     setContainerName("");
     setShowAddContainerModal(false);
+  };
+  const changeContainerTitle = (
+    id: UniqueIdentifier | undefined,
+    title: string | undefined
+  ) => {
+    if (title) {
+      toggleChangeTitle();
+
+      const updateItemTitle = containers.map((item) =>
+        item.id === id ? { ...item, title: title } : item
+      );
+      setContainers(updateItemTitle);
+    }
   };
 
   const onAddItem = () => {
@@ -80,17 +130,6 @@ export default function KanbanBoard() {
     setShowAddItemModal(false);
   };
 
-  // Find the value of the items
-  // function findValueOfItems(id: UniqueIdentifier | undefined, type: string) {
-  //   if (type === "container") {
-  //     return containers.find((item) => item.id === id);
-  //   }
-  //   if (type === "item") {
-  //     return containers.find((container) =>
-  //       container.items.find((item) => item.id === id)
-  //     );
-  //   }
-  // }
   const findValueOfItems = (
     id: UniqueIdentifier | undefined,
     type: "item" | "container"
@@ -253,46 +292,28 @@ export default function KanbanBoard() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl py-10">
-      {/* Add Container Modal */}
-      <Modal
-        showModal={showAddContainerModal}
-        setShowModal={setShowAddContainerModal}
-      >
-        <div className="flex flex-col w-full items-start gap-y-4">
-          <h1 className="text-gray-800 text-3xl font-bold">Add Container</h1>
-          <Input
-            type="text"
-            placeholder="Container Title"
-            name="containername"
-            value={containerName}
-            onChange={(e: any) => setContainerName(e.target.value)}
-          />
-          <Button onClick={onAddContainer}>Add container</Button>
-        </div>
-      </Modal>
-      {/* Add Item Modal */}
-      <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal}>
-        <div className="flex flex-col w-full items-start gap-y-4">
-          <h1 className="text-gray-800 text-3xl font-bold">Add Item</h1>
-          <Input
-            type="text"
-            placeholder="Item Title"
-            name="itemname"
-            value={itemName}
-            onChange={(e: any) => setItemName(e.target.value)}
-          />
-          <Button onClick={onAddItem}>Add Item</Button>
-        </div>
-      </Modal>
-      <div className="flex items-center justify-between gap-y-2">
-        <h1 className="text-gray-800 text-3xl font-bold">Dnd-kit Guide</h1>
-        <Button onClick={() => setShowAddContainerModal(true)}>
-          Add Container
-        </Button>
-      </div>
-      <div className="mt-10">
-        <div className="grid grid-cols-3 gap-6">
+    <div className="mx-auto max-w-7xl py-10 h-full custom-scrollbar">
+      <section className="flex gap-3">
+        {/* Add Column Modal */}
+        <AddColumn
+          showAddContainerModal={showAddContainerModal}
+          setShowAddContainerModal={setShowAddContainerModal}
+          containerName={containerName}
+          setContainerName={setContainerName}
+          onAddContainer={onAddContainer}
+        />
+        {/* Add Item Modal */}
+        <AddTasks
+          showAddItemModal={showAddItemModal}
+          setShowAddItemModal={setShowAddItemModal}
+          itemName={itemName}
+          setItemName={setItemName}
+          onAddItem={onAddItem}
+        />
+      </section>
+      {/* Kanban */}
+      <div className="mt-10 pb-5 custom-scrollbar overflow-x-scroll ">
+        <div className="flex gap-4 h-full ">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCorners}
@@ -310,11 +331,28 @@ export default function KanbanBoard() {
                     setShowAddItemModal(true);
                     setCurrentContainerId(container.id);
                   }}
+                  openChangeTitle={openChangeTitle}
+                  containerTitle={containerTitle}
+                  setContainerTitle={setContainerTitle}
+                  changeContainerTitle={changeContainerTitle}
+                  toggleChangeTitle={toggleChangeTitle}
+                  currentIdTitle={currentIdTitle}
+                  setCurrentIdTitle={setCurrentIdTitle}
                 >
                   <SortableContext items={container.items.map((i) => i.id)}>
-                    <div className="flex items-start flex-col gap-y-4">
+                    {/* Container tasks */}
+                    <div className="custom-scrollbar flex items-start flex-col gap-y-4 h-full max-h-[220px] overflow-y-scroll">
                       {container.items.map((i) => (
-                        <Items title={i.title} id={i.id} key={i.id} />
+                        <Items
+                          key={i.id}
+                          title={i.title}
+                          id={i.id}
+                          item={i}
+                          open={openEditor}
+                          close={toggleOpenEditor}
+                          currentIdTask={currentIdTask}
+                          setCurrentIdTask={setCurrentIdTask}
+                        />
                       ))}
                     </div>
                   </SortableContext>

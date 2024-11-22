@@ -3,13 +3,28 @@ import { useSortable } from "@dnd-kit/sortable";
 import React from "react";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
+import { GripVertical } from "lucide-react";
+import { DialogCustom } from "../Dialog/DialogCustom";
 
 type ItemsType = {
   id: UniqueIdentifier;
   title: string;
+  item?: any;
+  open?: boolean;
+  close?: () => void;
+  currentIdTask?: UniqueIdentifier;
+  setCurrentIdTask?: (id: UniqueIdentifier) => void;
 };
 
-const Items = ({ id, title }: ItemsType) => {
+const Items = ({
+  id,
+  title,
+  item,
+  open,
+  close,
+  setCurrentIdTask,
+  currentIdTask,
+}: ItemsType) => {
   const {
     attributes,
     listeners,
@@ -36,14 +51,26 @@ const Items = ({ id, title }: ItemsType) => {
         isDragging && "opacity-50"
       )}
     >
-      <div className="flex items-center justify-between">
+      <div
+        className="flex items-center justify-between"
+        onClick={() => {
+          setCurrentIdTask && setCurrentIdTask(id);
+          close && close();
+        }}
+      >
+        {open && close && currentIdTask === id && (
+          <DialogCustom
+            id={currentIdTask}
+            task={item}
+            open={open}
+            close={close}
+          />
+        )}
         {title}
-        <button
-          className="border p-2 text-xs rounded-xl shadow-lg hover:shadow-xl"
+        <GripVertical
+          className="w-5 h-5 text-gray-500 cursor-grab"
           {...listeners}
-        >
-          Drag Handle
-        </button>
+        />
       </div>
     </div>
   );

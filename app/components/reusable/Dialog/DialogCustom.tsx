@@ -14,30 +14,35 @@ import {
 import dynamic from "next/dynamic";
 import { ReactNode } from "react";
 import Editor from "../MarkDown/Editor.tsx";
+import { UniqueIdentifier } from "@dnd-kit/core";
 // const Editor = dynamic(() => import("../MarkDown/Editor.tsx"));
 
 export function DialogCustom({
-  children,
   id,
+  task,
+  open,
+  close,
 }: {
-  children: ReactNode;
-  id: string;
+  id: UniqueIdentifier | undefined;
+  task: any;
+  open: boolean;
+  close: () => void;
 }) {
+  console.log(task, id);
   return (
-    <Dialog key={id}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog key={id} open={open} onOpenChange={close}>
       <DialogContent
         className="min-w-[800px]"
         aria-describedby={"custom dialog"}
       >
         <DialogHeader>
-          <DialogTitle>Custom Your Task</DialogTitle>
-          <DialogDescription>Description of the Task </DialogDescription>
+          <DialogTitle>{task.title}</DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         <Editor />
         <DialogFooter className="flex items-center gap-2">
           <DialogClose asChild>
-            <Button type="button" variant="secondary">
+            <Button type="button" variant="secondary" onClick={close}>
               Close
             </Button>
           </DialogClose>

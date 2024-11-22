@@ -12,40 +12,34 @@ import {
 import Input from "./Input";
 
 interface AddColumnProps {
-  showAddContainerModal: boolean;
-  setShowAddContainerModal: (arg: boolean) => void;
-  containerName: string;
-  setContainerName: (e: any) => void;
-  onAddContainer: () => void;
+  showAddItemModal: boolean;
+  setShowAddItemModal: (arg: boolean) => void;
+  itemName: string;
+  setItemName: (e: any) => void;
+  onAddItem: () => void;
 }
 
-export const AddColumn = ({
-  showAddContainerModal,
-  setShowAddContainerModal,
-  containerName,
-  setContainerName,
-  onAddContainer,
+export const AddTasks = ({
+  showAddItemModal,
+  setShowAddItemModal,
+  itemName,
+  setItemName,
+  onAddItem,
 }: AddColumnProps) => {
   return (
-    <Dialog
-      open={showAddContainerModal}
-      onOpenChange={setShowAddContainerModal}
-    >
-      <DialogTrigger asChild>
-        <Button>Add a list</Button>
-      </DialogTrigger>
+    <Dialog open={showAddItemModal} onOpenChange={setShowAddItemModal}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle> Add a list</DialogTitle>
+          <DialogTitle> Add a Task</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <div>
           <Input
             type="text"
-            placeholder="Container Title"
-            name="containername"
-            value={containerName}
-            onChange={(e: any) => setContainerName(e.target.value)}
+            placeholder="Item Title"
+            name="itemname"
+            value={itemName}
+            onChange={(e: any) => setItemName(e.target.value)}
           />
         </div>
         <DialogFooter className="flex justify-end">
@@ -54,7 +48,7 @@ export const AddColumn = ({
               Close
             </Button>
           </DialogClose>{" "}
-          <Button onClick={onAddContainer}>Create a list</Button>
+          <Button onClick={onAddItem}>Create a Task</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -13,9 +13,11 @@ const Left = ({ data }: { data: any }) => {
       <ResizableHandle withHandle />
       <ResizablePanel
         defaultSize={70}
-        className="custom-scrollbar h-full overflow-x-scroll"
+        className="custom-scrollbar overflow-x-scroll  py-4"
       >
-        <KanbanBoard />
+        <div className="h-full">
+          <KanbanBoard />
+        </div>
       </ResizablePanel>
     </ResizablePanelGroup>
   );

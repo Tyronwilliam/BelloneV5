@@ -73,8 +73,10 @@ const Container = React.memo(
           inputTitleRef.current &&
           !inputTitleRef.current.contains(event.target as Node)
         ) {
-          changeContainerTitle && changeContainerTitle(id, containerTitle); // Save title
-          toggleChangeTitle && toggleChangeTitle(); // Toggle view
+          if (title?.trim() !== containerTitle?.trim()) {
+            changeContainerTitle && changeContainerTitle(id, containerTitle); // Save title
+            toggleChangeTitle && toggleChangeTitle(); // Toggle view
+          }
         }
       };
 
@@ -90,6 +92,10 @@ const Container = React.memo(
       id,
       containerTitle,
     ]);
+
+    useEffect(() => {
+      inputTitleRef?.current && inputTitleRef?.current?.focus();
+    }, [toggleChangeTitle]);
     return (
       <div
         {...attributes}
@@ -115,7 +121,12 @@ const Container = React.memo(
               value={containerTitle}
               onChange={(e: any) => setContainerTitle(e.target.value)}
               onBlur={() => {
-                changeContainerTitle(id, containerTitle);
+                toggleChangeTitle && toggleChangeTitle(); // Toggle view
+                if (title?.trim() !== containerTitle?.trim()) {
+                  changeContainerTitle &&
+                    changeContainerTitle(id, containerTitle); // Save title
+                  toggleChangeTitle && toggleChangeTitle(); // Toggle view
+                }
               }}
             />
           ) : (
@@ -125,6 +136,7 @@ const Container = React.memo(
                 setCurrentIdTitle && setCurrentIdTitle(id);
                 setContainerTitle && setContainerTitle(title);
                 toggleChangeTitle && toggleChangeTitle();
+                console.log("Hello");
               }}
             >
               {title}

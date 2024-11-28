@@ -329,16 +329,10 @@ export default function KanbanBoard() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl py-10 h-full custom-scrollbar">
+    <div className="mx-auto max-w-7xl h-full ">
       <section className="flex gap-3">
         {/* Add Column Modal */}
-        <AddColumn
-          showAddContainerModal={showAddContainerModal}
-          setShowAddContainerModal={setShowAddContainerModal}
-          containerName={containerName}
-          setContainerName={setContainerName}
-          onAddContainer={onAddContainer}
-        />
+
         {/* Add Item Modal */}
         <AddTasks
           showAddItemModal={showAddItemModal}
@@ -349,8 +343,8 @@ export default function KanbanBoard() {
         />
       </section>
       {/* Kanban */}
-      <div className="mt-10 pb-5 custom-scrollbar overflow-x-scroll ">
-        <div className="flex gap-4 h-full ">
+      <div className="pt-16 h-full overflow-x-scroll ">
+        <div className="flex gap-4 h-full mb-20">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCorners}
@@ -405,7 +399,14 @@ export default function KanbanBoard() {
                   </SortableContext>
                 </Container>
               ))}
-            </SortableContext>
+            </SortableContext>{" "}
+            <AddColumn
+              showAddContainerModal={showAddContainerModal}
+              setShowAddContainerModal={setShowAddContainerModal}
+              containerName={containerName}
+              setContainerName={setContainerName}
+              onAddContainer={onAddContainer}
+            />
             <DragOverlay adjustScale={false}>
               {/* Drag Overlay For item Item */}
               {activeId && activeId.toString().includes("item") && (

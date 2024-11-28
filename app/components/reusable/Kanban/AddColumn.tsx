@@ -32,7 +32,12 @@ export const AddColumn = ({
       onOpenChange={setShowAddContainerModal}
     >
       <DialogTrigger asChild>
-        <Button>Add a list</Button>
+        <Button
+          variant={"secondary"}
+          className="w-[280px] h-5  p-4 bg-gray-50  flex flex-col gap-y-4 flex-shrink-0 mb-10"
+        >
+          Add a list
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

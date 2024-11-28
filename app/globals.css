@@ -32,17 +32,18 @@ body {
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: #888;
-    -webkit-border-top-right-radius: 10px;
-    -webkit-border-bottom-right-radius: 10px;
-    -moz-border-radius-topright: 10px;
-    -moz-border-radius-bottomright: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
+    -webkit-border-top-right-radius: 2px;
+    -webkit-border-bottom-right-radius: 2px;
+    -moz-border-radius-topright: 2px;
+    -moz-border-radius-bottomright: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #00000026;
   }
+  /*  */
 }
 
 @layer base {

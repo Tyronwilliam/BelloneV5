@@ -1,19 +1,31 @@
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
-import React from "react";
+import React, { MutableRefObject } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { GripVertical } from "lucide-react";
-import { DialogCustom } from "../Dialog/DialogCustom";
+import { TaskDialog } from "../Dialog/TaskDialog";
+import { DNDType } from "./KanbanBoard";
 
 type ItemsType = {
   id: UniqueIdentifier;
   title: string;
+  containerId?: UniqueIdentifier;
   item?: any;
   open?: boolean;
   close?: () => void;
-  currentIdTask?: UniqueIdentifier;
-  setCurrentIdTask?: (id: UniqueIdentifier) => void;
+  taskTitle?: string;
+  setTaskTitle?: (e: any) => void;
+  handleChangeTaskTitle?: (
+    containerId: UniqueIdentifier,
+    id: UniqueIdentifier | undefined,
+    title: string | undefined
+  ) => void;
+  toggleChangeTaskTitle?: () => void;
+  openChangeTaskTitle?: boolean;
+  currentTaskId?: UniqueIdentifier | null;
+  setCurrentTaskId?: (value: UniqueIdentifier | null) => void;
+  inputTaskRef?: MutableRefObject<HTMLInputElement | null>;
 };
 
 const Items = ({
@@ -22,8 +34,15 @@ const Items = ({
   item,
   open,
   close,
-  setCurrentIdTask,
-  currentIdTask,
+  currentTaskId,
+  handleChangeTaskTitle,
+  setTaskTitle,
+  inputTaskRef,
+  taskTitle,
+  setCurrentTaskId,
+  toggleChangeTaskTitle,
+  containerId,
+  openChangeTaskTitle,
 }: ItemsType) => {
   const {
     attributes,
@@ -54,24 +73,37 @@ const Items = ({
       <div
         className="flex items-center justify-between"
         onClick={() => {
-          setCurrentIdTask && setCurrentIdTask(id);
+          setCurrentTaskId && setCurrentTaskId(id);
+          setTaskTitle && setTaskTitle(title);
           close && close();
+          toggleChangeTaskTitle &&
+            openChangeTaskTitle &&
+            toggleChangeTaskTitle();
         }}
       >
-        {open && close && currentIdTask === id && (
-          <DialogCustom
-            id={currentIdTask}
-            task={item}
-            open={open}
-            close={close}
-          />
-        )}
         {title}
         <GripVertical
           className="w-5 h-5 text-gray-500 cursor-grab"
           {...listeners}
         />
       </div>
+      {open && close && currentTaskId === id && (
+        <TaskDialog
+          id={currentTaskId}
+          task={item}
+          open={open}
+          close={close}
+          containerId={containerId}
+          currentTaskId={currentTaskId}
+          setCurrentTaskId={setCurrentTaskId}
+          taskTitle={taskTitle}
+          setTaskTitle={setTaskTitle}
+          inputTaskRef={inputTaskRef}
+          handleChangeTaskTitle={handleChangeTaskTitle}
+          openChangeTaskTitle={openChangeTaskTitle}
+          toggleChangeTaskTitle={toggleChangeTaskTitle}
+        />
+      )}
     </div>
   );
 };

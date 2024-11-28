@@ -40,6 +40,9 @@ import {
   INSERT_UNORDERED_LIST_COMMAND,
   REMOVE_LIST_COMMAND,
 } from "@lexical/list";
+import { useToggle } from "@/hooks/useToggle";
+import { toast } from "@/hooks/use-toast";
+import LinkDialog from "../../Dialog/LinkDialog";
 const LowPriority = 1;
 
 function Divider() {
@@ -61,14 +64,14 @@ export default function Toolbar() {
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isLink, setIsLink] = useState(false);
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isImage, setIsImage] = useState(false);
+  const { value: isDialogLink, toggleValue: toggleDialogLink } = useToggle();
+  const { value: isDialogImage, toggleValue: toggleDialogImage } = useToggle();
   const [url, setUrl] = useState("");
-  const [textUrl, settextUrl] = useState("");
+  const [textUrl, setTextUrl] = useState("");
   const [blockType, setBlockType] =
     useState<keyof typeof blockTypeToBlockName>("paragraph");
   const [currentList, setCurrentList] = useState("");
-  const openDialog = () => setDialogOpen(true);
-  const closeDialog = () => setDialogOpen(false);
 
   const $updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -142,6 +145,14 @@ export default function Toolbar() {
 
   const insertUrl = useCallback(
     (text: string, link: string) => {
+      if (!text || !link) {
+        toast({
+          title: "Text or Link need a value",
+          description: "Please add a link and a text",
+          variant: "destructive", // Variante destructrice pour les messages d'erreur
+        });
+        return;
+      }
       const normalizedLink =
         link.startsWith("http://") || link.startsWith("https://")
           ? link
@@ -156,7 +167,7 @@ export default function Toolbar() {
         root.append(paragraph); // Add the paragraph to the root.
       });
 
-      setDialogOpen(false); // Close the dialog.
+      toggleDialogLink(); // Close the dialog.
     },
     [editor]
   );
@@ -222,7 +233,7 @@ export default function Toolbar() {
       </button>
       <Divider />
       <button
-        onClick={openDialog}
+        onClick={toggleDialogLink}
         className={"toolbar-item spaced " + (isLink ? "active" : "")}
         aria-label={isLink ? "Remove Link" : "Insert Link"}
       >
@@ -239,7 +250,6 @@ export default function Toolbar() {
       >
         <i className="format bullet" />
       </button>
-
       <button
         disabled={false}
         className={
@@ -250,7 +260,6 @@ export default function Toolbar() {
       >
         <i className="format order" />
       </button>
-
       <button
         disabled={false}
         className={
@@ -261,9 +270,11 @@ export default function Toolbar() {
       >
         <i className="format check" />
       </button>
-
-      <Dialog open={isDialogOpen} onOpenChange={openDialog}>
-        <DialogContent>
+      {/* <button onClick={toggleDialogImage} className={"toolbar-item spaced "}>
+        <i className="format order" />
+      </button> */}
+      {/* <Dialog open={isDialogLink} onOpenChange={toggleDialogLink}>
+        <DialogContent aria-label="custom-dialog-link-editor">
           <DialogHeader>
             <DialogTitle>Insert Link</DialogTitle>
             <DialogDescription>
@@ -273,7 +284,7 @@ export default function Toolbar() {
           <div className="space-y-4 flex flex-col">
             <Input
               value={textUrl}
-              onChange={(e: any) => settextUrl(e.target.value)}
+              onChange={(e: any) => setTextUrl(e.target.value)}
               placeholder="Mon lien"
               className="w-full"
             />
@@ -285,13 +296,22 @@ export default function Toolbar() {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => closeDialog()}>
+            <Button variant="outline" onClick={toggleDialogLink}>
               Cancel
             </Button>
             <Button onClick={() => insertUrl(textUrl, url)}>Insert Link</Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog>{" "} */}
+      <LinkDialog
+        isOpen={isDialogLink}
+        onClose={toggleDialogLink}
+        textUrl={textUrl}
+        setTextUrl={setTextUrl}
+        url={url}
+        setUrl={setUrl}
+        onInsert={insertUrl}
+      />
     </div>
   );
 }

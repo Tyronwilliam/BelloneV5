@@ -1,11 +1,11 @@
-import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { Button } from "@/components/ui/button";
-import { UniqueIdentifier } from "@dnd-kit/core";
 import { GripVertical } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import React, { MutableRefObject, useEffect } from "react";
 
 interface ContainerProps {
   id: UniqueIdentifier;
@@ -23,6 +23,7 @@ interface ContainerProps {
   toggleChangeTitle?: () => void;
   currentIdTitle?: UniqueIdentifier | null;
   setCurrentIdTitle?: (value: UniqueIdentifier | null) => void;
+  inputTitleRef?: MutableRefObject<HTMLInputElement | null>;
 }
 
 const Container = React.memo(
@@ -39,6 +40,7 @@ const Container = React.memo(
     toggleChangeTitle,
     currentIdTitle,
     setCurrentIdTitle,
+    inputTitleRef,
   }: ContainerProps) => {
     const {
       attributes,
@@ -62,7 +64,32 @@ const Container = React.memo(
       }),
       [transform, transition]
     );
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          currentIdTitle === id &&
+          openChangeTitle &&
+          inputTitleRef &&
+          inputTitleRef.current &&
+          !inputTitleRef.current.contains(event.target as Node)
+        ) {
+          changeContainerTitle && changeContainerTitle(id, containerTitle); // Save title
+          toggleChangeTitle && toggleChangeTitle(); // Toggle view
+        }
+      };
 
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [
+      openChangeTitle,
+      inputTitleRef,
+      toggleChangeTitle,
+      changeContainerTitle,
+      id,
+      containerTitle,
+    ]);
     return (
       <div
         {...attributes}
@@ -74,33 +101,38 @@ const Container = React.memo(
         )}
       >
         <div className="flex items-center justify-between">
-          <div className="flex flex-col gap-y-1">
-            {currentIdTitle === id &&
-            openChangeTitle &&
-            setContainerTitle &&
-            changeContainerTitle ? (
-              <Input
-                type="text"
-                name={id as string | undefined}
-                placeholder={title}
-                value={containerTitle}
-                onChange={(e: any) => setContainerTitle(e.target.value)}
-                onBlur={() => changeContainerTitle(id, containerTitle)} // Sauvegarde la valeur lors de la perte de focus
-              />
-            ) : (
-              <h1
-                className="text-gray-800 text-xl"
-                onClick={() => {
-                  setCurrentIdTitle && setCurrentIdTitle(id);
-                  toggleChangeTitle && toggleChangeTitle();
-                }}
-              >
-                {title}
-              </h1>
-            )}
+          {/* <div className="flex flex-col gap-y-1"> */}
+          {currentIdTitle === id &&
+          openChangeTitle &&
+          setContainerTitle &&
+          changeContainerTitle ? (
+            <Input
+              ref={inputTitleRef}
+              key={id}
+              type="text"
+              name={id as string | undefined}
+              placeholder={title}
+              value={containerTitle}
+              onChange={(e: any) => setContainerTitle(e.target.value)}
+              onBlur={() => {
+                changeContainerTitle(id, containerTitle);
+              }}
+            />
+          ) : (
+            <h1
+              className="text-gray-800 text-xl w-full"
+              onClick={() => {
+                setCurrentIdTitle && setCurrentIdTitle(id);
+                setContainerTitle && setContainerTitle(title);
+                toggleChangeTitle && toggleChangeTitle();
+              }}
+            >
+              {title}
+            </h1>
+          )}
 
-            <p className="text-gray-400 text-sm">{description}</p>
-          </div>
+          <p className="text-gray-400 text-sm">{description}</p>
+          {/* </div> */}
           <GripVertical
             className="w-5 h-5 text-gray-500 cursor-grab"
             {...listeners}

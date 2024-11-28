@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 // DnD
@@ -22,16 +22,16 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 
+import { useToggle } from "@/hooks/useToggle";
+import { useRef } from "react";
 import { AddColumn } from "./AddColumn";
+import { AddTasks } from "./AddTasks";
 import Container from "./Container";
 import Items from "./Item";
-import { AddTasks } from "./AddTasks";
-import { useToggle } from "@/hooks/useToggle";
-import { DialogCustom } from "../Dialog/DialogCustom";
 
 // Components
 
-type DNDType = {
+export type DNDType = {
   id: UniqueIdentifier;
   title: string;
   color: string;
@@ -82,11 +82,19 @@ export default function KanbanBoard() {
   const [containerTitle, setContainerTitle] = useState("");
   const { value: openChangeTitle, toggleValue: toggleChangeTitle } =
     useToggle();
+  const { value: openChangeTaskTitle, toggleValue: toggleChangeTaskTitle } =
+    useToggle();
   const { value: openEditor, toggleValue: toggleOpenEditor } = useToggle();
   const [currentIdTitle, setCurrentIdTitle] = useState<UniqueIdentifier | null>(
     null
   );
-  const [currentIdTask, setCurrentIdTask] = useState<UniqueIdentifier>();
+  const [currentTaskId, setCurrentTaskId] = useState<UniqueIdentifier | null>(
+    null
+  );
+  const [taskTitle, setTaskTitle] = useState("");
+
+  const inputTaskRef = useRef<HTMLInputElement | null>(null);
+  const inputTitleRef = useRef<HTMLInputElement | null>(null);
   const onAddContainer = () => {
     if (!containerName) return;
     const id = `container-${uuidv4()}`;
@@ -102,19 +110,48 @@ export default function KanbanBoard() {
     setContainerName("");
     setShowAddContainerModal(false);
   };
-  const changeContainerTitle = (
+
+  function handleChangeTaskTitle(
+    containerId: UniqueIdentifier | undefined,
+    taskId: UniqueIdentifier | undefined,
+    title: string | undefined
+  ) {
+    if (title && containerId && taskId) {
+      // Trim the title and toggle task title change state
+      const trimmedTitle = title.trim();
+      toggleChangeTaskTitle();
+
+      // Update the containers state with the modified task title
+      const updatedContainers = containers.map((container) =>
+        // Find the container by id
+        container.id === containerId
+          ? {
+              ...container,
+              items: container.items.map((item) =>
+                // Find the task within the container by its id and update the title
+                item.id === taskId ? { ...item, title: trimmedTitle } : item
+              ),
+            }
+          : container
+      );
+
+      setContainers(updatedContainers); // Update the state with new containers
+    }
+  }
+
+  function changeContainerTitle(
     id: UniqueIdentifier | undefined,
     title: string | undefined
-  ) => {
+  ) {
     if (title) {
       toggleChangeTitle();
 
       const updateItemTitle = containers.map((item) =>
-        item.id === id ? { ...item, title: title } : item
+        item.id === id ? { ...item, title: title.trim() } : item
       );
       setContainers(updateItemTitle);
     }
-  };
+  }
 
   const onAddItem = () => {
     if (!itemName) return;
@@ -321,9 +358,12 @@ export default function KanbanBoard() {
             onDragMove={handleDragMove}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={containers.map((i) => i.id)}>
+            <SortableContext
+              items={containers.map((container) => container.id)}
+            >
               {containers.map((container) => (
                 <Container
+                  inputTitleRef={inputTitleRef}
                   id={container.id}
                   title={container.title}
                   key={container.id}
@@ -348,10 +388,17 @@ export default function KanbanBoard() {
                           title={i.title}
                           id={i.id}
                           item={i}
+                          containerId={container?.id}
                           open={openEditor}
                           close={toggleOpenEditor}
-                          currentIdTask={currentIdTask}
-                          setCurrentIdTask={setCurrentIdTask}
+                          currentTaskId={currentTaskId}
+                          setCurrentTaskId={setCurrentTaskId}
+                          taskTitle={taskTitle}
+                          setTaskTitle={setTaskTitle}
+                          inputTaskRef={inputTaskRef}
+                          openChangeTaskTitle={openChangeTaskTitle}
+                          toggleChangeTaskTitle={toggleChangeTaskTitle}
+                          handleChangeTaskTitle={handleChangeTaskTitle}
                         />
                       ))}
                     </div>

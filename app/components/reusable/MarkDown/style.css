@@ -26,6 +26,7 @@ body {
   color: #777;
   text-decoration: underline;
   font-size: 14px;
+  cursor: pointer;
 }
 
 .other ul {
@@ -129,6 +130,10 @@ h1 {
 .editor-link {
   color: rgb(33, 111, 219);
   text-decoration: none;
+  cursor: pointer;
+}
+.editor-link:hover {
+  text-decoration: underline;
 }
 
 .tree-view-output {

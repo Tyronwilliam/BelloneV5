@@ -6,12 +6,12 @@ import {
   remove,
   getErrorMessage,
 } from "@/customApi/apiService";
-import { Project } from "@/zodSchema/Project/type";
+import { ProjectType } from "@/zodSchema/Project/project";
 
-export const addProject = async (data: Project) => {
+export const addProject = async (data: ProjectType) => {
   try {
-    const newProject = await create<Project>("projects", data);
-    console.log("New Project created:", newProject);
+    const newProject = await create<ProjectType>("projects", data);
+    console.log("New ProjectType created:", newProject);
   } catch (error) {
     console.error(
       "Erreur lors de l'ajout de la tâche :",
@@ -21,7 +21,7 @@ export const addProject = async (data: Project) => {
 };
 export const loadProject = async () => {
   try {
-    const project: Project[] = await fetchAll<Project>("projects");
+    const project: ProjectType[] = await fetchAll<ProjectType>("projects");
     console.log("List of project :", project);
   } catch (error) {
     console.error(

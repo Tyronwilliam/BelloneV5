@@ -6,7 +6,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { ProjectSchema } from "@/zodSchema/Project/zodSchema";
 import CustomFormItem from "./reusable/CustomFormItem";
 import { DateInput } from "./reusable/DateInput";
 import { SelectInput } from "./reusable/SelectInput";
@@ -15,6 +14,7 @@ import { useState } from "react";
 import { addClient, getClient } from "@/customApi/Client/api";
 import { ClientSchema } from "@/zodSchema/Client/zodSchema";
 import { useToggle } from "@/hooks/useToggle";
+import { ProjectType, ProjectTypeSchema } from "@/zodSchema/Project/project";
 
 const statusOptions = [
   { value: "OPEN", label: "Open", color: "text-green-700" },
@@ -61,8 +61,8 @@ export function CreateProjectForm({ clients }: CreateProjectProps) {
   const handleNewClientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewClientEmail(e.target.value);
   };
-  const form = useForm<z.infer<typeof ProjectSchema>>({
-    resolver: zodResolver(ProjectSchema),
+  const form = useForm<ProjectType>({
+    resolver: zodResolver(ProjectTypeSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -73,7 +73,7 @@ export function CreateProjectForm({ clients }: CreateProjectProps) {
     },
   });
 
-  function onSubmit(data: z.infer<typeof ProjectSchema>) {
+  function onSubmit(data: ProjectType) {
     toast({
       title: "You submitted the following values:",
       description: "Sucess",
@@ -107,8 +107,18 @@ export function CreateProjectForm({ clients }: CreateProjectProps) {
           isAddingNew={value}
           toggleValue={toggleValue}
         />
-        <DateInput control={form.control} name="startDate" label="Start Date" />
-        <DateInput control={form.control} name="endDate" label="End Date" />
+        <DateInput
+          control={form.control}
+          name="startDate"
+          label="Start Date"
+          isTasksDialog={false}
+        />
+        <DateInput
+          control={form.control}
+          name="endDate"
+          label="End Date"
+          isTasksDialog={false}
+        />
         <CustomFormItem
           control={form.control}
           name="budget"

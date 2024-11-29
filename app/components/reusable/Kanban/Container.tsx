@@ -6,6 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { GripVertical } from "lucide-react";
 import React, { MutableRefObject, useEffect } from "react";
+import ContainerHeader from "./Container/ContainerHeader";
 
 interface ContainerProps {
   id: UniqueIdentifier;
@@ -94,10 +95,6 @@ const Container = React.memo(
       id,
       containerTitle,
     ]);
-
-    useEffect(() => {
-      inputTitleRef?.current && inputTitleRef?.current?.focus();
-    }, [toggleChangeTitle]);
     return (
       <div
         {...attributes}
@@ -108,55 +105,22 @@ const Container = React.memo(
           isDragging && "opacity-50"
         )}
       >
-        <div
-          className={`flex items-center justify-between p-2 rounded-md `}
-          style={{ backgroundColor: `${color && color}` }}
-        >
-          {/* <div className="flex flex-col gap-y-1"> */}
-          {currentIdTitle === id &&
-          openChangeTitle &&
-          setContainerTitle &&
-          changeContainerTitle ? (
-            <Input
-              ref={inputTitleRef}
-              key={id}
-              type="text"
-              name={id as string | undefined}
-              placeholder={title}
-              value={containerTitle}
-              onChange={(e: any) => setContainerTitle(e.target.value)}
-              onBlur={() => {
-                toggleChangeTitle && toggleChangeTitle(); // Toggle view
-                if (title?.trim() !== containerTitle?.trim()) {
-                  changeContainerTitle &&
-                    changeContainerTitle(id, containerTitle); // Save title
-                  toggleChangeTitle && toggleChangeTitle(); // Toggle view
-                }
-              }}
-            />
-          ) : (
-            <h1
-              className="text-gray-800 text-xl w-full"
-              onClick={() => {
-                setCurrentIdTitle && setCurrentIdTitle(id);
-                setContainerTitle && setContainerTitle(title);
-                toggleChangeTitle && toggleChangeTitle();
-              }}
-            >
-              {title}
-            </h1>
-          )}
-
-          <p className="text-gray-400 text-sm">{description}</p>
-          {/* </div> */}
-          <GripVertical
-            className="w-5 h-5 text-gray-500 cursor-grab"
-            {...listeners}
-          />
-        </div>
-
+        <ContainerHeader
+          id={id}
+          title={title}
+          description={description}
+          color={color}
+          containerTitle={containerTitle}
+          setContainerTitle={setContainerTitle}
+          changeContainerTitle={changeContainerTitle}
+          toggleChangeTitle={toggleChangeTitle}
+          currentIdTitle={currentIdTitle}
+          setCurrentIdTitle={setCurrentIdTitle}
+          openChangeTitle={openChangeTitle}
+          inputTitleRef={inputTitleRef}
+          listeners={listeners}
+        />
         {children}
-
         {onAddItem && (
           <Button variant="ghost" onClick={onAddItem}>
             Add Item

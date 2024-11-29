@@ -10,7 +10,9 @@ export interface FormFieldComponentProps<T extends FieldValues> {
 }
 
 export interface DatePickerFormProps<T extends FieldValues>
-  extends Omit<FormFieldComponentProps<T>, "type" | "placeholder"> {}
+  extends Omit<FormFieldComponentProps<T>, "type" | "placeholder"> {
+  isTasksDialog: boolean;
+}
 
 export interface SelectFormProps<T extends FieldValues> {
   control: Control<T>;

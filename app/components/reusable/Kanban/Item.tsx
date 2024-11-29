@@ -4,8 +4,8 @@ import React, { MutableRefObject } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { GripVertical } from "lucide-react";
-import { TaskDialog } from "../Dialog/TaskDialog";
-import { DNDType } from "./KanbanBoard";
+import { TaskDialog } from "../Dialog/Tasks/TaskDialog";
+import { DNDType } from "./KanbanView";
 
 type ItemsType = {
   id: UniqueIdentifier;

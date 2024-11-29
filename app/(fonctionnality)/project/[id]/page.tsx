@@ -8,19 +8,19 @@ const SingleProjectPage = async ({
 }: {
   params: Promise<{ id: string }>;
 }) => {
-  const id = (await params).id;
+  const projectId = (await params).id;
   //   let projectData = await fetch(`http://localhost:3000/projects/${id}`);
   //   let project = await projectData.json();
 
-  let tasksData = await fetch(`http://localhost:3000/tasks/${id}`);
+  let tasksData = await fetch(`http://localhost:3000/tasks/${projectId}`);
   let tasks = await tasksData.json();
-  let kanbanData = await fetch(`http://localhost:3000/kanban/${id}`);
+  let kanbanData = await fetch(`http://localhost:3000/kanban/${projectId}`);
   let kanban = await kanbanData.json();
 
   console.log(tasks);
   return (
     <Entete>
-      <GridLayout tasks={tasks} kanban={kanban} />
+      <GridLayout tasks={tasks} kanban={kanban} projectId={projectId} />
     </Entete>
   );
 };

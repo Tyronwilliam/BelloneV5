@@ -19,7 +19,7 @@ export type CardProps = React.ComponentProps<typeof Card> & {
   custom: CardCustomItem;
 };
 
-export function CardDemo({ className, custom, ...props }: CardProps) {
+export function CustomCard({ className, custom, ...props }: CardProps) {
   return (
     <Card className={cn("", className)} {...props}>
       <CardHeader>

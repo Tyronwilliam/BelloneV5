@@ -1,5 +1,5 @@
 "use client";
-import KanbanBoard from "@/app/components/reusable/Kanban/KanbanBoard";
+import KanbanView from "@/app/components/reusable/Kanban/KanbanView";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -7,7 +7,15 @@ import {
 } from "@/components/ui/resizable";
 import Image from "next/image";
 
-const Left = ({ tasks, kanban }: { tasks: any; kanban: any }) => {
+const Left = ({
+  tasks,
+  kanban,
+  projectId,
+}: {
+  tasks: any;
+  kanban: any;
+  projectId: string;
+}) => {
   return (
     <ResizablePanelGroup direction="vertical">
       <ResizablePanel defaultSize={30}>One</ResizablePanel>
@@ -24,7 +32,7 @@ const Left = ({ tasks, kanban }: { tasks: any; kanban: any }) => {
             fill
             unoptimized={true}
           />
-          <KanbanBoard />
+          <KanbanView projectId={projectId} />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

@@ -28,7 +28,11 @@ const ProjectPage = async () => {
   return (
     <Entete word={"Projects"}>
       {projects?.length > 0 ? (
-        <DataTable columns={columns} data={projects} />
+        <>
+          {/* Add project even when we have project */}
+          {/* <EmptyProjectView clients={clients} /> */}
+          <DataTable columns={columns} data={projects} />
+        </>
       ) : (
         <EmptyProjectView clients={clients} />
       )}

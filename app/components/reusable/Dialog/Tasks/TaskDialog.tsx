@@ -1,18 +1,25 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import Editor from "../MarkDown/Editor.tsx";
-import { UniqueIdentifier } from "@dnd-kit/core";
 import { Input } from "@/components/ui/input.tsx";
-import { MutableRefObject, useEffect } from "react";
-import { DNDType } from "../Kanban/KanbanBoard.tsx";
+import { UniqueIdentifier } from "@dnd-kit/core";
+import { MutableRefObject, useEffect, useState } from "react";
+import Editor from "../../MarkDown/Editor.tsx";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import RightSide from "./RightSide.tsx";
 
 export function TaskDialog({
   id,
@@ -84,9 +91,7 @@ export function TaskDialog({
     containerId,
     currentTaskId,
   ]);
-  useEffect(() => {
-    inputTaskRef?.current && inputTaskRef?.current?.focus();
-  }, [toggleChangeTaskTitle]);
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <Dialog key={id} open={open} onOpenChange={close}>
       <DialogContent
@@ -94,7 +99,7 @@ export function TaskDialog({
         aria-describedby={"custom dialog"}
       >
         <DialogHeader>
-          <DialogTitle className="mx-auto w-[550px]">
+          <DialogTitle>
             {currentTaskId === id &&
             openChangeTaskTitle &&
             setTaskTitle &&
@@ -112,6 +117,7 @@ export function TaskDialog({
                     handleChangeTaskTitle(containerId, id, taskTitle);
                   }
                 }}
+                className=" text-xl w-[90%]"
               />
             ) : (
               <div
@@ -128,38 +134,53 @@ export function TaskDialog({
           <DialogDescription></DialogDescription>
         </DialogHeader>
         {/* Faire un composant */}
-        <section className="mx-auto w-[550px] flex flex-col gap-12 ">
-          <section className="flex gap-2 overflow-x-auto ">
-            <div className="bg-orange-500 rounded-sm p-2 text-sm w-fit text-white cursor-pointer  hover:bg-opacity-85">
-              Urgent
-            </div>
-            <div className="bg-green-500 rounded-sm p-2 text-sm text-white font-semibold w-fit cursor-pointer  hover:bg-opacity-85">
-              Done
-            </div>
+        <section className="flex w-full min-h-[600px] gap-4">
+          <section className="w-[75%] flex flex-col gap-12 ">
+            <section className="flex gap-2 overflow-x-auto ">
+              <div className="bg-orange-500 rounded-sm p-2 text-sm w-fit text-white cursor-pointer  hover:bg-opacity-85">
+                Urgent
+              </div>
+              <div className="bg-green-500 rounded-sm p-2 text-sm text-white font-semibold w-fit cursor-pointer  hover:bg-opacity-85">
+                Done
+              </div>
+            </section>
+            <section className="flex flex-col">
+              <h2>Description</h2>
+              {/* Faire condition pour ouvrir l'editeur */}
+              {isOpen ? (
+                <section>
+                  <Editor />
+                  <Button
+                    className="block ml-auto"
+                    type="submit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // On sauvegarde l'Editeur
+                    }}
+                  >
+                    Save changes
+                  </Button>
+                </section>
+              ) : (
+                <Card
+                  className="w-full h-fit mt-2 mb-5 p-3 cursor-pointer rounded-sm"
+                  onClick={() => setIsOpen(true)}
+                >
+                  <CardContent className="w-full h-fit flex items-center p-0 m-0">
+                    <p>Write something</p>
+                  </CardContent>
+                </Card>
+              )}
+            </section>
+            <div>Remarques : Text area pour annoter</div>
           </section>
-          <section className="flex flex-col">
-            <h2>Description</h2>
-            {/* Faire condition pour ouvrir l'editeur */}
-            <Editor />
-            <section className=" flex justify-end w-[550px] mx-auto">
-              <Button
-                type="submit"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // On sauvegarde l'Editeur
-                }}
-              >
-                Save changes
-              </Button>
-            </section>{" "}
-          </section>
-          <div>Remarques : Text area pour annoter</div>
-        </section>{" "}
-        <DialogFooter className="flex items-center gap-2 w-[550px] mx-auto">
+          <RightSide />
+        </section>
+        <DialogFooter className="flex items-center gap-2 w-full">
           <Button type="button" variant="secondary" onClick={close}>
             Close
           </Button>
-        </DialogFooter>{" "}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

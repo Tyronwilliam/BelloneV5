@@ -84,7 +84,9 @@ export function TaskDialog({
     containerId,
     currentTaskId,
   ]);
-
+  useEffect(() => {
+    inputTaskRef?.current && inputTaskRef?.current?.focus();
+  }, [toggleChangeTaskTitle]);
   return (
     <Dialog key={id} open={open} onOpenChange={close}>
       <DialogContent
@@ -92,7 +94,7 @@ export function TaskDialog({
         aria-describedby={"custom dialog"}
       >
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="mx-auto w-[550px]">
             {currentTaskId === id &&
             openChangeTaskTitle &&
             setTaskTitle &&
@@ -110,11 +112,10 @@ export function TaskDialog({
                     handleChangeTaskTitle(containerId, id, taskTitle);
                   }
                 }}
-                className="max-w-[90%]"
               />
             ) : (
               <div
-                className="text-gray-800 text-xl w-full"
+                className="text-gray-800 text-xl w-[90%] cursor-pointer"
                 onClick={() => {
                   setCurrentTaskId && setCurrentTaskId(task?.id);
                   toggleChangeTaskTitle && toggleChangeTaskTitle();
@@ -126,24 +127,39 @@ export function TaskDialog({
           </DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
-
-        {/* Editor Component - Assuming it handles the markdown editing */}
-        <Editor />
-
-        <DialogFooter className="flex items-center gap-2">
+        {/* Faire un composant */}
+        <section className="mx-auto w-[550px] flex flex-col gap-12 ">
+          <section className="flex gap-2 overflow-x-auto ">
+            <div className="bg-orange-500 rounded-sm p-2 text-sm w-fit text-white cursor-pointer  hover:bg-opacity-85">
+              Urgent
+            </div>
+            <div className="bg-green-500 rounded-sm p-2 text-sm text-white font-semibold w-fit cursor-pointer  hover:bg-opacity-85">
+              Done
+            </div>
+          </section>
+          <section className="flex flex-col">
+            <h2>Description</h2>
+            {/* Faire condition pour ouvrir l'editeur */}
+            <Editor />
+            <section className=" flex justify-end w-[550px] mx-auto">
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // On sauvegarde l'Editeur
+                }}
+              >
+                Save changes
+              </Button>
+            </section>{" "}
+          </section>
+          <div>Remarques : Text area pour annoter</div>
+        </section>{" "}
+        <DialogFooter className="flex items-center gap-2 w-[550px] mx-auto">
           <Button type="button" variant="secondary" onClick={close}>
             Close
           </Button>
-          <Button
-            type="submit"
-            onClick={(e) => {
-              e.stopPropagation();
-              // Handle saving changes or whatever needs to be done here
-            }}
-          >
-            Save changes
-          </Button>
-        </DialogFooter>
+        </DialogFooter>{" "}
       </DialogContent>
     </Dialog>
   );

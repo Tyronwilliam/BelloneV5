@@ -24,6 +24,7 @@ interface ContainerProps {
   currentIdTitle?: UniqueIdentifier | null;
   setCurrentIdTitle?: (value: UniqueIdentifier | null) => void;
   inputTitleRef?: MutableRefObject<HTMLInputElement | null>;
+  color?: string;
 }
 
 const Container = React.memo(
@@ -41,6 +42,7 @@ const Container = React.memo(
     currentIdTitle,
     setCurrentIdTitle,
     inputTitleRef,
+    color,
   }: ContainerProps) => {
     const {
       attributes,
@@ -106,7 +108,10 @@ const Container = React.memo(
           isDragging && "opacity-50"
         )}
       >
-        <div className="flex items-center justify-between">
+        <div
+          className={`flex items-center justify-between p-2 rounded-md `}
+          style={{ backgroundColor: `${color && color}` }}
+        >
           {/* <div className="flex flex-col gap-y-1"> */}
           {currentIdTitle === id &&
           openChangeTitle &&
@@ -136,7 +141,6 @@ const Container = React.memo(
                 setCurrentIdTitle && setCurrentIdTitle(id);
                 setContainerTitle && setContainerTitle(title);
                 toggleChangeTitle && toggleChangeTitle();
-                console.log("Hello");
               }}
             >
               {title}

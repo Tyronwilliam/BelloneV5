@@ -171,7 +171,7 @@ export default function Editor() {
           />
           <HistoryPlugin />
           <AutoFocusPlugin />
-          <TreeViewPlugin />
+          {/* <TreeViewPlugin /> */}
           <ClickableLinkPlugin />
           <AutoLinkPlugin matchers={MATCHERS} /> <ListPlugin />
           <CheckListPlugin />

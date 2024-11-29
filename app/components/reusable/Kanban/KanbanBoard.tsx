@@ -28,6 +28,7 @@ import { AddColumn } from "./AddColumn";
 import { AddTasks } from "./AddTasks";
 import Container from "./Container";
 import Items from "./Item";
+import { Button } from "@/components/ui/button";
 
 // Components
 
@@ -38,35 +39,37 @@ export type DNDType = {
   items: {
     id: UniqueIdentifier;
     title: string;
+    stickers: [];
+    members: [];
   }[];
 };
 const columns: DNDType[] = [
   {
     id: `container-${uuidv4()}`, // Unique identifier for the column
     title: "To Do", // Column name
-    color: "",
+    color: "#FFDAB9",
     items: [
-      { id: `item-${uuidv4()}`, title: "Task 1" },
-      { id: `item-${uuidv4()}`, title: "Task 2" },
+      { id: `item-${uuidv4()}`, title: "Task 1", stickers: [], members: [] },
+      { id: `item-${uuidv4()}`, title: "Task 2", stickers: [], members: [] },
     ],
   },
   {
     id: `container-${uuidv4()}`, // Unique identifier for the column
     title: "In Progress", // Column name
-    color: "",
+    color: "#C9A0DC",
 
     items: [
-      { id: `item-${uuidv4()}`, title: "Task 3" },
-      { id: `item-${uuidv4()}`, title: "Task 4" },
+      { id: `item-${uuidv4()}`, title: "Task 3", stickers: [], members: [] },
+      { id: `item-${uuidv4()}`, title: "Task 4", stickers: [], members: [] },
     ],
   },
   {
     id: `container-${uuidv4()}`, // Unique identifier for the column
     title: "Done", // Column name
-    color: "",
+    color: "#B8D9C8",
     items: [
-      { id: `item-${uuidv4()}`, title: "Task 5" },
-      { id: `item-${uuidv4()}`, title: "Task 6" },
+      { id: `item-${uuidv4()}`, title: "Task 5", stickers: [], members: [] },
+      { id: `item-${uuidv4()}`, title: "Task 6", stickers: [], members: [] },
     ],
   },
 ];
@@ -161,6 +164,8 @@ export default function KanbanBoard() {
     container.items.push({
       id,
       title: itemName,
+      stickers: [],
+      members: [],
     });
     setContainers([...containers]);
     setItemName("");
@@ -329,22 +334,21 @@ export default function KanbanBoard() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl h-full ">
-      <section className="flex gap-3">
-        {/* Add Column Modal */}
-
-        {/* Add Item Modal */}
-        <AddTasks
-          showAddItemModal={showAddItemModal}
-          setShowAddItemModal={setShowAddItemModal}
-          itemName={itemName}
-          setItemName={setItemName}
-          onAddItem={onAddItem}
-        />
-      </section>
+    <div className="mx-auto max-w-7xl h-full flex flex-col gap-5 pt-4">
+      <AddTasks
+        showAddItemModal={showAddItemModal}
+        setShowAddItemModal={setShowAddItemModal}
+        itemName={itemName}
+        setItemName={setItemName}
+        onAddItem={onAddItem}
+      />
+      <Button className="w-fit">Background</Button>
       {/* Kanban */}
-      <div className="pt-16 h-full overflow-x-scroll ">
-        <div className="flex gap-4 h-full mb-20">
+      <div
+        className="w-full overflow-x-scroll "
+        style={{ height: "calc(100% - 36px)" }}
+      >
+        <div className="flex gap-4 h-full">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCorners}
@@ -372,6 +376,7 @@ export default function KanbanBoard() {
                   toggleChangeTitle={toggleChangeTitle}
                   currentIdTitle={currentIdTitle}
                   setCurrentIdTitle={setCurrentIdTitle}
+                  color={container?.color}
                 >
                   <SortableContext items={container.items.map((i) => i.id)}>
                     {/* Container tasks */}

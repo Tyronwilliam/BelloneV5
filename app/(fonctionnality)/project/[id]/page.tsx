@@ -14,11 +14,13 @@ const SingleProjectPage = async ({
 
   let tasksData = await fetch(`http://localhost:3000/tasks/${id}`);
   let tasks = await tasksData.json();
+  let kanbanData = await fetch(`http://localhost:3000/kanban/${id}`);
+  let kanban = await kanbanData.json();
 
   console.log(tasks);
   return (
     <Entete>
-      <GridLayout data={tasks} />
+      <GridLayout tasks={tasks} kanban={kanban} />
     </Entete>
   );
 };

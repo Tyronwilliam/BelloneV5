@@ -81,9 +81,9 @@ const Items = ({
             toggleChangeTaskTitle();
         }}
       >
-        {title}
+        <span className="cursor-pointer w-full h-full">{title}</span>
         <GripVertical
-          className="w-5 h-5 text-gray-500 cursor-grab"
+          className="w-5 h-5 text-gray-500 cursor-grab shrink-0"
           {...listeners}
         />
       </div>

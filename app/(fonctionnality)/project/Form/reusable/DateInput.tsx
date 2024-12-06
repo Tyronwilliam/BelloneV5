@@ -33,7 +33,7 @@ export function DateInput<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-col ">
+        <FormItem className="">
           {!isTasksDialog && (
             <FormLabel className="font-semibold">{label}</FormLabel>
           )}

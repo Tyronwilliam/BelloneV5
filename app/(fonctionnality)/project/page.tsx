@@ -24,17 +24,24 @@ const clients = [
 const ProjectPage = async () => {
   let projectsData = await fetch("http://localhost:3000/projects");
   let projects = await projectsData.json();
-
+  const isProjectMoreThan0 = projects?.length > 0 ? true : false;
   return (
     <Entete word={"Projects"}>
-      {projects?.length > 0 ? (
+      {isProjectMoreThan0 ? (
         <>
           {/* Add project even when we have project */}
-          {/* <EmptyProjectView clients={clients} /> */}
-          <DataTable columns={columns} data={projects} />
+          <DataTable
+            columns={columns}
+            data={projects}
+            clients={clients}
+            isProjectMoreThan0={isProjectMoreThan0}
+          />
         </>
       ) : (
-        <EmptyProjectView clients={clients} />
+        <EmptyProjectView
+          clients={clients}
+          isProjectMoreThan0={isProjectMoreThan0}
+        />
       )}
     </Entete>
   );

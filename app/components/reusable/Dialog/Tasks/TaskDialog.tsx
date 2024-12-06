@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -11,15 +12,8 @@ import { Input } from "@/components/ui/input.tsx";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { MutableRefObject, useEffect, useState } from "react";
 import Editor from "../../MarkDown/Editor.tsx";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import RightSide from "./RightSide.tsx";
+import { ItemInterfaceType } from "@/zodSchema/Project/tasks.ts";
 
 export function TaskDialog({
   id,
@@ -37,7 +31,7 @@ export function TaskDialog({
   openChangeTaskTitle,
 }: {
   id: UniqueIdentifier | undefined;
-  task: any;
+  task: ItemInterfaceType;
   open: boolean;
   close: () => void;
   containerId?: UniqueIdentifier;
@@ -174,7 +168,7 @@ export function TaskDialog({
             </section>
             <div>Remarques : Text area pour annoter</div>
           </section>
-          <RightSide />
+          <RightSide task={task} />
         </section>
         <DialogFooter className="flex items-center gap-2 w-full">
           <Button type="button" variant="secondary" onClick={close}>

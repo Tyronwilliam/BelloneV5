@@ -3,11 +3,13 @@ import { z } from "zod";
 // Zod schema for ProjectType
 export const ProjectTypeSchema = z.object({
   id: z.number(), // Project ID
-  title: z.string(), // Project title
-  description: z.string(), // Project description
+  title: z.string().min(1, "Title is required"), // Project title
+  description: z.string().min(1, "Description is required"), // Project description
   clientId: z.string().nullable(),
   budget: z.number().nullable(),
-  startDate: z.date(),
+  startDate: z.date().refine((date) => !isNaN(date.getTime()), {
+    message: "Start Date is required",
+  }),
   endDate: z.date().optional(),
   status: z.string().default("OPEN"),
   progress: z.number().min(0).max(100), // Project progress between 0 and 100
@@ -17,4 +19,7 @@ export const ProjectTypeSchema = z.object({
 });
 
 // If you want to infer the type from the schema
+export const ProjectFormSchema = ProjectTypeSchema.omit({ id: true });
+export type ProjectFormType = z.infer<typeof ProjectFormSchema>;
+
 export type ProjectType = z.infer<typeof ProjectTypeSchema>;

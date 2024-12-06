@@ -1,17 +1,17 @@
+import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
-import React, { MutableRefObject } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { GripVertical } from "lucide-react";
+import { MutableRefObject } from "react";
 import { TaskDialog } from "../Dialog/Tasks/TaskDialog";
-import { DNDType } from "./KanbanView";
 
 type ItemsType = {
   id: UniqueIdentifier;
   title: string;
   containerId?: UniqueIdentifier;
-  item?: any;
+  item?: ItemInterfaceType;
   open?: boolean;
   close?: () => void;
   taskTitle?: string;
@@ -90,7 +90,7 @@ const Items = ({
       {open && close && currentTaskId === id && (
         <TaskDialog
           id={currentTaskId}
-          task={item}
+          task={item!}
           open={open}
           close={close}
           containerId={containerId}

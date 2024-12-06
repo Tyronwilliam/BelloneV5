@@ -69,18 +69,14 @@ const Items = ({
         "px-2 py-4 bg-white shadow-md rounded-xl w-full border border-transparent hover:border-gray-200 cursor-pointer",
         isDragging && "opacity-50"
       )}
+      onClick={() => {
+        setCurrentTaskId && setCurrentTaskId(id);
+        setTaskTitle && setTaskTitle(title);
+        close && close();
+        toggleChangeTaskTitle && openChangeTaskTitle && toggleChangeTaskTitle();
+      }}
     >
-      <div
-        className="flex items-center justify-between"
-        onClick={() => {
-          setCurrentTaskId && setCurrentTaskId(id);
-          setTaskTitle && setTaskTitle(title);
-          close && close();
-          toggleChangeTaskTitle &&
-            openChangeTaskTitle &&
-            toggleChangeTaskTitle();
-        }}
-      >
+      <div className="flex items-center justify-between">
         <span className="cursor-pointer w-full h-full">{title}</span>
         <GripVertical
           className="w-5 h-5 text-gray-500 cursor-grab shrink-0"

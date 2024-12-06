@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // Zod schema for ProjectType
 export const ProjectTypeSchema = z.object({
-  id: z.number(), // Project ID
+  id: z.union([z.number(), z.string()]),
   title: z.string().min(1, "Title is required"), // Project title
   description: z.string().min(1, "Description is required"), // Project description
   clientId: z.string().nullable(),

@@ -1,5 +1,7 @@
 "use client";
-import KanbanView from "@/app/components/reusable/Kanban/KanbanView";
+import KanbanView, {
+  DNDType,
+} from "@/app/components/reusable/Kanban/KanbanView";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -11,10 +13,12 @@ const Left = ({
   tasks,
   kanban,
   projectId,
+  columnsWithTasks,
 }: {
   tasks: any;
   kanban: any;
   projectId: string;
+  columnsWithTasks: DNDType[];
 }) => {
   return (
     <ResizablePanelGroup direction="vertical">
@@ -32,7 +36,10 @@ const Left = ({
             fill
             unoptimized={true}
           />
-          <KanbanView projectId={projectId} />
+          <KanbanView
+            projectId={projectId}
+            columnsWithTasks={columnsWithTasks}
+          />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

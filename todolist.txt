@@ -1,0 +1,5 @@
+Task Dialog
+- Function duplicate Task  
+- Function Timer  (Context)
+- TextArea ( Commentaire)
+- Etiquette/Labels

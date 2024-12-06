@@ -1,4 +1,4 @@
-import { create, fetchAll, getErrorMessage } from "@/customApi/apiService";
+import { create, fetchAll, getErrorMessage } from "@/service/apiService";
 
 import { ClientSchema } from "@/zodSchema/Client/zodSchema";
 

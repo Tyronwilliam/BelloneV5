@@ -1,5 +1,7 @@
 import Entete from "@/app/components/reusable/Entete/Entete";
 import GridLayout from "../GridLayout/GridLayout";
+import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
+import { ColumnsType } from "@/zodSchema/Kanban/columns";
 
 // const GridLayout = dynamic(() => import("../GridLayout/GridLayout"));
 
@@ -9,18 +11,42 @@ const SingleProjectPage = async ({
   params: Promise<{ id: string }>;
 }) => {
   const projectId = (await params).id;
-  //   let projectData = await fetch(`http://localhost:3000/projects/${id}`);
-  //   let project = await projectData.json();
-
-  let tasksData = await fetch(`http://localhost:3000/tasks/${projectId}`);
+  //Project
+  let projectData = await fetch(`http://localhost:3000/projects/${projectId}`);
+  let project = await projectData.json();
+  // Tasks
+  let tasksData = await fetch(`http://localhost:3000/tasks`);
   let tasks = await tasksData.json();
+  const filteredTasks = tasks?.filter(
+    (task: ItemInterfaceType) => JSON.stringify(task?.project_id) === projectId
+  );
+  //Column KANBAN
+  let columnsData = await fetch(`http://localhost:3000/KanbanColumns`);
+  let columns = await columnsData.json();
+  const filteredColumns = columns?.filter(
+    (column: ColumnsType) => JSON.stringify(column?.project_id) === projectId
+  );
+  // Kanban
   let kanbanData = await fetch(`http://localhost:3000/kanban/${projectId}`);
   let kanban = await kanbanData.json();
+  // COlumn & Task
+  const columnsWithTasks = filteredColumns.map((column: ColumnsType) => ({
+    ...column,
+    items: filteredTasks.filter(
+      (task: ItemInterfaceType) => Number(task.column_id) === Number(column.id) // Normalizing to numbers
+    ),
+  }));
 
-  console.log(tasks);
+  console.log(columnsWithTasks, "columnsWithTasks");
+  console.log(filteredTasks, " filteredTasks");
   return (
     <Entete>
-      <GridLayout tasks={tasks} kanban={kanban} projectId={projectId} />
+      <GridLayout
+        tasks={tasks}
+        kanban={kanban}
+        projectId={projectId}
+        columnsWithTasks={columnsWithTasks}
+      />
     </Entete>
   );
 };

@@ -1,14 +1,17 @@
 import React from "react";
 import Left from "./Left";
+import { DNDType } from "@/app/components/reusable/Kanban/KanbanView";
 
 const GridLayout = ({
   tasks,
   kanban,
   projectId,
+  columnsWithTasks,
 }: {
   tasks: any;
   kanban: any;
   projectId: string;
+  columnsWithTasks: DNDType[];
 }) => {
   return (
     <section
@@ -16,7 +19,12 @@ const GridLayout = ({
       style={{ height: "calc(100vh - 80px)" }}
     >
       <div className="h-full col-span-4 row-span-5  border-2 p-2">
-        <Left tasks={tasks} kanban={kanban} projectId={projectId} />
+        <Left
+          tasks={tasks}
+          kanban={kanban}
+          projectId={projectId}
+          columnsWithTasks={columnsWithTasks}
+        />
       </div>
       <div className="row-span-5 col-start-5  border-2 p-2">2</div>
     </section>

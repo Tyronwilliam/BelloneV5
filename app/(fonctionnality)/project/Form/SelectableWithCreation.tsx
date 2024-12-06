@@ -76,6 +76,7 @@ export function SelectableWithCreation<T extends FieldValues>({
   saveButtonLabel,
   cancelButtonLabel,
   isPopover,
+  icon,
 }: SelectableWithCreationProps<T>) {
   return (
     <>
@@ -90,7 +91,7 @@ export function SelectableWithCreation<T extends FieldValues>({
       )}
       {isPopover ? (
         <PopoverView
-          icon={<User />}
+          icon={icon}
           label={label}
           classCustom="w-full text-wrap flex justify-start button-custom"
         >

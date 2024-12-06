@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Control, FieldValues, Path } from "react-hook-form";
 
 export interface SelectableWithCreationProps<T extends FieldValues> {
@@ -17,6 +18,7 @@ export interface SelectableWithCreationProps<T extends FieldValues> {
   saveButtonLabel?: string;
   cancelButtonLabel?: string;
   isPopover: boolean;
+  icon?: ReactNode;
 }
 export type QuickFormProps = {
   isAddingNew: boolean;

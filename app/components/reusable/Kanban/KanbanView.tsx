@@ -32,13 +32,13 @@ import { Button } from "@/components/ui/button";
 import KanbanBoard from "./KanbanBoard";
 import { customFormatDate } from "@/utils/date";
 import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
+import { ProjectTypeSchema } from "@/zodSchema/Project/project";
+import { z } from "zod";
+import { ColumnsTypeSchema } from "@/zodSchema/Kanban/columns";
 
 // Components
 
-export type DNDType = {
-  id: UniqueIdentifier;
-  title: string;
-  color: string;
+export type DNDType = z.infer<typeof ColumnsTypeSchema> & {
   items: ItemInterfaceType[];
 };
 const columns: DNDType[] = [
@@ -46,6 +46,7 @@ const columns: DNDType[] = [
     id: `container-${uuidv4()}`,
     title: "To Do",
     color: "#FFDAB9",
+    project_id: 1,
     items: [
       {
         id: `item-${uuidv4()}`,
@@ -58,7 +59,7 @@ const columns: DNDType[] = [
         created_at: "2024-01-01T08:00:00Z",
         updated_at: "2024-01-02T10:00:00Z",
         time: 3000,
-        stickers: [],
+        column_id: 1,
         members: [],
       },
       {
@@ -72,7 +73,8 @@ const columns: DNDType[] = [
         created_at: "2024-01-02T08:00:00Z",
         updated_at: "2024-01-03T12:00:00Z",
         time: 4000,
-        stickers: [],
+        column_id: 1,
+
         members: [],
       },
     ],
@@ -81,6 +83,7 @@ const columns: DNDType[] = [
     id: `container-${uuidv4()}`,
     title: "In Progress",
     color: "#C9A0DC",
+    project_id: 1,
     items: [
       {
         id: `item-${uuidv4()}`,
@@ -93,7 +96,8 @@ const columns: DNDType[] = [
         created_at: "2024-01-05T09:00:00Z",
         updated_at: "2024-01-07T14:00:00Z",
         time: 5000,
-        stickers: [],
+        column_id: 2,
+
         members: [],
       },
       {
@@ -107,7 +111,8 @@ const columns: DNDType[] = [
         created_at: "2024-01-06T10:00:00Z",
         updated_at: "2024-01-08T15:00:00Z",
         time: 6000,
-        stickers: [],
+        column_id: 2,
+
         members: [],
       },
     ],
@@ -116,6 +121,7 @@ const columns: DNDType[] = [
     id: `container-${uuidv4()}`,
     title: "Done",
     color: "#B8D9C8",
+    project_id: 1,
     items: [
       {
         id: `item-${uuidv4()}`,
@@ -128,7 +134,8 @@ const columns: DNDType[] = [
         created_at: "2024-01-10T08:00:00Z",
         updated_at: "2024-01-14T16:00:00Z",
         time: 2000,
-        stickers: [],
+        column_id: 3,
+
         members: [],
       },
       {
@@ -142,15 +149,22 @@ const columns: DNDType[] = [
         created_at: "2024-01-12T08:00:00Z",
         updated_at: "2024-01-15T17:00:00Z",
         time: 3500,
-        stickers: [],
+        column_id: 3,
+
         members: [],
       },
     ],
   },
 ];
 
-export default function KanbanView({ projectId }: { projectId: string }) {
-  const [containers, setContainers] = useState<DNDType[]>(columns);
+export default function KanbanView({
+  projectId,
+  columnsWithTasks,
+}: {
+  projectId: string;
+  columnsWithTasks: DNDType[];
+}) {
+  const [containers, setContainers] = useState<DNDType[]>(columnsWithTasks);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [currentContainerId, setCurrentContainerId] =
     useState<UniqueIdentifier>();
@@ -191,6 +205,7 @@ export default function KanbanView({ projectId }: { projectId: string }) {
         title: containerName,
         items: [],
         color: "",
+        project_id: projectId,
       },
     ]);
     setContainerName("");
@@ -257,8 +272,8 @@ export default function KanbanView({ projectId }: { projectId: string }) {
       created_at: new Date().toISOString(), // Current timestamp for when the task is created
       updated_at: new Date().toISOString(), // Timestamp for when the task is updated
       time: 0, // Initial time spent is 0
-      stickers: [], // Initially no stickers
       members: [], // Initially no members
+      column_id: container?.id,
     };
 
     // Push the new item into the container's items array

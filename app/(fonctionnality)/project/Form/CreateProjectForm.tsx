@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { addClient } from "@/customApi/Client/api";
+import { addClient } from "@/service/Client/api";
 import { useToast } from "@/hooks/use-toast";
 import { useToggle } from "@/hooks/useToggle";
 import { ClientSchema } from "@/zodSchema/Client/zodSchema";

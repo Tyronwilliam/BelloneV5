@@ -5,7 +5,7 @@ import {
   update,
   remove,
   getErrorMessage,
-} from "@/customApi/apiService";
+} from "@/service/apiService";
 import { ProjectType } from "@/zodSchema/Project/project";
 
 export const addProject = async (data: ProjectType) => {

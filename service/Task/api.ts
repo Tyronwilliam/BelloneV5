@@ -1,9 +1,8 @@
-import { create, fetchAll, getErrorMessage } from "@/customApi/apiService";
+import { create, fetchAll, getErrorMessage } from "@/service/apiService";
 import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
-import { UniqueIdentifier } from "@dnd-kit/core";
 
 // Utilisation de la fonction utilitaire
-const loadTasks = async () => {
+export const loadTasks = async () => {
   try {
     const tasks: ItemInterfaceType[] = await fetchAll<ItemInterfaceType>(
       "tasks"
@@ -17,7 +16,7 @@ const loadTasks = async () => {
   }
 };
 
-const addTask = async (task: ItemInterfaceType) => {
+export const addTask = async (task: ItemInterfaceType) => {
   try {
     const newTask = await create<ItemInterfaceType>("tasks", task);
     console.log("Nouvelle tâche ajoutée :", newTask);

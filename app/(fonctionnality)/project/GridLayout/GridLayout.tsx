@@ -1,15 +1,16 @@
 import React from "react";
 import Left from "./Left";
 import { DNDType } from "@/app/components/reusable/Kanban/KanbanView";
+import { KanbanType } from "@/zodSchema/Kanban/kanban";
 
 const GridLayout = ({
   kanban,
   projectId,
   columnsWithTasks,
 }: {
-  kanban: any;
+  kanban: KanbanType;
   projectId: string;
-  columnsWithTasks: DNDType[];
+  columnsWithTasks: DNDType[] | undefined;
 }) => {
   return (
     <section

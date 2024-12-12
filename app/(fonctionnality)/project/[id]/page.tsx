@@ -1,9 +1,11 @@
 import Entete from "@/app/components/reusable/Entete/Entete";
+import { fetchKanbansByProjectId } from "@/service/Kanban/api";
+import { fetchColumnsByProjectId } from "@/service/Kanban/columns/api";
+import { fetchTasksByProject } from "@/service/Task/api";
+import { ColumnsType } from "@/zodSchema/Kanban/columns";
+import { KanbanType } from "@/zodSchema/Kanban/kanban";
 import GridLayout from "../GridLayout/GridLayout";
 import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
-import { ColumnsType } from "@/zodSchema/Kanban/columns";
-import { fetchTasksByProject } from "@/service/Task/api";
-import { fetchProjectsByCreator } from "@/service/Project/api";
 
 // const GridLayout = dynamic(() => import("../GridLayout/GridLayout"));
 
@@ -16,7 +18,7 @@ const SingleProjectPage = async ({
   //Project
 
   // Tasks
-  let tasksData = fetchTasksByProject(projectId)
+  let tasksData = await fetchTasksByProject(projectId)
     .then((tasks) => {
       console.log("Tasks:", tasks); // Traitez les tâches récupérées
       return tasks;
@@ -26,28 +28,46 @@ const SingleProjectPage = async ({
     });
 
   //Column KANBAN
-  let columnsData = await fetch(`http://localhost:3000/KanbanColumns`);
-  let columns = await columnsData.json();
-  const filteredColumns = columns?.filter(
-    (column: ColumnsType) => JSON.stringify(column?.project_id) === projectId
-  );
-  // Kanban
-  let kanbanData = await fetch(`http://localhost:3000/kanban/${projectId}`);
-  let kanban = await kanbanData.json();
-  // COlumn & Task
-  const columnsWithTasks = filteredColumns.map((column: ColumnsType) => ({
-    ...column,
-    items: tasksData.filter(
-      (task: ItemInterfaceType) => Number(task.column_id) === Number(column.id) // Normalizing to numbers
-    ),
-  }));
+  const columnsData = await fetchColumnsByProjectId(projectId)
+    .then((columns: ColumnsType[]) => {
+      console.log("Columns:", columns); // Process the columns data
+      return columns;
+    })
+    .catch((error) => {
+      console.error("Error fetching columns:", error); // Handle the error
+    });
 
-  console.log(columnsWithTasks, "columnsWithTasks");
-  // console.log(filteredTasks, " filteredTasks");
+  // const filteredColumns = columns?.filter(
+  //   (column: ColumnsType) => JSON.stringify(column?.project_id) === projectId
+  // );
+  // Kanban
+  let kanbanData = await fetchKanbansByProjectId(projectId)
+    .then((kanbans: KanbanType) => {
+      return kanbans;
+    })
+    .catch((error) => {
+      console.error("Error fetching kanbans:", error); // Handle the error
+    });
+
+  const columnsWithTasks = columnsData?.map((column: ColumnsType) => {
+    console.log("Column ID:", column.id); // Vérifier l'ID de la colonne
+    const tasksForColumn = tasksData.filter(
+      (task: ItemInterfaceType) => task.column_id === column.id
+    );
+    console.log("Tasks for column:", tasksForColumn); // Vérifier les tâches filtrées
+    return {
+      ...column,
+      items: tasksForColumn,
+    };
+  });
+
+  console.log(tasksData, "tasksData");
+
   return (
     <Entete>
+      {/* <p>HELLO</p> */}
       <GridLayout
-        kanban={kanban}
+        kanban={kanbanData!}
         projectId={projectId}
         columnsWithTasks={columnsWithTasks}
       />

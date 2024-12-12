@@ -1,11 +1,13 @@
-export const fetchKanbansByProjectId = async (projectId: string) => {
+export const fetchColumnsByProjectId = async (projectId: string) => {
   const query = `
-      query GetKanbansByProjectId($project_id: String!) {
-        kanbansByProjectId(project_id: $project_id) {
+      query GetColumnsByProjectId($project_id: String!) {
+        columnsByProjectId(project_id: $project_id) {
           id
+          title
+          color
           project_id
-          image
-          assigned_to
+          order
+          pseudo_id
         }
       }
     `;
@@ -13,7 +15,7 @@ export const fetchKanbansByProjectId = async (projectId: string) => {
   const variables = { project_id: projectId };
 
   try {
-    const response = await fetch(`${process.env.PROTECTED_URL}/kanban`, {
+    const response = await fetch(`${process.env.PROTECTED_URL}/columns`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,12 +34,10 @@ export const fetchKanbansByProjectId = async (projectId: string) => {
 
     const result = await response.json();
 
-    // Return the kanbans data if the query was successful
-    return result?.data?.kanbansByProjectId || [];
+    // Return the columns data if the query was successful
+    return result?.data?.columnsByProjectId || [];
   } catch (error) {
-    console.error("Error fetching kanbans:", error);
+    console.error("Error fetching columns:", error);
     throw error; // Rethrow error for further handling
   }
 };
-
-// Example usage

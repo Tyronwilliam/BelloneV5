@@ -17,11 +17,9 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import { Button } from "@/components/ui/button";
 import { useToggle } from "@/hooks/useToggle";
-import { UPDATE_TASK } from "@/service/Task/api";
 import { customFormatDate } from "@/utils/date";
 import { ColumnsTypeSchema } from "@/zodSchema/Kanban/columns";
 import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
-import { useMutation } from "@apollo/client";
 import { useRef } from "react";
 import { z } from "zod";
 import { AddTasks } from "./AddTasks";
@@ -164,11 +162,9 @@ export default function KanbanView({
   columnsWithTasks,
 }: {
   projectId: string;
-  columnsWithTasks: DNDType[];
+  columnsWithTasks: DNDType[] | undefined;
 }) {
-  console.log(columnsWithTasks);
-  const [containers, setContainers] = useState<DNDType[]>(columns);
-  const [updateTask, { data, loading, error }] = useMutation(UPDATE_TASK);
+  const [containers, setContainers] = useState<DNDType[]>(columnsWithTasks!);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [currentContainerId, setCurrentContainerId] =
     useState<UniqueIdentifier>();

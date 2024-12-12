@@ -10,12 +10,10 @@ import {
 import Image from "next/image";
 
 const Left = ({
-  tasks,
   kanban,
   projectId,
   columnsWithTasks,
 }: {
-  tasks: any;
   kanban: any;
   projectId: string;
   columnsWithTasks: DNDType[];

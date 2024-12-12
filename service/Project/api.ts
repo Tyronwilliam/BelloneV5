@@ -1,32 +1,40 @@
-import {
-  fetchAll,
-  fetchOne,
-  create,
-  update,
-  remove,
-  getErrorMessage,
-} from "@/service/apiService";
-import { ProjectType } from "@/zodSchema/Project/project";
+export const fetchProjectsByCreator = async (creatorId: string | number) => {
+  const query = `
+    query GetProjects($creator: Int!) {
+      projects(creator: $creator) {
+        id
+        title
+        description
+        clientId
+        budget
+        startDate
+        endDate
+        status
+        progress
+        creator
+        time
+        image
+      }
+    }
+  `;
 
-export const addProject = async (data: ProjectType) => {
-  try {
-    const newProject = await create<ProjectType>("projects", data);
-    console.log("New ProjectType created:", newProject);
-  } catch (error) {
-    console.error(
-      "Erreur lors de l'ajout de la tâche :",
-      getErrorMessage(error)
-    );
-  }
+  const variables = {
+    creator: creatorId,
+  };
+
+  const response = await fetch(`${process.env.PROTECTED_URL}/project`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query,
+      variables,
+    }),
+  });
+
+  const result = await response.json();
+  return result?.data?.projects;
 };
-export const loadProject = async () => {
-  try {
-    const project: ProjectType[] = await fetchAll<ProjectType>("projects");
-    console.log("List of project :", project);
-  } catch (error) {
-    console.error(
-      "Erreur lors de la récupération des tâches :",
-      getErrorMessage(error)
-    );
-  }
-};
+
+// Usage example

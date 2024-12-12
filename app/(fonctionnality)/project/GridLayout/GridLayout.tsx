@@ -3,12 +3,10 @@ import Left from "./Left";
 import { DNDType } from "@/app/components/reusable/Kanban/KanbanView";
 
 const GridLayout = ({
-  tasks,
   kanban,
   projectId,
   columnsWithTasks,
 }: {
-  tasks: any;
   kanban: any;
   projectId: string;
   columnsWithTasks: DNDType[];
@@ -20,7 +18,6 @@ const GridLayout = ({
     >
       <div className="h-full col-span-4 row-span-5  border-2 p-2">
         <Left
-          tasks={tasks}
           kanban={kanban}
           projectId={projectId}
           columnsWithTasks={columnsWithTasks}

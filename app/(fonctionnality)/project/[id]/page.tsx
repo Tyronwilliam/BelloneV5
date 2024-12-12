@@ -2,6 +2,8 @@ import Entete from "@/app/components/reusable/Entete/Entete";
 import GridLayout from "../GridLayout/GridLayout";
 import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
 import { ColumnsType } from "@/zodSchema/Kanban/columns";
+import { fetchTasksByProject } from "@/service/Task/api";
+import { fetchProjectsByCreator } from "@/service/Project/api";
 
 // const GridLayout = dynamic(() => import("../GridLayout/GridLayout"));
 
@@ -12,14 +14,17 @@ const SingleProjectPage = async ({
 }) => {
   const projectId = (await params).id;
   //Project
-  let projectData = await fetch(`http://localhost:3000/projects/${projectId}`);
-  let project = await projectData.json();
+
   // Tasks
-  let tasksData = await fetch(`http://localhost:3000/tasks`);
-  let tasks = await tasksData.json();
-  const filteredTasks = tasks?.filter(
-    (task: ItemInterfaceType) => JSON.stringify(task?.project_id) === projectId
-  );
+  let tasksData = fetchTasksByProject(projectId)
+    .then((tasks) => {
+      console.log("Tasks:", tasks); // Traitez les tâches récupérées
+      return tasks;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+
   //Column KANBAN
   let columnsData = await fetch(`http://localhost:3000/KanbanColumns`);
   let columns = await columnsData.json();
@@ -32,17 +37,16 @@ const SingleProjectPage = async ({
   // COlumn & Task
   const columnsWithTasks = filteredColumns.map((column: ColumnsType) => ({
     ...column,
-    items: filteredTasks.filter(
+    items: tasksData.filter(
       (task: ItemInterfaceType) => Number(task.column_id) === Number(column.id) // Normalizing to numbers
     ),
   }));
 
   console.log(columnsWithTasks, "columnsWithTasks");
-  console.log(filteredTasks, " filteredTasks");
+  // console.log(filteredTasks, " filteredTasks");
   return (
     <Entete>
       <GridLayout
-        tasks={tasks}
         kanban={kanban}
         projectId={projectId}
         columnsWithTasks={columnsWithTasks}

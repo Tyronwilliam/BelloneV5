@@ -15,7 +15,7 @@ export type StickersType = z.infer<typeof StickersInterface>;
 export const ItemInterface = z.object({
   id: z.string(), // Unique identifier for the item, assuming it's a string. You can adjust if it's a number or another type.
   project_id: z.number(), // Project ID, should be a number
-  title: z.string().min(1, "Title is requiered"), // Title of the task/item, required as a string
+  title: z.string().min(1, "Title is required"), // Title of the task/item, required as a string
   description: z.string().optional(), // Optional description of the task
   start_date: z.string(), // Start date in ISO 8601 format, assuming it's a string
   due_date: z.string(), // Due date in ISO 8601 format, assuming it's a string
@@ -25,6 +25,7 @@ export const ItemInterface = z.object({
   time: z.number(), // Time spent on the task in seconds, a number
   members: z.array(z.string()).min(1), // Array for assigned members, assuming each member is represented by a string (e.g., user ID). You can extend this if needed.
   column_id: z.union([z.number(), z.string()]),
+  order: z.union([z.string(), z.number()]),
 });
 
 // If you want to infer the type from the schema, use this:

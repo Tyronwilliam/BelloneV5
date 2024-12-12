@@ -4,37 +4,28 @@ import { v4 as uuidv4 } from "uuid";
 
 // DnD
 import {
-  DndContext,
   DragEndEvent,
   DragMoveEvent,
-  DragOverlay,
   DragStartEvent,
   KeyboardSensor,
   PointerSensor,
   UniqueIdentifier,
-  closestCorners,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
-import { useToggle } from "@/hooks/useToggle";
-import { useRef } from "react";
-import { AddColumn } from "./AddColumn";
-import { AddTasks } from "./AddTasks";
-import Container from "./Container";
-import Items from "./Item";
 import { Button } from "@/components/ui/button";
-import KanbanBoard from "./KanbanBoard";
+import { useToggle } from "@/hooks/useToggle";
+import { UPDATE_TASK } from "@/service/Task/api";
 import { customFormatDate } from "@/utils/date";
-import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
-import { ProjectTypeSchema } from "@/zodSchema/Project/project";
-import { z } from "zod";
 import { ColumnsTypeSchema } from "@/zodSchema/Kanban/columns";
+import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
+import { useMutation } from "@apollo/client";
+import { useRef } from "react";
+import { z } from "zod";
+import { AddTasks } from "./AddTasks";
+import KanbanBoard from "./KanbanBoard";
 
 // Components
 
@@ -47,6 +38,7 @@ const columns: DNDType[] = [
     title: "To Do",
     color: "#FFDAB9",
     project_id: 1,
+    order: 3,
     items: [
       {
         id: `item-${uuidv4()}`,
@@ -61,6 +53,7 @@ const columns: DNDType[] = [
         time: 3000,
         column_id: 1,
         members: [],
+        order: 1,
       },
       {
         id: `item-${uuidv4()}`,
@@ -74,6 +67,7 @@ const columns: DNDType[] = [
         updated_at: "2024-01-03T12:00:00Z",
         time: 4000,
         column_id: 1,
+        order: 1,
 
         members: [],
       },
@@ -84,6 +78,8 @@ const columns: DNDType[] = [
     title: "In Progress",
     color: "#C9A0DC",
     project_id: 1,
+    order: 3,
+
     items: [
       {
         id: `item-${uuidv4()}`,
@@ -97,6 +93,7 @@ const columns: DNDType[] = [
         updated_at: "2024-01-07T14:00:00Z",
         time: 5000,
         column_id: 2,
+        order: 1,
 
         members: [],
       },
@@ -112,6 +109,7 @@ const columns: DNDType[] = [
         updated_at: "2024-01-08T15:00:00Z",
         time: 6000,
         column_id: 2,
+        order: 1,
 
         members: [],
       },
@@ -122,6 +120,8 @@ const columns: DNDType[] = [
     title: "Done",
     color: "#B8D9C8",
     project_id: 1,
+    order: 3,
+
     items: [
       {
         id: `item-${uuidv4()}`,
@@ -135,6 +135,7 @@ const columns: DNDType[] = [
         updated_at: "2024-01-14T16:00:00Z",
         time: 2000,
         column_id: 3,
+        order: 1,
 
         members: [],
       },
@@ -150,6 +151,7 @@ const columns: DNDType[] = [
         updated_at: "2024-01-15T17:00:00Z",
         time: 3500,
         column_id: 3,
+        order: 1,
 
         members: [],
       },
@@ -164,7 +166,9 @@ export default function KanbanView({
   projectId: string;
   columnsWithTasks: DNDType[];
 }) {
-  const [containers, setContainers] = useState<DNDType[]>(columnsWithTasks);
+  console.log(columnsWithTasks);
+  const [containers, setContainers] = useState<DNDType[]>(columns);
+  const [updateTask, { data, loading, error }] = useMutation(UPDATE_TASK);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [currentContainerId, setCurrentContainerId] =
     useState<UniqueIdentifier>();
@@ -197,6 +201,8 @@ export default function KanbanView({
 
   const onAddContainer = () => {
     if (!containerName) return;
+
+    // Create functiion add container
     const id = `container-${uuidv4()}`;
     setContainers([
       ...containers,
@@ -206,6 +212,7 @@ export default function KanbanView({
         items: [],
         color: "",
         project_id: projectId,
+        order: containers?.length + 1,
       },
     ]);
     setContainerName("");
@@ -274,6 +281,7 @@ export default function KanbanView({
       time: 0, // Initial time spent is 0
       members: [], // Initially no members
       column_id: container?.id,
+      order: container?.items?.length,
     };
 
     // Push the new item into the container's items array
@@ -340,7 +348,6 @@ export default function KanbanView({
   const handleDragMove = (event: DragMoveEvent) => {
     const { active, over } = event;
     if (!over) return;
-
     if (
       active.id.toString().includes("item") &&
       over.id.toString().includes("item") &&
@@ -364,7 +371,8 @@ export default function KanbanView({
       const overItemIndex = overContainer.items.findIndex(
         (item) => item.id === over.id
       );
-
+      console.log(overItemIndex, "overItemIndex");
+      console.log(activeItemIndex, "activeItemIndex");
       if (activeContainerIndex === overContainerIndex) {
         // Within the same container
         const newItems = [...containers];
@@ -373,6 +381,9 @@ export default function KanbanView({
           activeItemIndex,
           overItemIndex
         );
+        console.log(overItemIndex, "overItemIndex END ");
+        console.log(activeItemIndex, "activeItemIndex END");
+        console.log(newItems, "NEW ITEMS");
         setContainers(newItems);
       } else {
         // Between different containers
@@ -435,13 +446,14 @@ export default function KanbanView({
       const activeItemIndex = activeContainer.items.findIndex(
         (item) => item.id === active.id
       );
-
+      console.log(activeItemIndex, "activeItemIndex");
       const newItems = [...containers];
       const [removedItem] = newItems[activeContainerIndex].items.splice(
         activeItemIndex,
         1
       );
       newItems[overContainerIndex].items.push(removedItem);
+
       setContainers(newItems);
     }
 

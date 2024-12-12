@@ -1,29 +1,66 @@
-import { create, fetchAll, getErrorMessage } from "@/service/apiService";
-import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
+import { gql } from "@apollo/client";
+export const fetchTasksByProject = async (projectId: string) => {
+  const query = `
+    query GetTasksByProject($project_id: ID!) {
+      tasksByProject(project_id: $project_id) {
+        id
+        title
+        description
+        start_date
+        due_date
+        members
+        column_id
+        
+      }
+    }
+  `;
 
-// Utilisation de la fonction utilitaire
-export const loadTasks = async () => {
-  try {
-    const tasks: ItemInterfaceType[] = await fetchAll<ItemInterfaceType>(
-      "tasks"
-    );
-    console.log("Liste des tâches :", tasks);
-  } catch (error) {
-    console.error(
-      "Erreur lors de la récupération des tâches :",
-      getErrorMessage(error)
-    );
-  }
-};
+  const variables = { project_id: projectId };
 
-export const addTask = async (task: ItemInterfaceType) => {
-  try {
-    const newTask = await create<ItemInterfaceType>("tasks", task);
-    console.log("Nouvelle tâche ajoutée :", newTask);
-  } catch (error) {
-    console.error(
-      "Erreur lors de l'ajout de la tâche :",
-      getErrorMessage(error)
-    );
-  }
+  const response = await fetch(`${process.env.PROTECTED_URL}/task`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query,
+      variables,
+    }),
+  });
+
+  const result = await response.json();
+  return result?.data?.task;
 };
+export const UPDATE_TASK = gql`
+  mutation UpdateTask(
+    $id: ID!
+    $title: String
+    $description: String
+    $start_date: Int
+    $due_date: Int
+    $time: Int
+    $members: [String]  // Utilisez [String] pour un tableau d'IDs de membres
+    $column_id: String
+  ) {
+    updateTask(
+      id: $id
+      title: $title
+      description: $description
+      start_date: $start_date
+      due_date: $due_date
+      time: $time
+      members: $members
+      column_id: $column_id
+    ) {
+      id
+      title
+      description
+      start_date
+      due_date
+      time
+      members
+      column_id
+      
+    }
+  }
+`;

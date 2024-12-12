@@ -19,7 +19,6 @@ const YesPROJECT = "We let you cook !";
 const MorePROJECT = "An another one";
 const ToggleText = "Not now !";
 
-
 const EmptyProjectView = ({
   clients,
   isProjectMoreThan0,
@@ -71,7 +70,7 @@ const ProjectForm = ({
   toggleValue,
 }: ProjectFormProps) => {
   return (
-    <section className="w-[90%] h-full mx-auto pb-4 max-w-5xl">
+    <section className="basis-full h-full mx-auto pb-4 max-w-5xl shrink-0 grow-1">
       <Card className={cn("", !value && "w-fit mx-auto")}>
         <CardHeader className="pr-4 pt-4">
           {value && (

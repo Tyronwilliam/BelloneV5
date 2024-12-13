@@ -8,9 +8,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { KanbanType } from "@/zodSchema/Kanban/kanban";
-import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 
 const Left = ({
   kanban,
@@ -21,13 +19,6 @@ const Left = ({
   projectId: string;
   columnsWithTasks: DNDType[] | undefined;
 }) => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true); // Only set the state once the component is mounted in the client
-  }, []);
-
-  if (!isClient) return null; // Don't render anything until the client is ready
   return (
     <ResizablePanelGroup direction="vertical">
       <ResizablePanel defaultSize={30}>One</ResizablePanel>

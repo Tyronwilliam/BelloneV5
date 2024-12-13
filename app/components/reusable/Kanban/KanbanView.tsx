@@ -165,6 +165,7 @@ export default function KanbanView({
   columnsWithTasks: DNDType[] | undefined;
 }) {
   const [containers, setContainers] = useState<DNDType[]>(columnsWithTasks!);
+  const [isClient, setIsClient] = useState(false);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [currentContainerId, setCurrentContainerId] =
     useState<UniqueIdentifier>();
@@ -194,7 +195,9 @@ export default function KanbanView({
   useEffect(() => {
     inputTaskRef?.current && inputTaskRef?.current?.focus();
   }, [toggleChangeTaskTitle]);
-
+  useEffect(() => {
+    setIsClient(true); // Only set the state once the component is mounted in the client
+  }, []);
   const onAddContainer = () => {
     if (!containerName) return;
 
@@ -455,6 +458,7 @@ export default function KanbanView({
 
     setActiveId(null);
   };
+  if (!isClient) return null; // Don't render anything until the client is ready
 
   return (
     <div className="mx-auto max-w-7xl h-full flex flex-col gap-5 pt-4">

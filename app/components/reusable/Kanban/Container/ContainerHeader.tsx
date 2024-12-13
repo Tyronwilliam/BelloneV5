@@ -1,19 +1,18 @@
 import { Input } from "@/components/ui/input";
-import { UniqueIdentifier } from "@dnd-kit/core";
 import { GripVertical } from "lucide-react";
 import { MutableRefObject } from "react";
 
 export interface ContainerHeaderProps {
-  id: UniqueIdentifier; // Unique identifier for the container
+  id: string; // Unique identifier for the container
   title?: string; // The title of the container
   description?: string; // Optional description
   color?: string; // Background color for the container
   containerTitle?: string; // Title of the container when in edit mode
   setContainerTitle?: (value: string) => void; // Function to update the container title
-  changeContainerTitle?: (id: UniqueIdentifier, title: string) => void; // Function to save the new title
+  changeContainerTitle?: (id: string, title: string) => void; // Function to save the new title
   toggleChangeTitle?: () => void; // Function to toggle the edit mode
-  currentIdTitle?: UniqueIdentifier | null; // Current active container being edited
-  setCurrentIdTitle?: (value: UniqueIdentifier | null) => void; // Function to set the active container for editing
+  currentIdTitle?: string | null; // Current active container being edited
+  setCurrentIdTitle?: (value: string | null) => void; // Function to set the active container for editing
   openChangeTitle?: boolean; // Boolean to indicate if the title is being edited
   inputTitleRef?: MutableRefObject<HTMLInputElement | null>; // Ref for the input field
   listeners?: any; // DND Kit listeners for dragging

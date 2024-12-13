@@ -15,17 +15,20 @@ export const fetchColumnsByProjectId = async (projectId: string) => {
   const variables = { project_id: projectId };
 
   try {
-    const response = await fetch(`${process.env.PROTECTED_URL}/columns`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Add any other headers if needed (like authorization)
-      },
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Add any other headers if needed (like authorization)
+        },
+        body: JSON.stringify({
+          query,
+          variables,
+        }),
+      }
+    );
 
     // Check if response is ok (status 200)
     if (!response.ok) {

@@ -1,23 +1,44 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input.tsx";
-import { useToggle } from "@/hooks/useToggle.tsx";
 import { useEffect, useState } from "react";
 import Editor from "../../MarkDown/Editor.tsx";
 import RightSide from "./RightSide.tsx";
-import { TaskDialogInterface } from "./TaskDialog.ts";
-import { ItemInterfaceType, StickersType } from "@/zodSchema/Project/tasks.ts";
+import { ItemInterfaceType, StickersType } from "@/zodSchema/Project/tasks";
+import { MutableRefObject } from "react";
+import { Card, CardContent } from "@/components/ui/card.tsx";
+import {
+  DialogHeader,
+  DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog.tsx";
+import { useToggle } from "@/hooks/useToggle.tsx";
 import { cn } from "@/lib/utils.ts";
-import { UniqueIdentifier } from "@dnd-kit/core";
 import { getAllSticker } from "@/service/Stickers/api.ts";
+
+import { Button } from "@/components/ui/button.tsx";
+import { Input } from "@/components/ui/input.tsx";
+
+export interface TaskDialogInterface {
+  id: string | undefined;
+  task: ItemInterfaceType;
+  open: boolean;
+  close: () => void;
+  containerId?: string;
+  taskTitle?: string;
+  setTaskTitle?: (e: any) => void;
+  handleChangeTaskTitle?: (
+    containerId: string,
+    id: string | undefined,
+    title: string | undefined
+  ) => void;
+  toggleChangeTaskTitle?: () => void;
+  openChangeTaskTitle?: boolean;
+
+  currentTaskId?: string | null;
+  setCurrentTaskId?: (value: string | null) => void;
+  inputTaskRef?: MutableRefObject<HTMLInputElement | null>;
+}
 
 export function TaskDialog({
   id,
@@ -39,29 +60,29 @@ export function TaskDialog({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchStickers = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllSticker();
-        console.log(data, "DATA MY MAN", currentTaskId);
-        if (data) {
-          const filteredStickers = stickers?.filter((sticker) =>
-            sticker?.taskId?.includes(currentTaskId as string)
-          );
+  // useEffect(() => {
+  //   const fetchStickers = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const data = await getAllSticker();
+  //       console.log(data, "DATA MY MAN", currentTaskId);
+  //       if (data) {
+  //         const filteredStickers = stickers?.filter((sticker) =>
+  //           sticker?.taskId?.includes(currentTaskId as string)
+  //         );
 
-          setStickers(filteredStickers); // Update state with stickers data
-        }
-      } catch (err) {
-        console.error("Error fetching stickers:", err);
-        setError("Failed to load stickers.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  //         setStickers(filteredStickers); // Update state with stickers data
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching stickers:", err);
+  //       setError("Failed to load stickers.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchStickers(); // Call the fetch function on mount
-  }, [open, currentTaskId]); // Empty dependency array to run only once on component mount
+  //   fetchStickers(); // Call the fetch function on mount
+  // }, [open, currentTaskId]); // Empty dependency array to run only once on component mount
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -132,14 +153,14 @@ export function TaskDialog({
         <section className="flex w-full min-h-[600px] gap-4">
           <section className="w-[75%] flex flex-col gap-12 ">
             {/* LABELS VIEWS */}
-            {loading && <div>Loading...</div>}
+            {/* {loading && <div>Loading...</div>}
             {error && <div>{error}</div>}
-            {!error && !loading && <LabelsView stickers={stickers} />}
+            {!error && !loading && <LabelsView stickers={stickers} />} */}
             {/* LABELS VIEWS */}
             <EditorView isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
             <div>Remarques : Text area pour annoter</div>
           </section>
-          <RightSide task={task} />
+          {/* <RightSide task={task} /> */}
         </section>
         <DialogFooter className="flex items-center gap-2 w-full">
           <Button type="button" variant="secondary" onClick={close}>

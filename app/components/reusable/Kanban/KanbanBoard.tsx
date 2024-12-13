@@ -16,6 +16,7 @@ import { AddColumn } from "./AddColumn";
 import Container from "./Container";
 import Items from "./Item";
 import { DNDType } from "./KanbanView";
+import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
 
 interface KanbanBoardProps {
   containers: DNDType[];
@@ -28,28 +29,26 @@ interface KanbanBoardProps {
   containerTitle: string;
   setContainerTitle: React.Dispatch<React.SetStateAction<string>>;
   changeContainerTitle?: (
-    id: UniqueIdentifier | undefined,
+    id: string | undefined,
     title: string | undefined
   ) => void;
   toggleChangeTitle: () => void;
-  currentIdTitle: UniqueIdentifier | null;
-  setCurrentIdTitle?: (value: UniqueIdentifier | null) => void;
+  currentIdTitle: string | null;
+  setCurrentIdTitle?: (value: string | null) => void;
   setShowAddItemModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentContainerId: React.Dispatch<
-    React.SetStateAction<UniqueIdentifier | undefined>
-  >;
+  setCurrentContainerId: React.Dispatch<React.SetStateAction<UniqueIdentifier>>;
   openEditor: boolean;
   toggleOpenEditor: () => void;
-  currentTaskId: UniqueIdentifier | null;
-  setCurrentTaskId?: (value: UniqueIdentifier | null) => void;
+  currentTaskId: string | null;
+  setCurrentTaskId?: (value: string | null) => void;
   taskTitle: string;
   setTaskTitle: React.Dispatch<React.SetStateAction<string>>;
   inputTaskRef: React.RefObject<HTMLInputElement>;
   openChangeTaskTitle: boolean;
   toggleChangeTaskTitle: () => void;
   handleChangeTaskTitle?: (
-    containerId: UniqueIdentifier,
-    id: UniqueIdentifier | undefined,
+    containerId: string,
+    id: string | undefined,
     title: string | undefined
   ) => void;
   showAddContainerModal: boolean;
@@ -57,10 +56,10 @@ interface KanbanBoardProps {
   containerName: string;
   setContainerName: React.Dispatch<React.SetStateAction<string>>;
   onAddContainer: () => void;
-  activeId: UniqueIdentifier | string | null;
+  activeId: string | string | null;
   findItemTitle: (id: string) => string;
   findContainerTitle: (id: string) => string;
-  findContainerItems: (id: UniqueIdentifier | undefined) => any[];
+  findContainerItems: (id: string | undefined) => any[];
 }
 
 const KanbanBoard = ({
@@ -108,52 +107,58 @@ const KanbanBoard = ({
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={containers.map((container) => container.id)}>
-          {containers.map((container) => (
-            <Container
-              inputTitleRef={inputTitleRef}
-              id={container.id}
-              title={container.title}
-              key={container.id}
-              onAddItem={() => {
-                setShowAddItemModal(true);
-                setCurrentContainerId(container.id);
-              }}
-              openChangeTitle={openChangeTitle}
-              containerTitle={containerTitle}
-              setContainerTitle={setContainerTitle}
-              changeContainerTitle={changeContainerTitle}
-              toggleChangeTitle={toggleChangeTitle}
-              currentIdTitle={currentIdTitle}
-              setCurrentIdTitle={setCurrentIdTitle}
-              color={container?.color}
-            >
-              <SortableContext items={container.items.map((i) => i.id)}>
-                {/* Container tasks */}
-                <div className="custom-scrollbar flex items-start flex-col gap-y-4 h-full max-h-[220px] overflow-y-scroll">
-                  {container.items.map((i) => (
-                    <Items
-                      key={i.id}
-                      title={i.title}
-                      id={i.id}
-                      item={i}
-                      containerId={container?.id}
-                      open={openEditor}
-                      close={toggleOpenEditor}
-                      currentTaskId={currentTaskId}
-                      setCurrentTaskId={setCurrentTaskId}
-                      taskTitle={taskTitle}
-                      setTaskTitle={setTaskTitle}
-                      inputTaskRef={inputTaskRef}
-                      openChangeTaskTitle={openChangeTaskTitle}
-                      toggleChangeTaskTitle={toggleChangeTaskTitle}
-                      handleChangeTaskTitle={handleChangeTaskTitle}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </Container>
-          ))}
+        <SortableContext
+          items={containers.map((container) => container.pseudo_id!)}
+        >
+          {containers
+            .sort((a, b) => a.order - b.order)
+            .map((container) => (
+              <Container
+                inputTitleRef={inputTitleRef}
+                id={container.pseudo_id!}
+                title={container.title}
+                key={container.pseudo_id}
+                onAddItem={() => {
+                  setShowAddItemModal(true);
+                  setCurrentContainerId(container.pseudo_id!);
+                }}
+                openChangeTitle={openChangeTitle}
+                containerTitle={containerTitle}
+                setContainerTitle={setContainerTitle}
+                changeContainerTitle={changeContainerTitle}
+                toggleChangeTitle={toggleChangeTitle}
+                currentIdTitle={currentIdTitle}
+                setCurrentIdTitle={setCurrentIdTitle}
+                color={container?.color}
+              >
+                <SortableContext
+                  items={container.items.map((i) => i.pseudo_id!)}
+                >
+                  {/* Container tasks */}
+                  <div className="custom-scrollbar flex items-start flex-col gap-y-4 h-full max-h-[220px] overflow-y-scroll">
+                    {container.items.map((i: ItemInterfaceType) => (
+                      <Items
+                        key={i.pseudo_id!}
+                        title={i.title}
+                        id={i.pseudo_id!}
+                        item={i}
+                        containerId={container.pseudo_id}
+                        open={openEditor}
+                        close={toggleOpenEditor}
+                        currentTaskId={currentTaskId}
+                        setCurrentTaskId={setCurrentTaskId}
+                        taskTitle={taskTitle}
+                        setTaskTitle={setTaskTitle}
+                        inputTaskRef={inputTaskRef}
+                        openChangeTaskTitle={openChangeTaskTitle}
+                        toggleChangeTaskTitle={toggleChangeTaskTitle}
+                        handleChangeTaskTitle={handleChangeTaskTitle}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </Container>
+            ))}
         </SortableContext>{" "}
         <AddColumn
           showAddContainerModal={showAddContainerModal}
@@ -165,7 +170,7 @@ const KanbanBoard = ({
         <DragOverlay adjustScale={false}>
           {/* Drag Overlay For item Item */}
           {activeId && activeId.toString().includes("item") && (
-            <Items id={activeId} title={findItemTitle(activeId as string)} />
+            <Items id={activeId} title={findItemTitle(activeId)} />
           )}
           {/* Drag Overlay For Container */}
           {activeId && activeId.toString().includes("container") && (
@@ -173,8 +178,8 @@ const KanbanBoard = ({
               id={activeId}
               title={findContainerTitle(activeId as string)}
             >
-              {findContainerItems(activeId as string)?.map((i) => (
-                <Items key={i.id} title={i.title} id={i.id} />
+              {findContainerItems(activeId)?.map((i) => (
+                <Items key={i.id} title={i.title} id={i.pseudo_id!} />
               ))}
             </Container>
           )}

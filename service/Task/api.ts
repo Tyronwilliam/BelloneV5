@@ -1,3 +1,7 @@
+import { ColumnsType } from "@/zodSchema/Kanban/columns";
+import { fetchColumnsByProjectId } from "../Kanban/columns/api";
+import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
+
 export const fetchTasksByProject = async (projectId: string) => {
   const query = `
     query GetTasksByProject($project_id: String!) {
@@ -10,6 +14,7 @@ export const fetchTasksByProject = async (projectId: string) => {
         members
         column_id
         project_id
+        pseudo_id
       }
     }
   `;
@@ -17,16 +22,19 @@ export const fetchTasksByProject = async (projectId: string) => {
   const variables = { project_id: projectId };
 
   try {
-    const response = await fetch(`${process.env.PROTECTED_URL}/task`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_PROTECTED_URL}/task`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query,
+          variables,
+        }),
+      }
+    );
 
     // Vérification de la réponse du serveur
     if (!response.ok) {
@@ -41,3 +49,31 @@ export const fetchTasksByProject = async (projectId: string) => {
     throw error; // Relance l'erreur après l'avoir loggée
   }
 };
+// Assuming fetchTasksByProject and fetchColumnsByProjectId are already defined
+export async function getColumnsWithTasks(projectId: string) {
+  try {
+    // Fetch tasks for the given project
+    const tasksData = await fetchTasksByProject(projectId);
+    console.log("Tasks:", tasksData);
+
+    // Fetch columns for the given project
+    const columnsData = await fetchColumnsByProjectId(projectId);
+    console.log("Columns:", columnsData);
+
+    // Map columns and associate tasks with each column
+    const columnsWithTasks = columnsData.map((column: ColumnsType) => {
+      const tasksForColumn = tasksData.filter(
+        (task: ItemInterfaceType) => task.column_id === column.id
+      );
+      return {
+        ...column,
+        items: tasksForColumn, // Attach the tasks to the column
+      };
+    });
+
+    return columnsWithTasks; // Return the columns with tasks
+  } catch (error) {
+    console.error("Error fetching columns or tasks:", error);
+    throw error; // Rethrow error to be handled by the calling function
+  }
+}

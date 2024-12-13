@@ -1,5 +1,4 @@
 import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
-import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
@@ -8,23 +7,23 @@ import { MutableRefObject } from "react";
 import { TaskDialog } from "../Dialog/Tasks/TaskDialog";
 
 type ItemsType = {
-  id: UniqueIdentifier;
+  id: string;
   title: string;
-  containerId?: UniqueIdentifier;
+  containerId?: string;
   item?: ItemInterfaceType;
   open?: boolean;
   close?: () => void;
   taskTitle?: string;
   setTaskTitle?: (e: any) => void;
   handleChangeTaskTitle?: (
-    containerId: UniqueIdentifier,
-    id: UniqueIdentifier | undefined,
+    containerId: string,
+    id: string | undefined,
     title: string | undefined
   ) => void;
   toggleChangeTaskTitle?: () => void;
   openChangeTaskTitle?: boolean;
-  currentTaskId?: UniqueIdentifier | null;
-  setCurrentTaskId?: (value: UniqueIdentifier | null) => void;
+  currentTaskId?: string | null;
+  setCurrentTaskId?: (value: string | null) => void;
   inputTaskRef?: MutableRefObject<HTMLInputElement | null>;
 };
 

@@ -5,5 +5,6 @@ export const ColumnsTypeSchema = z.object({
   color: z.string(),
   project_id: z.union([z.number(), z.string()]),
   order: z.number(), // Adding an order field to control the position of the column
+  pseudo_id: z.string().optional(),
 });
 export type ColumnsType = z.infer<typeof ColumnsTypeSchema>;

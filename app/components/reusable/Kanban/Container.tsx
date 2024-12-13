@@ -1,15 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { GripVertical } from "lucide-react";
 import React, { MutableRefObject, useEffect } from "react";
 import ContainerHeader from "./Container/ContainerHeader";
 
 interface ContainerProps {
-  id: UniqueIdentifier;
+  id: string;
   children: React.ReactNode;
   title?: string;
   description?: string;
@@ -17,13 +14,10 @@ interface ContainerProps {
   openChangeTitle?: boolean;
   containerTitle?: string;
   setContainerTitle?: (e: any) => void;
-  changeContainerTitle?: (
-    id: UniqueIdentifier | undefined,
-    title: string | undefined
-  ) => void;
+  changeContainerTitle?: (id: string, title: string | undefined) => void;
   toggleChangeTitle?: () => void;
-  currentIdTitle?: UniqueIdentifier | null;
-  setCurrentIdTitle?: (value: UniqueIdentifier | null) => void;
+  currentIdTitle?: string | null;
+  setCurrentIdTitle?: (value: string | null) => void;
   inputTitleRef?: MutableRefObject<HTMLInputElement | null>;
   color?: string;
 }

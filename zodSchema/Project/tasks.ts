@@ -26,6 +26,7 @@ export const ItemInterface = z.object({
   members: z.array(z.string()).min(1), // Array for assigned members, assuming each member is represented by a string (e.g., user ID). You can extend this if needed.
   column_id: z.union([z.number(), z.string()]),
   order: z.union([z.string(), z.number()]),
+  pseudo_id: z.string().optional(),
 });
 
 // If you want to infer the type from the schema, use this:

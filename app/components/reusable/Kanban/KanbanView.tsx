@@ -16,7 +16,10 @@ import {
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import { Button } from "@/components/ui/button";
+import { useSelectableWithCreation } from "@/hooks/useSelectableWithCreation";
 import { useToggle } from "@/hooks/useToggle";
+import useUpdateColumns from "@/hooks/useUpdateColumns";
+import { getColumnsWithTasks } from "@/service/Task/api";
 import { customFormatDate } from "@/utils/date";
 import { ColumnsTypeSchema } from "@/zodSchema/Kanban/columns";
 import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
@@ -30,132 +33,132 @@ import KanbanBoard from "./KanbanBoard";
 export type DNDType = z.infer<typeof ColumnsTypeSchema> & {
   items: ItemInterfaceType[];
 };
-const columns: DNDType[] = [
-  {
-    id: `container-${uuidv4()}`,
-    title: "To Do",
-    color: "#FFDAB9",
-    project_id: 1,
-    order: 3,
-    items: [
-      {
-        id: `item-${uuidv4()}`,
-        project_id: 1,
-        title: "Task 1",
-        description: "Design the wireframes for the homepage.",
-        start_date: "2024-01-01",
-        due_date: "2024-01-05",
-        completed_at: null,
-        created_at: "2024-01-01T08:00:00Z",
-        updated_at: "2024-01-02T10:00:00Z",
-        time: 3000,
-        column_id: 1,
-        members: [],
-        order: 1,
-      },
-      {
-        id: `item-${uuidv4()}`,
-        project_id: 1,
-        title: "Task 2",
-        description: "Write the project proposal.",
-        start_date: "2024-01-02",
-        due_date: "2024-01-06",
-        completed_at: null,
-        created_at: "2024-01-02T08:00:00Z",
-        updated_at: "2024-01-03T12:00:00Z",
-        time: 4000,
-        column_id: 1,
-        order: 1,
+// const columns: DNDType[] = [
+//   {
+//     id: `container-${uuidv4()}`,
+//     title: "To Do",
+//     color: "#FFDAB9",
+//     project_id: 1,
+//     order: 3,
+//     items: [
+//       {
+//         id: `item-${uuidv4()}`,
+//         project_id: 1,
+//         title: "Task 1",
+//         description: "Design the wireframes for the homepage.",
+//         start_date: "2024-01-01",
+//         due_date: "2024-01-05",
+//         completed_at: null,
+//         created_at: "2024-01-01T08:00:00Z",
+//         updated_at: "2024-01-02T10:00:00Z",
+//         time: 3000,
+//         column_id: 1,
+//         members: [],
+//         order: 1,
+//       },
+//       {
+//         id: `item-${uuidv4()}`,
+//         project_id: 1,
+//         title: "Task 2",
+//         description: "Write the project proposal.",
+//         start_date: "2024-01-02",
+//         due_date: "2024-01-06",
+//         completed_at: null,
+//         created_at: "2024-01-02T08:00:00Z",
+//         updated_at: "2024-01-03T12:00:00Z",
+//         time: 4000,
+//         column_id: 1,
+//         order: 1,
 
-        members: [],
-      },
-    ],
-  },
-  {
-    id: `container-${uuidv4()}`,
-    title: "In Progress",
-    color: "#C9A0DC",
-    project_id: 1,
-    order: 3,
+//         members: [],
+//       },
+//     ],
+//   },
+//   {
+//     id: `container-${uuidv4()}`,
+//     title: "In Progress",
+//     color: "#C9A0DC",
+//     project_id: 1,
+//     order: 3,
 
-    items: [
-      {
-        id: `item-${uuidv4()}`,
-        project_id: 2,
-        title: "Task 3",
-        description: "Create the user login form.",
-        start_date: "2024-01-05",
-        due_date: "2024-01-10",
-        completed_at: null,
-        created_at: "2024-01-05T09:00:00Z",
-        updated_at: "2024-01-07T14:00:00Z",
-        time: 5000,
-        column_id: 2,
-        order: 1,
+//     items: [
+//       {
+//         id: `item-${uuidv4()}`,
+//         project_id: 2,
+//         title: "Task 3",
+//         description: "Create the user login form.",
+//         start_date: "2024-01-05",
+//         due_date: "2024-01-10",
+//         completed_at: null,
+//         created_at: "2024-01-05T09:00:00Z",
+//         updated_at: "2024-01-07T14:00:00Z",
+//         time: 5000,
+//         column_id: 2,
+//         order: 1,
 
-        members: [],
-      },
-      {
-        id: `item-${uuidv4()}`,
-        project_id: 2,
-        title: "Task 4",
-        description: "Develop the backend API for user authentication.",
-        start_date: "2024-01-06",
-        due_date: "2024-01-11",
-        completed_at: null,
-        created_at: "2024-01-06T10:00:00Z",
-        updated_at: "2024-01-08T15:00:00Z",
-        time: 6000,
-        column_id: 2,
-        order: 1,
+//         members: [],
+//       },
+//       {
+//         id: `item-${uuidv4()}`,
+//         project_id: 2,
+//         title: "Task 4",
+//         description: "Develop the backend API for user authentication.",
+//         start_date: "2024-01-06",
+//         due_date: "2024-01-11",
+//         completed_at: null,
+//         created_at: "2024-01-06T10:00:00Z",
+//         updated_at: "2024-01-08T15:00:00Z",
+//         time: 6000,
+//         column_id: 2,
+//         order: 1,
 
-        members: [],
-      },
-    ],
-  },
-  {
-    id: `container-${uuidv4()}`,
-    title: "Done",
-    color: "#B8D9C8",
-    project_id: 1,
-    order: 3,
+//         members: [],
+//       },
+//     ],
+//   },
+//   {
+//     id: `container-${uuidv4()}`,
+//     title: "Done",
+//     color: "#B8D9C8",
+//     project_id: 1,
+//     order: 3,
 
-    items: [
-      {
-        id: `item-${uuidv4()}`,
-        project_id: 3,
-        title: "Task 5",
-        description: "Finish the user registration flow.",
-        start_date: "2024-01-10",
-        due_date: "2024-01-15",
-        completed_at: "2024-01-14T17:00:00Z",
-        created_at: "2024-01-10T08:00:00Z",
-        updated_at: "2024-01-14T16:00:00Z",
-        time: 2000,
-        column_id: 3,
-        order: 1,
+//     items: [
+//       {
+//         id: `item-${uuidv4()}`,
+//         project_id: 3,
+//         title: "Task 5",
+//         description: "Finish the user registration flow.",
+//         start_date: "2024-01-10",
+//         due_date: "2024-01-15",
+//         completed_at: "2024-01-14T17:00:00Z",
+//         created_at: "2024-01-10T08:00:00Z",
+//         updated_at: "2024-01-14T16:00:00Z",
+//         time: 2000,
+//         column_id: 3,
+//         order: 1,
 
-        members: [],
-      },
-      {
-        id: `item-${uuidv4()}`,
-        project_id: 3,
-        title: "Task 6",
-        description: "Finalize the project documentation.",
-        start_date: "2024-01-12",
-        due_date: "2024-01-16",
-        completed_at: "2024-01-15T18:00:00Z",
-        created_at: "2024-01-12T08:00:00Z",
-        updated_at: "2024-01-15T17:00:00Z",
-        time: 3500,
-        column_id: 3,
-        order: 1,
+//         members: [],
+//       },
+//       {
+//         id: `item-${uuidv4()}`,
+//         project_id: 3,
+//         title: "Task 6",
+//         description: "Finalize the project documentation.",
+//         start_date: "2024-01-12",
+//         due_date: "2024-01-16",
+//         completed_at: "2024-01-15T18:00:00Z",
+//         created_at: "2024-01-12T08:00:00Z",
+//         updated_at: "2024-01-15T17:00:00Z",
+//         time: 3500,
+//         column_id: 3,
+//         order: 1,
 
-        members: [],
-      },
-    ],
-  },
-];
+//         members: [],
+//       },
+//     ],
+//   },
+// ];
 
 export default function KanbanView({
   projectId,
@@ -164,11 +167,10 @@ export default function KanbanView({
   projectId: string;
   columnsWithTasks: DNDType[] | undefined;
 }) {
-  const [containers, setContainers] = useState<DNDType[]>(columnsWithTasks!);
+  const [containers, setContainers] = useState<DNDType[] | []>([]);
   const [isClient, setIsClient] = useState(false);
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [currentContainerId, setCurrentContainerId] =
-    useState<UniqueIdentifier>();
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [currentContainerId, setCurrentContainerId] = useState<any>();
   const [containerName, setContainerName] = useState("");
   const [itemName, setItemName] = useState("");
   const [showAddContainerModal, setShowAddContainerModal] = useState(false);
@@ -179,14 +181,10 @@ export default function KanbanView({
   const { value: openChangeTaskTitle, toggleValue: toggleChangeTaskTitle } =
     useToggle();
   const { value: openEditor, toggleValue: toggleOpenEditor } = useToggle();
-  const [currentIdTitle, setCurrentIdTitle] = useState<UniqueIdentifier | null>(
-    null
-  );
-  const [currentTaskId, setCurrentTaskId] = useState<UniqueIdentifier | null>(
-    null
-  );
+  const [currentIdTitle, setCurrentIdTitle] = useState<string | null>(null);
+  const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [taskTitle, setTaskTitle] = useState("");
-
+  const { handleUpdateColumns } = useUpdateColumns();
   const inputTaskRef = useRef<HTMLInputElement | null>(null);
   const inputTitleRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
@@ -196,8 +194,10 @@ export default function KanbanView({
     inputTaskRef?.current && inputTaskRef?.current?.focus();
   }, [toggleChangeTaskTitle]);
   useEffect(() => {
+    setContainers(columnsWithTasks!);
     setIsClient(true); // Only set the state once the component is mounted in the client
   }, []);
+
   const onAddContainer = () => {
     if (!containerName) return;
 
@@ -219,8 +219,8 @@ export default function KanbanView({
   };
 
   function handleChangeTaskTitle(
-    containerId: UniqueIdentifier | undefined,
-    taskId: UniqueIdentifier | undefined,
+    containerId: string | undefined,
+    taskId: string | undefined,
     title: string | undefined
   ) {
     if (title && containerId && taskId) {
@@ -231,12 +231,14 @@ export default function KanbanView({
       // Update the containers state with the modified task title
       const updatedContainers = containers.map((container) =>
         // Find the container by id
-        container.id === containerId
+        container.pseudo_id === containerId
           ? {
               ...container,
               items: container.items.map((item) =>
                 // Find the task within the container by its id and update the title
-                item.id === taskId ? { ...item, title: trimmedTitle } : item
+                item.pseudo_id === taskId
+                  ? { ...item, title: trimmedTitle }
+                  : item
               ),
             }
           : container
@@ -247,15 +249,24 @@ export default function KanbanView({
   }
 
   function changeContainerTitle(
-    id: UniqueIdentifier | undefined,
+    id: string | undefined,
     title: string | undefined
   ) {
     if (title) {
       toggleChangeTitle();
 
       const updateItemTitle = containers.map((item) =>
-        item.id === id ? { ...item, title: title.trim() } : item
+        item.pseudo_id === id ? { ...item, title: title.trim() } : item
       );
+      containers?.map((item) => {
+        item.pseudo_id === id &&
+          title !== item.title &&
+          handleUpdateColumns({
+            id: id as unknown as string,
+            title: title.trim(),
+          });
+      });
+
       setContainers(updateItemTitle);
     }
   }
@@ -263,7 +274,9 @@ export default function KanbanView({
   const onAddItem = () => {
     if (!itemName) return; // If no item name is provided, do nothing
     const id = `item-${uuidv4()}`; // Generate a unique id for the new item
-    const container = containers.find((item) => item.id === currentContainerId); // Find the container based on currentContainerId
+    const container = containers.find(
+      (item) => item.pseudo_id === currentContainerId
+    ); // Find the container based on currentContainerId
     if (!container) return; // If container is not found, do nothing
     const formattedDate = customFormatDate(new Date()); // "en-CA" returns the date in YYYY-MM-DD format
 
@@ -299,20 +312,20 @@ export default function KanbanView({
     type: "item" | "container"
   ) => {
     for (const container of containers) {
-      if (type === "container" && container.id === id) {
+      if (type === "container" && container.pseudo_id === id) {
         return container;
       }
       if (type === "item") {
-        const item = container.items.find((item) => item.id === id);
+        const item = container.items.find((item) => item.pseudo_id === id);
         if (item) return container;
       }
     }
     return null;
   };
-  const findItemTitle = (id: UniqueIdentifier | string | undefined) => {
+  const findItemTitle = (id: UniqueIdentifier | undefined) => {
     const container = findValueOfItems(id, "item");
     if (!container) return "";
-    const item = container.items.find((item) => item.id === id);
+    const item = container.items.find((item) => item.pseudo_id === id);
     if (!item) return "";
     return item.title;
   };
@@ -340,6 +353,7 @@ export default function KanbanView({
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
     const { id } = active;
+    //@ts-ignore
     setActiveId(id);
   }
 
@@ -354,35 +368,37 @@ export default function KanbanView({
     ) {
       const activeContainer = findValueOfItems(active.id, "item");
       const overContainer = findValueOfItems(over.id, "item");
-
       if (!activeContainer || !overContainer) return;
 
       const activeContainerIndex = containers.findIndex(
-        (container) => container.id === activeContainer.id
+        (container) =>
+          String(container.pseudo_id) === String(activeContainer.pseudo_id)
       );
-      const overContainerIndex = containers.findIndex(
-        (container) => container.id === overContainer.id
-      );
+      const overContainerIndex = containers.findIndex((container) => {
+        console.log(container.pseudo_id, overContainer);
+        return String(container.pseudo_id) === String(overContainer.pseudo_id);
+      });
 
       const activeItemIndex = activeContainer.items.findIndex(
-        (item) => item.id === active.id
+        (item) => item.pseudo_id === active.id
       );
+      console.log(activeItemIndex);
       const overItemIndex = overContainer.items.findIndex(
-        (item) => item.id === over.id
+        (item) => item.pseudo_id === over.id
       );
-      console.log(overItemIndex, "overItemIndex");
-      console.log(activeItemIndex, "activeItemIndex");
+
       if (activeContainerIndex === overContainerIndex) {
         // Within the same container
         const newItems = [...containers];
+
+        console.log("activeContainerIndex :", activeContainerIndex);
+
         newItems[activeContainerIndex].items = arrayMove(
           newItems[activeContainerIndex].items,
           activeItemIndex,
           overItemIndex
         );
-        console.log(overItemIndex, "overItemIndex END ");
-        console.log(activeItemIndex, "activeItemIndex END");
-        console.log(newItems, "NEW ITEMS");
+
         setContainers(newItems);
       } else {
         // Between different containers
@@ -396,13 +412,14 @@ export default function KanbanView({
           0,
           removedItem
         );
+
         setContainers(newItems);
       }
     }
   };
 
   // Handle Drag End
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
 
@@ -412,10 +429,10 @@ export default function KanbanView({
       active.id !== over.id
     ) {
       const activeContainerIndex = containers.findIndex(
-        (container) => container.id === active.id
+        (container) => container.pseudo_id === active.id
       );
       const overContainerIndex = containers.findIndex(
-        (container) => container.id === over.id
+        (container) => container.pseudo_id === over.id
       );
 
       if (activeContainerIndex !== overContainerIndex) {
@@ -424,7 +441,16 @@ export default function KanbanView({
           activeContainerIndex,
           overContainerIndex
         );
-        setContainers(newItems);
+        await Promise.all(
+          newItems.map(async (container, index) => {
+            await handleUpdateColumns({
+              id: container.id as unknown as string,
+              order: index, // The new order for the container
+            });
+          })
+        );
+        const columnsWithTasks = await getColumnsWithTasks(projectId);
+        setContainers(columnsWithTasks);
       }
     } else if (
       active.id.toString().includes("item") &&
@@ -436,16 +462,15 @@ export default function KanbanView({
       if (!activeContainer || !overContainer) return;
 
       const activeContainerIndex = containers.findIndex(
-        (container) => container.id === activeContainer.id
+        (container) => container.pseudo_id === activeContainer.pseudo_id
       );
       const overContainerIndex = containers.findIndex(
-        (container) => container.id === overContainer.id
+        (container) => container.pseudo_id === overContainer.pseudo_id
       );
 
       const activeItemIndex = activeContainer.items.findIndex(
-        (item) => item.id === active.id
+        (item) => item.pseudo_id === active.id
       );
-      console.log(activeItemIndex, "activeItemIndex");
       const newItems = [...containers];
       const [removedItem] = newItems[activeContainerIndex].items.splice(
         activeItemIndex,
@@ -458,8 +483,7 @@ export default function KanbanView({
 
     setActiveId(null);
   };
-  if (!isClient) return null; // Don't render anything until the client is ready
-
+  if (!isClient) return null;
   return (
     <div className="mx-auto max-w-7xl h-full flex flex-col gap-5 pt-4">
       <AddTasks

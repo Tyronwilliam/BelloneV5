@@ -22,16 +22,19 @@ export const fetchProjectsByCreator = async (creatorId: string | number) => {
     creator: creatorId,
   };
   try {
-    const response = await fetch(`${process.env.PROTECTED_URL}/project`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_PROTECTED_URL}/project`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query,
+          variables,
+        }),
+      }
+    );
 
     // Vérification de la réponse du serveur
     if (!response.ok) {
@@ -45,7 +48,6 @@ export const fetchProjectsByCreator = async (creatorId: string | number) => {
     console.error("Error fetching projects:", error);
     throw error; // Relance l'erreur après l'avoir loggée
   }
-
 };
 
 // Usage example

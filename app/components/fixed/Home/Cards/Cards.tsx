@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CardDemo } from "../../../reusable/Card/CustomCard.tsx";
+import { CustomCard } from "../../../reusable/Card/CustomCard.tsx";
 import { CardCustomItem } from "@/app/components/reusable/Card/CustomCard.ts";
 
 const content: CardCustomItem[] = [
@@ -42,7 +42,7 @@ const Cards = () => {
   return (
     <section className="flex flex-wrap gap-3 items-center justify-center h-fit py-10">
       {content?.map((items, index) => (
-        <CardDemo
+        <CustomCard
           custom={items}
           key={index}
           className="w-[30%] h-[372px] flex flex-col"

@@ -1,6 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import SideMenu from "../components/fixed/SideMenu/SideMenu";
 import { Toaster } from "@/components/ui/toaster";
+import SideMenu from "../components/fixed/SideMenu/SideMenu";
 
 export default function DashboardLayout({
   children,
@@ -16,7 +16,7 @@ export default function DashboardLayout({
           {children}
         </main>
       </SidebarProvider>{" "}
-      <Toaster />
+      <Toaster />{" "}
     </div>
   );
 }

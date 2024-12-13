@@ -1,0 +1,10 @@
+Task Dialog
+- Function duplicate Task  
+- Function Timer  (Context)
+- TextArea ( Commentaire)
+- Etiquette/Labels
+
+Kanban 
+
+- Faire les requetes changement de columns ordre
+- Same pour changement de task entre columns et ordre entre tasks 

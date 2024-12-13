@@ -1,21 +1,58 @@
 "use client";
-import KanbanBoard from "@/app/components/reusable/DragBox/KanbanBoard";
+import KanbanView, {
+  DNDType,
+} from "@/app/components/reusable/Kanban/KanbanView";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { KanbanType } from "@/zodSchema/Kanban/kanban";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
-const Left = ({ data }: { data: any }) => {
+const Left = ({
+  kanban,
+  projectId,
+  columnsWithTasks,
+}: {
+  kanban: KanbanType;
+  projectId: string;
+  columnsWithTasks: DNDType[] | undefined;
+}) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true); // Only set the state once the component is mounted in the client
+  }, []);
+
+  if (!isClient) return null; // Don't render anything until the client is ready
   return (
     <ResizablePanelGroup direction="vertical">
       <ResizablePanel defaultSize={30}>One</ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel
         defaultSize={70}
-        className="custom-scrollbar h-full overflow-x-scroll"
+        className="custom-scrollbar overflow-x-scroll "
       >
-        <KanbanBoard />
+        <div className="h-full w-full relative px-2 ">
+          {kanban?.image && (
+            <Image
+              src={kanban?.image}
+              alt="image"
+              className="absolute object-cover -z-10 w-[95%] h-[90%] pt-2 rounded-sm"
+              fill
+              unoptimized={true}
+            />
+          )}
+          {columnsWithTasks && columnsWithTasks?.length > 0 && (
+            <KanbanView
+              projectId={projectId}
+              columnsWithTasks={columnsWithTasks}
+            />
+          )}
+        </div>
       </ResizablePanel>
     </ResizablePanelGroup>
   );

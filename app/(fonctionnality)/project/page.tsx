@@ -2,6 +2,9 @@ import Entete from "@/app/components/reusable/Entete/Entete";
 import { DataTable } from "../../components/reusable/Table/DataTable";
 import { columns } from "./Table/column";
 import EmptyProjectView from "./Views/ProjectView";
+import { fetchProjectsByCreator } from "@/service/Project/api";
+import { formatDateToTimestamp } from "@/utils/date";
+import { ProjectType } from "@/zodSchema/Project/project";
 
 const clients = [
   {
@@ -22,15 +25,37 @@ const clients = [
   },
 ];
 const ProjectPage = async () => {
-  let projectsData = await fetch("http://localhost:3000/projects");
-  let projects = await projectsData.json();
-
+  let projects = await fetchProjectsByCreator(1)
+    .then((res) => {
+      // Format the dates in each project
+      return res.map((project: ProjectType) => ({
+        ...project,
+        startDate: formatDateToTimestamp(
+          project.startDate as unknown as string
+        ),
+        endDate: formatDateToTimestamp(project.endDate as unknown as string),
+      }));
+    })
+    .catch((error) => console.error("Error fetching projects:", error));
+  console.log(projects, "PROJECTS");
+  const isProjectMoreThan0 = projects?.length > 0 ? true : false;
   return (
     <Entete word={"Projects"}>
-      {projects?.length > 0 ? (
-        <DataTable columns={columns} data={projects} />
+      {isProjectMoreThan0 ? (
+        <>
+          {/* Add project even when we have project */}
+          <DataTable
+            columns={columns}
+            data={projects}
+            clients={clients}
+            isProjectMoreThan0={isProjectMoreThan0}
+          />
+        </>
       ) : (
-        <EmptyProjectView clients={clients} />
+        <EmptyProjectView
+          clients={clients}
+          isProjectMoreThan0={isProjectMoreThan0}
+        />
       )}
     </Entete>
   );

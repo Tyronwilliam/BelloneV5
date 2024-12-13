@@ -1,10 +1,16 @@
 "use client";
 
+import { AutoLinkNode, LinkNode } from "@lexical/link";
+import { ListItemNode, ListNode } from "@lexical/list";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { AutoLinkPlugin } from "@lexical/react/LexicalAutoLinkPlugin";
+import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
+import { ClickableLinkPlugin } from "@lexical/react/LexicalClickableLinkPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import {
   $isTextNode,
@@ -17,12 +23,15 @@ import {
   ParagraphNode,
   TextNode,
 } from "lexical";
-import { LinkNode } from "@lexical/link";
 import ExampleTheme from "./ExampleTheme";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
 import TreeViewPlugin from "./plugins/TreeViewPlugin";
-import { parseAllowedColor, parseAllowedFontSize } from "./styleConfig";
 import "./style.css";
+import {
+  MATCHERS,
+  parseAllowedColor,
+  parseAllowedFontSize,
+} from "./styleConfig";
 const placeholder = "Enter some rich text...";
 
 const removeStylesExportDOM = (
@@ -128,7 +137,14 @@ const editorConfig = {
     import: constructImportMap(),
   },
   namespace: "React.js Demo",
-  nodes: [ParagraphNode, TextNode, LinkNode],
+  nodes: [
+    ParagraphNode,
+    TextNode,
+    LinkNode,
+    AutoLinkNode,
+    ListNode,
+    ListItemNode,
+  ],
   onError(error: Error) {
     throw error;
   },
@@ -138,7 +154,7 @@ const editorConfig = {
 export default function Editor() {
   return (
     <LexicalComposer initialConfig={editorConfig}>
-      <div className="editor-container">
+      <div className="editor-container" onClick={(e) => e.stopPropagation()}>
         <ToolbarPlugin />
         <div className="editor-inner">
           <RichTextPlugin
@@ -155,7 +171,11 @@ export default function Editor() {
           />
           <HistoryPlugin />
           <AutoFocusPlugin />
-          <TreeViewPlugin />
+          {/* <TreeViewPlugin /> */}
+          <ClickableLinkPlugin />
+          <AutoLinkPlugin matchers={MATCHERS} /> <ListPlugin />
+          <CheckListPlugin />
+          {/* <ListPlugin /> */}
         </div>
       </div>
     </LexicalComposer>

@@ -23,15 +23,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import EmptyProjectView from "@/app/(fonctionnality)/project/Views/ProjectView";
+import { z } from "zod";
+import { ClientSchema } from "@/zodSchema/Client/zodSchema";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isProjectMoreThan0: boolean;
+  clients: z.infer<typeof ClientSchema>[];
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  clients,
+  isProjectMoreThan0,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -54,14 +61,18 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center flex-wrap py-4 gap-4">
         <Input
           placeholder="Filter by Title..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("title")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm shrink-0"
+        />{" "}
+        <EmptyProjectView
+          clients={clients}
+          isProjectMoreThan0={isProjectMoreThan0}
         />
       </div>
       <div className="rounded-md border">

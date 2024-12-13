@@ -1,22 +1,35 @@
+import { ReactNode } from "react";
 import { Control, FieldValues, Path } from "react-hook-form";
-import { ClientSchema } from "./zodSchema";
 
-export interface ClientFormPropss<T extends FieldValues> {
+export interface SelectableWithCreationProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   label: string;
   options: any[]; // Array of options
   placeholder?: string; // Optional placeholder
   isAddingNew: boolean;
-  addClientToDatabase: () => void;
-  handleNewClientChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  newClientEmail: string;
+  addToDatabase: () => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  newData: string;
   toggleValue: () => void;
+  isLoading: boolean;
+  inputPlaceholder: string;
+  addButtonLabel?: string;
+  saveButtonLabel?: string;
+  cancelButtonLabel?: string;
+  isPopover: boolean;
+  icon?: ReactNode;
 }
-export type ClientFormProps = {
+export type QuickFormProps = {
   isAddingNew: boolean;
-  addClientToDatabase: () => void;
-  handleNewClientChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  newClientEmail: string;
+  addToDatabase: () => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  newData: string;
   toggleValue: () => void;
+  inputPlaceholder: string;
+  isLoading: boolean;
+  addButtonLabel?: string;
+  saveButtonLabel?: string;
+  cancelButtonLabel?: string;
+  isPopover: boolean;
 };

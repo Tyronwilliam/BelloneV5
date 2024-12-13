@@ -25,7 +25,7 @@ export const ItemInterface = z.object({
   time: z.number(), // Time spent on the task in seconds, a number
   members: z.array(z.string()).min(1), // Array for assigned members, assuming each member is represented by a string (e.g., user ID). You can extend this if needed.
   column_id: z.union([z.number(), z.string()]),
-  order: z.union([z.string(), z.number()]),
+  order: z.number(),
   pseudo_id: z.string().optional(),
 });
 

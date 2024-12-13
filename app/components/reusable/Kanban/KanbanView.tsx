@@ -16,7 +16,6 @@ import {
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import { Button } from "@/components/ui/button";
-import { useSelectableWithCreation } from "@/hooks/useSelectableWithCreation";
 import { useToggle } from "@/hooks/useToggle";
 import useUpdateColumns from "@/hooks/useUpdateColumns";
 import { getColumnsWithTasks } from "@/service/Task/api";
@@ -27,138 +26,13 @@ import { useRef } from "react";
 import { z } from "zod";
 import { AddTasks } from "./AddTasks";
 import KanbanBoard from "./KanbanBoard";
+import useUpdateTasks from "@/hooks/useUpdateTasks";
 
 // Components
 
 export type DNDType = z.infer<typeof ColumnsTypeSchema> & {
   items: ItemInterfaceType[];
 };
-// const columns: DNDType[] = [
-//   {
-//     id: `container-${uuidv4()}`,
-//     title: "To Do",
-//     color: "#FFDAB9",
-//     project_id: 1,
-//     order: 3,
-//     items: [
-//       {
-//         id: `item-${uuidv4()}`,
-//         project_id: 1,
-//         title: "Task 1",
-//         description: "Design the wireframes for the homepage.",
-//         start_date: "2024-01-01",
-//         due_date: "2024-01-05",
-//         completed_at: null,
-//         created_at: "2024-01-01T08:00:00Z",
-//         updated_at: "2024-01-02T10:00:00Z",
-//         time: 3000,
-//         column_id: 1,
-//         members: [],
-//         order: 1,
-//       },
-//       {
-//         id: `item-${uuidv4()}`,
-//         project_id: 1,
-//         title: "Task 2",
-//         description: "Write the project proposal.",
-//         start_date: "2024-01-02",
-//         due_date: "2024-01-06",
-//         completed_at: null,
-//         created_at: "2024-01-02T08:00:00Z",
-//         updated_at: "2024-01-03T12:00:00Z",
-//         time: 4000,
-//         column_id: 1,
-//         order: 1,
-
-//         members: [],
-//       },
-//     ],
-//   },
-//   {
-//     id: `container-${uuidv4()}`,
-//     title: "In Progress",
-//     color: "#C9A0DC",
-//     project_id: 1,
-//     order: 3,
-
-//     items: [
-//       {
-//         id: `item-${uuidv4()}`,
-//         project_id: 2,
-//         title: "Task 3",
-//         description: "Create the user login form.",
-//         start_date: "2024-01-05",
-//         due_date: "2024-01-10",
-//         completed_at: null,
-//         created_at: "2024-01-05T09:00:00Z",
-//         updated_at: "2024-01-07T14:00:00Z",
-//         time: 5000,
-//         column_id: 2,
-//         order: 1,
-
-//         members: [],
-//       },
-//       {
-//         id: `item-${uuidv4()}`,
-//         project_id: 2,
-//         title: "Task 4",
-//         description: "Develop the backend API for user authentication.",
-//         start_date: "2024-01-06",
-//         due_date: "2024-01-11",
-//         completed_at: null,
-//         created_at: "2024-01-06T10:00:00Z",
-//         updated_at: "2024-01-08T15:00:00Z",
-//         time: 6000,
-//         column_id: 2,
-//         order: 1,
-
-//         members: [],
-//       },
-//     ],
-//   },
-//   {
-//     id: `container-${uuidv4()}`,
-//     title: "Done",
-//     color: "#B8D9C8",
-//     project_id: 1,
-//     order: 3,
-
-//     items: [
-//       {
-//         id: `item-${uuidv4()}`,
-//         project_id: 3,
-//         title: "Task 5",
-//         description: "Finish the user registration flow.",
-//         start_date: "2024-01-10",
-//         due_date: "2024-01-15",
-//         completed_at: "2024-01-14T17:00:00Z",
-//         created_at: "2024-01-10T08:00:00Z",
-//         updated_at: "2024-01-14T16:00:00Z",
-//         time: 2000,
-//         column_id: 3,
-//         order: 1,
-
-//         members: [],
-//       },
-//       {
-//         id: `item-${uuidv4()}`,
-//         project_id: 3,
-//         title: "Task 6",
-//         description: "Finalize the project documentation.",
-//         start_date: "2024-01-12",
-//         due_date: "2024-01-16",
-//         completed_at: "2024-01-15T18:00:00Z",
-//         created_at: "2024-01-12T08:00:00Z",
-//         updated_at: "2024-01-15T17:00:00Z",
-//         time: 3500,
-//         column_id: 3,
-//         order: 1,
-
-//         members: [],
-//       },
-//     ],
-//   },
-// ];
 
 export default function KanbanView({
   projectId,
@@ -185,6 +59,7 @@ export default function KanbanView({
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [taskTitle, setTaskTitle] = useState("");
   const { handleUpdateColumns } = useUpdateColumns();
+  const { handleUpdateTask } = useUpdateTasks();
   const inputTaskRef = useRef<HTMLInputElement | null>(null);
   const inputTitleRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
@@ -196,8 +71,15 @@ export default function KanbanView({
   useEffect(() => {
     setContainers(columnsWithTasks!);
     setIsClient(true); // Only set the state once the component is mounted in the client
-  }, []);
-
+  }, [columnsWithTasks]);
+  useEffect(() => {
+    if (containers.length > 0) {
+      // Optionnel : Re-fetch des données si nécessaire
+      getColumnsWithTasks(projectId).then((newColumns) => {
+        setContainers(newColumns);
+      });
+    }
+  }, [containers]); // Cela se déclenche chaque fois que containers change
   const onAddContainer = () => {
     if (!containerName) return;
 
@@ -356,11 +238,10 @@ export default function KanbanView({
     //@ts-ignore
     setActiveId(id);
   }
-
-  // Handle Drag Move
-  const handleDragMove = (event: DragMoveEvent) => {
+  const handleDragMove = async (event: DragMoveEvent) => {
     const { active, over } = event;
     if (!over) return;
+
     if (
       active.id.toString().includes("item") &&
       over.id.toString().includes("item") &&
@@ -368,6 +249,7 @@ export default function KanbanView({
     ) {
       const activeContainer = findValueOfItems(active.id, "item");
       const overContainer = findValueOfItems(over.id, "item");
+
       if (!activeContainer || !overContainer) return;
 
       const activeContainerIndex = containers.findIndex(
@@ -375,14 +257,12 @@ export default function KanbanView({
           String(container.pseudo_id) === String(activeContainer.pseudo_id)
       );
       const overContainerIndex = containers.findIndex((container) => {
-        console.log(container.pseudo_id, overContainer);
         return String(container.pseudo_id) === String(overContainer.pseudo_id);
       });
 
       const activeItemIndex = activeContainer.items.findIndex(
         (item) => item.pseudo_id === active.id
       );
-      console.log(activeItemIndex);
       const overItemIndex = overContainer.items.findIndex(
         (item) => item.pseudo_id === over.id
       );
@@ -390,16 +270,13 @@ export default function KanbanView({
       if (activeContainerIndex === overContainerIndex) {
         // Within the same container
         const newItems = [...containers];
-
-        console.log("activeContainerIndex :", activeContainerIndex);
-
         newItems[activeContainerIndex].items = arrayMove(
           newItems[activeContainerIndex].items,
           activeItemIndex,
           overItemIndex
         );
-
-        setContainers(newItems);
+        // Just update the UI here without triggering an API request
+        // setContainers(newItems);
       } else {
         // Between different containers
         const newItems = [...containers];
@@ -413,10 +290,12 @@ export default function KanbanView({
           removedItem
         );
 
-        setContainers(newItems);
+        // Just update the UI here without triggering an API request
+        // setContainers(newItems);
       }
     }
   };
+  //////
 
   // Handle Drag End
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -428,6 +307,8 @@ export default function KanbanView({
       over.id.toString().includes("container") &&
       active.id !== over.id
     ) {
+      console.log("CONTAINER & CONTAINER");
+
       const activeContainerIndex = containers.findIndex(
         (container) => container.pseudo_id === active.id
       );
@@ -443,19 +324,21 @@ export default function KanbanView({
         );
         await Promise.all(
           newItems.map(async (container, index) => {
-            await handleUpdateColumns({
+            handleUpdateColumns({
               id: container.id as unknown as string,
               order: index, // The new order for the container
             });
           })
         );
-        const columnsWithTasks = await getColumnsWithTasks(projectId);
-        setContainers(columnsWithTasks);
+        setContainers(newItems);
       }
     } else if (
       active.id.toString().includes("item") &&
       over.id.toString().includes("container")
     ) {
+      console.log("ITEM & CONTAINER");
+      console.log("FRERE");
+
       const activeContainer = findValueOfItems(active.id, "item");
       const overContainer = findValueOfItems(over.id, "container");
 
@@ -477,12 +360,147 @@ export default function KanbanView({
         1
       );
       newItems[overContainerIndex].items.push(removedItem);
+      // After updating the UI, update the backend
+
+      // Update the task's column_id and order in the target container
+      await handleUpdateTask({
+        id: removedItem.id,
+        column_id: newItems[overContainerIndex].id as string,
+        order: newItems[overContainerIndex].items.length - 1, // Place it at the end of the new container's list
+      });
+
+      // Optionally update the tasks order in the source container if necessary
+      newItems[activeContainerIndex].items.forEach(async (item, index) => {
+        if (item.order !== index) {
+          await handleUpdateTask({
+            id: item.id,
+            column_id: newItems[activeContainerIndex].id as string,
+            order: index,
+          });
+        }
+      });
+
+      // Optionally update the tasks order in the target container after the move
+      newItems[overContainerIndex].items.forEach(async (item, index) => {
+        if (item.order !== index) {
+          await handleUpdateTask({
+            id: item.id,
+            column_id: newItems[overContainerIndex].id as string,
+            order: index,
+          });
+        }
+      });
 
       setContainers(newItems);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////
+    if (
+      active.id.toString().includes("item") &&
+      over.id.toString().includes("item") &&
+      active.id !== over.id
+    ) {
+      console.log("ITEM & ITEM ");
+      const activeContainer = findValueOfItems(active.id, "item");
+      const overContainer = findValueOfItems(over.id, "item");
+      if (!activeContainer || !overContainer) return;
+
+      const activeContainerIndex = containers.findIndex(
+        (container) =>
+          String(container.pseudo_id) === String(activeContainer.pseudo_id)
+      );
+      const overContainerIndex = containers.findIndex((container) => {
+        return String(container.pseudo_id) === String(overContainer.pseudo_id);
+      });
+
+      const activeItemIndex = activeContainer.items.findIndex(
+        (item) => item.pseudo_id === active.id
+      );
+      const overItemIndex = overContainer.items.findIndex(
+        (item) => item.pseudo_id === over.id
+      );
+
+      if (activeContainerIndex === overContainerIndex) {
+        // Within the same container
+        const newItems = [...containers];
+
+        newItems[activeContainerIndex].items = arrayMove(
+          newItems[activeContainerIndex].items,
+          activeItemIndex,
+          overItemIndex
+        );
+
+        // Update orders in the backend
+        await Promise.all(
+          newItems[activeContainerIndex].items.map(async (item, index) => {
+            if (item.order !== index) {
+              console.log(item.order, index); // Log the old and new orders
+              await handleUpdateTask({
+                id: item.id,
+                column_id: newItems[activeContainerIndex].id as string,
+                order: index,
+              });
+            }
+          })
+        );
+
+        setContainers(newItems);
+      } else {
+        console.log("BETWEEN CONTAINER");
+        // Between different containers
+        const newItems = [...containers];
+        const [removedItem] = newItems[activeContainerIndex].items.splice(
+          activeItemIndex,
+          1
+        );
+        newItems[overContainerIndex].items.splice(
+          overItemIndex,
+          0,
+          removedItem
+        );
+
+        // Update the moved task in the backend
+        // Update orders for the source container
+        newItems[activeContainerIndex].items.forEach((item, index) => {
+          // Vérifie si l'ordre a changé avant d'envoyer la requête
+          if (item.order !== index) {
+            handleUpdateTask({
+              id: item.id,
+              column_id: newItems[activeContainerIndex].id as string,
+              order: index,
+            });
+          }
+        });
+
+        // Update orders for the target container
+        newItems[overContainerIndex].items.forEach((item, index) => {
+          // Vérifie si l'ordre a changé avant d'envoyer la requête
+          if (item.order !== index) {
+            handleUpdateTask({
+              id: item.id,
+              column_id: newItems[overContainerIndex].id as string,
+              order: index,
+            });
+          }
+        });
+
+        // Vérifie si la tâche déplacée a réellement changé de colonne ou d'ordre
+        if (
+          removedItem.column_id !== newItems[overContainerIndex].id ||
+          removedItem.order !== overItemIndex
+        ) {
+          handleUpdateTask({
+            id: removedItem.id,
+            column_id: newItems[overContainerIndex].id as string,
+            order: overItemIndex,
+          });
+        }
+        setContainers(newItems);
+      }
     }
 
     setActiveId(null);
   };
+
   if (!isClient) return null;
   return (
     <div className="mx-auto max-w-7xl h-full flex flex-col gap-5 pt-4">

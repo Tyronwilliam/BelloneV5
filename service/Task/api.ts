@@ -15,6 +15,7 @@ export const fetchTasksByProject = async (projectId: string) => {
         column_id
         project_id
         pseudo_id
+        order
       }
     }
   `;
@@ -54,11 +55,9 @@ export async function getColumnsWithTasks(projectId: string) {
   try {
     // Fetch tasks for the given project
     const tasksData = await fetchTasksByProject(projectId);
-    console.log("Tasks:", tasksData);
 
     // Fetch columns for the given project
     const columnsData = await fetchColumnsByProjectId(projectId);
-    console.log("Columns:", columnsData);
 
     // Map columns and associate tasks with each column
     const columnsWithTasks = columnsData.map((column: ColumnsType) => {

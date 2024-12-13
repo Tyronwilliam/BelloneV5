@@ -23,25 +23,7 @@ const SingleProjectPage = async ({
       console.error("Error fetching kanbans:", error); // Handle the error
     });
   // Tasks
-  let tasksData = await fetchTasksByProject(projectId)
-    .then((tasks) => {
-      console.log("Tasks:", tasks); // Traitez les tâches récupérées
-      return tasks;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-
-  //Column KANBAN
-  const columnsData = await fetchColumnsByProjectId(projectId)
-    .then((columns: ColumnsType[]) => {
-      console.log("Columns:", columns); // Process the columns data
-      return columns;
-    })
-    .catch((error) => {
-      console.error("Error fetching columns:", error); // Handle the error
-    });
-
+ 
   const columnsWithTasks = await getColumnsWithTasks(projectId);
   console.log(columnsWithTasks, "COLUMN & TASK");
   return (

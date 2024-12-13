@@ -8,7 +8,6 @@ const useUpdateColumns = () => {
 
   const update = useMutation({
     mutationFn: async (variables: any) => {
-      console.log(variables, "FROM MUTATION");
       return await axios.post(
         `${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`, // URL de ton endpoint GraphQL
         { query: updateColumnMutation, variables: variables }

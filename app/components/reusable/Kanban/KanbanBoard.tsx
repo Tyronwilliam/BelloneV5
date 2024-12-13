@@ -136,25 +136,27 @@ const KanbanBoard = ({
                 >
                   {/* Container tasks */}
                   <div className="custom-scrollbar flex items-start flex-col gap-y-4 h-full max-h-[220px] overflow-y-scroll">
-                    {container.items.map((i: ItemInterfaceType) => (
-                      <Items
-                        key={i.pseudo_id!}
-                        title={i.title}
-                        id={i.pseudo_id!}
-                        item={i}
-                        containerId={container.pseudo_id}
-                        open={openEditor}
-                        close={toggleOpenEditor}
-                        currentTaskId={currentTaskId}
-                        setCurrentTaskId={setCurrentTaskId}
-                        taskTitle={taskTitle}
-                        setTaskTitle={setTaskTitle}
-                        inputTaskRef={inputTaskRef}
-                        openChangeTaskTitle={openChangeTaskTitle}
-                        toggleChangeTaskTitle={toggleChangeTaskTitle}
-                        handleChangeTaskTitle={handleChangeTaskTitle}
-                      />
-                    ))}
+                    {container.items
+                      .sort((a, b) => a.order - b.order)
+                      .map((i: ItemInterfaceType) => (
+                        <Items
+                          key={i.pseudo_id!}
+                          title={i.title}
+                          id={i.pseudo_id!}
+                          item={i}
+                          containerId={container.pseudo_id}
+                          open={openEditor}
+                          close={toggleOpenEditor}
+                          currentTaskId={currentTaskId}
+                          setCurrentTaskId={setCurrentTaskId}
+                          taskTitle={taskTitle}
+                          setTaskTitle={setTaskTitle}
+                          inputTaskRef={inputTaskRef}
+                          openChangeTaskTitle={openChangeTaskTitle}
+                          toggleChangeTaskTitle={toggleChangeTaskTitle}
+                          handleChangeTaskTitle={handleChangeTaskTitle}
+                        />
+                      ))}
                   </div>
                 </SortableContext>
               </Container>
@@ -179,7 +181,7 @@ const KanbanBoard = ({
               title={findContainerTitle(activeId as string)}
             >
               {findContainerItems(activeId)?.map((i) => (
-                <Items key={i.id} title={i.title} id={i.pseudo_id!} />
+                <Items key={i.id} title={i.title} id={activeId} />
               ))}
             </Container>
           )}

@@ -268,30 +268,43 @@ export default function KanbanView({
       );
 
       if (activeContainerIndex === overContainerIndex) {
-        // Within the same container
-        const newItems = [...containers];
-        newItems[activeContainerIndex].items = arrayMove(
-          newItems[activeContainerIndex].items,
-          activeItemIndex,
-          overItemIndex
-        );
-        // Just update the UI here without triggering an API request
-        // setContainers(newItems);
-      } else {
-        // Between different containers
-        const newItems = [...containers];
-        const [removedItem] = newItems[activeContainerIndex].items.splice(
-          activeItemIndex,
-          1
-        );
-        newItems[overContainerIndex].items.splice(
-          overItemIndex,
-          0,
-          removedItem
+        // Déplacement au sein du même container
+        const newContainers = [...containers]; // Copie immuable des containers
+
+        // Réorganisation des items dans le container actif
+        const updatedItems = arrayMove(
+          newContainers[activeContainerIndex].items, // Items dans le container actif
+          activeItemIndex, // Index de l'item déplacé
+          overItemIndex // Nouvel index pour l'item déplacé
         );
 
-        // Just update the UI here without triggering an API request
-        // setContainers(newItems);
+        // Mise à jour des items du container actif
+        newContainers[activeContainerIndex] = {
+          ...newContainers[activeContainerIndex],
+          items: updatedItems, // Remplace les anciens items par les nouveaux
+        };
+
+        // Prévisualisation de la mise à jour
+        setContainers(newContainers);
+      } else {
+        // Déplacement entre deux containers différents
+        const newContainers = [...containers]; // Copie immuable des containers
+
+        // Retirer l'item du container actif
+        const [removedItem] = newContainers[activeContainerIndex].items.splice(
+          activeItemIndex, // Index de l'item déplacé dans le container actif
+          1 // Supprimer un seul élément
+        );
+
+        // Ajouter l'item dans le nouveau container
+        newContainers[overContainerIndex].items.splice(
+          overItemIndex, // Nouvel index dans le container cible
+          0, // Aucun élément à remplacer
+          removedItem // Ajouter l'item déplacé
+        );
+
+        // Mise à jour des containers pour prévisualisation
+        setContainers(newContainers);
       }
     }
   };
@@ -317,21 +330,29 @@ export default function KanbanView({
       );
 
       if (activeContainerIndex !== overContainerIndex) {
-        const newItems = arrayMove(
-          containers,
+        // Utiliser `arrayMove` pour déplacer les colonnes dans le tableau
+        const newContainers = arrayMove(
+          [...containers], // Crée une copie immuable des containers
           activeContainerIndex,
           overContainerIndex
         );
+
+        // Met à jour l'ordre des colonnes localement
+        newContainers.forEach((container, index) => {
+          container.order = index; // Met à jour la propriété `order` de chaque colonne
+        });
+
+        // Synchroniser les changements avec le backend
         await Promise.all(
-          newItems.map(async (container, index) => {
-            handleUpdateColumns({
-              id: container.id as unknown as string,
-              order: index, // The new order for the container
+          newContainers.map(async (container) => {
+            await handleUpdateColumns({
+              id: container.id as string, // ID de la colonne
+              order: container.order, // Nouvel ordre de la colonne
             });
           })
         );
-
-        setContainers(newItems);
+        // Mettre à jour l'état pour refléter les changements dans l'UI
+        setContainers(newContainers); // Met à jour les containers avec leur nouvelle position
       }
     } else if (
       active.id.toString().includes("item") &&

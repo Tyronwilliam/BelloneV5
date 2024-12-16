@@ -72,14 +72,14 @@ export default function KanbanView({
     setContainers(columnsWithTasks!);
     setIsClient(true); // Only set the state once the component is mounted in the client
   }, [columnsWithTasks]);
-  useEffect(() => {
-    if (containers.length > 0) {
-      // Optionnel : Re-fetch des données si nécessaire
-      getColumnsWithTasks(projectId).then((newColumns) => {
-        setContainers(newColumns);
-      });
-    }
-  }, [containers]); // Cela se déclenche chaque fois que containers change
+  // useEffect(() => {
+  //   if (containers.length > 0) {
+  //     // Optionnel : Re-fetch des données si nécessaire
+  //     getColumnsWithTasks(projectId).then((newColumns) => {
+  //       setContainers(newColumns);
+  //     });
+  //   }
+  // }, [containers]); // Cela se déclenche chaque fois que containers change
   const onAddContainer = () => {
     if (!containerName) return;
 
@@ -330,6 +330,7 @@ export default function KanbanView({
             });
           })
         );
+
         setContainers(newItems);
       }
     } else if (
@@ -390,7 +391,6 @@ export default function KanbanView({
           });
         }
       });
-
       setContainers(newItems);
     }
     /////////////////////////////////////////////////////////////////////////////////////
@@ -420,30 +420,43 @@ export default function KanbanView({
       );
 
       if (activeContainerIndex === overContainerIndex) {
-        // Within the same container
-        const newItems = [...containers];
+        const newItems = [...containers]; // Crée une copie du tableau des containers
 
-        newItems[activeContainerIndex].items = arrayMove(
-          newItems[activeContainerIndex].items,
-          activeItemIndex,
-          overItemIndex
-        );
+        // Récupérez les items du container actif
+        const items = [...newItems[activeContainerIndex].items]; // Crée une copie des items
 
-        // Update orders in the backend
+        // Identifiez les items à intervertir
+        const activeItem = items[activeItemIndex]; // L'item déplacé
+        const overItem = items[overItemIndex]; // L'item avec lequel il est échangé
+
+        // Échangez les propriétés `order` des deux items
+        const tempOrder = activeItem.order; // Sauvegardez temporairement l'ordre de l'item actif
+        activeItem.order = overItem.order; // L'item actif prend l'ordre de l'item cible
+        overItem.order = tempOrder; // L'item cible prend l'ordre initial de l'item actif
+
+        // Remplacez les items dans le tableau à leurs nouvelles positions
+        items[activeItemIndex] = { ...activeItem };
+        items[overItemIndex] = { ...overItem };
+
+        // Mettez à jour les items dans le container actif
+        newItems[activeContainerIndex] = {
+          ...newItems[activeContainerIndex],
+          items, // Remplacez l'ancien tableau d'items par le nouveau
+        };
+
+        // Mettez à jour les ordres dans le backend
         await Promise.all(
-          newItems[activeContainerIndex].items.map(async (item, index) => {
-            if (item.order !== index) {
-              console.log(item.order, index); // Log the old and new orders
-              await handleUpdateTask({
-                id: item.id,
-                column_id: newItems[activeContainerIndex].id as string,
-                order: index,
-              });
-            }
+          newItems[activeContainerIndex].items.map(async (item) => {
+            await handleUpdateTask({
+              id: item.id,
+              column_id: newItems[activeContainerIndex].id as string, // ID du container
+              order: item.order, // Nouvel ordre de l'item
+            });
           })
         );
 
-        setContainers(newItems);
+        // Mettez à jour l'état pour refléter les changements dans l'UI
+        setContainers([...newItems]); // Créez une nouvelle référence pour forcer le re-render
       } else {
         console.log("BETWEEN CONTAINER");
         // Between different containers

@@ -7,12 +7,12 @@ import { MutableRefObject } from "react";
 import { TaskDialog } from "../Dialog/Tasks/TaskDialog";
 
 type ItemsType = {
-  id: string;
+  pseudoId: string;
   title: string;
   containerId?: string;
   item?: ItemInterfaceType;
-  open?: boolean;
-  close?: () => void;
+  openEditor?: boolean;
+  toggleOpenEditor?: () => void;
   taskTitle?: string;
   setTaskTitle?: (e: any) => void;
   handleChangeTaskTitle?: (
@@ -28,11 +28,11 @@ type ItemsType = {
 };
 
 const Items = ({
-  id,
+  pseudoId,
   title,
   item,
-  open,
-  close,
+  openEditor,
+  toggleOpenEditor,
   currentTaskId,
   handleChangeTaskTitle,
   setTaskTitle,
@@ -51,7 +51,7 @@ const Items = ({
     transition,
     isDragging,
   } = useSortable({
-    id: id,
+    id: pseudoId,
     data: {
       type: "item",
     },
@@ -69,9 +69,9 @@ const Items = ({
         isDragging && "opacity-50"
       )}
       onClick={() => {
-        setCurrentTaskId && setCurrentTaskId(id);
+        setCurrentTaskId && setCurrentTaskId(pseudoId);
         setTaskTitle && setTaskTitle(title);
-        close && close();
+        toggleOpenEditor && toggleOpenEditor();
         toggleChangeTaskTitle && openChangeTaskTitle && toggleChangeTaskTitle();
       }}
     >
@@ -82,21 +82,21 @@ const Items = ({
           {...listeners}
         />
       </div>
-      {open && close && currentTaskId === id && (
+      {openEditor && currentTaskId === pseudoId && (
         <TaskDialog
-          id={currentTaskId}
+          pseudoId={currentTaskId}
           task={item!}
-          open={open}
-          close={close}
-          containerId={containerId}
+          open={openEditor}
+          close={toggleOpenEditor!}
+          containerId={containerId!}
           currentTaskId={currentTaskId}
           setCurrentTaskId={setCurrentTaskId}
-          taskTitle={taskTitle}
+          taskTitle={taskTitle!}
           setTaskTitle={setTaskTitle}
           inputTaskRef={inputTaskRef}
-          handleChangeTaskTitle={handleChangeTaskTitle}
+          handleChangeTaskTitle={handleChangeTaskTitle!}
           openChangeTaskTitle={openChangeTaskTitle}
-          toggleChangeTaskTitle={toggleChangeTaskTitle}
+          toggleChangeTaskTitle={toggleChangeTaskTitle!}
         />
       )}
     </div>

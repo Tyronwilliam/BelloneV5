@@ -1,7 +1,7 @@
+import { createTaskMutation, updateTaskMutation } from "@/service/Task/query";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { toast, useToast } from "./use-toast";
-import { createTaskMutation, updateTaskMutation } from "@/service/Task/query";
+import { toast } from "./use-toast";
 
 const useUpdateTasks = () => {
   const createTask = useMutation({
@@ -21,15 +21,20 @@ const useUpdateTasks = () => {
         variant: "destructive",
         title: `Failed to update task: ${error.message}`,
       });
-
-      throw new Error(error?.message);
     },
     onSuccess: (data) => {
-      toast({
-        variant: "default",
-        title: "Task created successfully!",
-      });
-      return data;
+      if (data?.data?.createTask) {
+        toast({
+          variant: "default",
+          title: "Task created successfully!",
+        });
+        return data;
+      } else {
+        toast({
+          variant: "destructive",
+          title: `Failed to update task`,
+        });
+      }
     },
   });
   const updateTask = useMutation({
@@ -45,16 +50,20 @@ const useUpdateTasks = () => {
         variant: "destructive",
         title: `Failed to update task: ${error.message}`,
       });
-
-      throw new Error(error?.message);
     },
     onSuccess: (data) => {
-      console.log("Task updated successfully:", data);
-      toast({
-        variant: "default",
-        title: "Task updated successfully!",
-      });
-      return data;
+      if (data?.data?.data?.updateTask) {
+        toast({
+          variant: "default",
+          title: "Task updated successfully!",
+        });
+        return data;
+      } else {
+        toast({
+          variant: "destructive",
+          title: `Failed to update task`,
+        });
+      }
     },
   });
   const handleCreateTask = async ({
@@ -79,7 +88,6 @@ const useUpdateTasks = () => {
     order?: number;
   }) => {
     try {
-      // Use the mutateAsync method to wait for the result of the mutation
       const response = await createTask.mutateAsync({
         title,
         description,
@@ -91,10 +99,6 @@ const useUpdateTasks = () => {
         project_id,
         order,
       });
-
-      console.log("Task created:", response); // Use the response here
-
-      // Optionally, you can return the response or handle it further
       return response;
     } catch (error) {
       console.error("Error creating task:", error);

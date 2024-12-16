@@ -3,7 +3,7 @@ export const updateTaskMutation = /* GraphQL */ `
     $id: String!
     $title: String
     $description: String
-    $start_date: Int
+    $start_date: Float
     $due_date: Int
     $time: Int
     $members: [String]

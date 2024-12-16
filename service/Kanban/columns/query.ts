@@ -24,3 +24,21 @@ export const updateColumnMutation = /* GraphQL */ `
     }
   }
 `;
+
+export const createColumnMutation = `
+  mutation AddColumn($title: String, $color: String, $project_id: String!, $order: Int!) {
+    addColumn(
+      title: $title
+      color: $color
+      project_id: $project_id
+      order: $order
+    ) {
+      id
+      title
+      color
+      project_id
+      order
+      pseudo_id
+    }
+  }
+`;

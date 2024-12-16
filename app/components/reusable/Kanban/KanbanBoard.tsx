@@ -142,11 +142,11 @@ const KanbanBoard = ({
                         <Items
                           key={i.pseudo_id!}
                           title={i.title}
-                          id={i.pseudo_id!}
+                          pseudoId={i.pseudo_id!}
                           item={i}
-                          containerId={container.pseudo_id}
-                          open={openEditor}
-                          close={toggleOpenEditor}
+                          containerId={container.pseudo_id!}
+                          openEditor={openEditor}
+                          toggleOpenEditor={toggleOpenEditor}
                           currentTaskId={currentTaskId}
                           setCurrentTaskId={setCurrentTaskId}
                           taskTitle={taskTitle}
@@ -172,7 +172,7 @@ const KanbanBoard = ({
         <DragOverlay adjustScale={false}>
           {/* Drag Overlay For item Item */}
           {activeId && activeId.toString().includes("item") && (
-            <Items id={activeId} title={findItemTitle(activeId)} />
+            <Items pseudoId={activeId} title={findItemTitle(activeId)} />
           )}
           {/* Drag Overlay For Container */}
           {activeId && activeId.toString().includes("container") && (
@@ -181,7 +181,7 @@ const KanbanBoard = ({
               title={findContainerTitle(activeId as string)}
             >
               {findContainerItems(activeId)?.map((i) => (
-                <Items key={i.id} title={i.title} id={activeId} />
+                <Items key={i.id} title={i.title} pseudoId={activeId} />
               ))}
             </Container>
           )}

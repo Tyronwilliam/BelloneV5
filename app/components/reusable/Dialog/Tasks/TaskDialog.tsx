@@ -20,28 +20,27 @@ import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
 
 export interface TaskDialogInterface {
-  id: string | undefined;
+  pseudoId: string;
   task: ItemInterfaceType;
   open: boolean;
   close: () => void;
-  containerId?: string;
-  taskTitle?: string;
+  containerId: string;
+  taskTitle: string;
   setTaskTitle?: (e: any) => void;
-  handleChangeTaskTitle?: (
+  handleChangeTaskTitle: (
     containerId: string,
-    id: string | undefined,
-    title: string | undefined
+    id: string,
+    title: string
   ) => void;
-  toggleChangeTaskTitle?: () => void;
+  toggleChangeTaskTitle: () => void;
   openChangeTaskTitle?: boolean;
-
   currentTaskId?: string | null;
   setCurrentTaskId?: (value: string | null) => void;
   inputTaskRef?: MutableRefObject<HTMLInputElement | null>;
 }
 
 export function TaskDialog({
-  id,
+  pseudoId,
   task,
   open,
   close,
@@ -50,12 +49,11 @@ export function TaskDialog({
   setTaskTitle,
   inputTaskRef,
   taskTitle,
-  setCurrentTaskId,
-  toggleChangeTaskTitle,
   containerId,
-  openChangeTaskTitle,
 }: TaskDialogInterface) {
   const { value: isOpen, toggleValue: toggleIsOpen } = useToggle();
+  const { value: isChangeTitle, toggleValue: toggleIsChangeTitle } =
+    useToggle();
   const [stickers, setStickers] = useState<StickersType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,45 +84,32 @@ export function TaskDialog({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Save task title if clicked outside and the input is focused
       if (
-        currentTaskId === id &&
-        openChangeTaskTitle &&
+        currentTaskId === pseudoId &&
+        isChangeTitle &&
         inputTaskRef &&
         inputTaskRef.current &&
-        containerId &&
         !inputTaskRef.current.contains(event.target as Node)
       ) {
-        if (task?.title?.trim() !== taskTitle?.trim()) {
-          handleChangeTaskTitle &&
-            handleChangeTaskTitle(containerId, id, taskTitle); // Save title
-          toggleChangeTaskTitle && toggleChangeTaskTitle(); // Toggle edit mode
-        }
+        handleChangeTaskTitle(containerId, pseudoId, taskTitle); // Save title
+        toggleIsChangeTitle();
       }
     };
 
-    if (openChangeTaskTitle) {
+    if (isChangeTitle) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [
-    openChangeTaskTitle,
-    inputTaskRef,
-    toggleChangeTaskTitle,
-    handleChangeTaskTitle,
-    id,
-    taskTitle,
-    containerId,
-    currentTaskId,
-  ]);
+  }, [isChangeTitle, pseudoId, currentTaskId, taskTitle]);
   return (
-    <Dialog key={id} open={open} onOpenChange={close}>
+    <Dialog key={pseudoId} open={open} onOpenChange={close}>
       <DialogContent
-        className="min-w-[800px]"
-        aria-describedby={"Task dialog"}
+        className="min-w-[800px] z-50"
+        // aria-describedby={"Task dialog"}
+        aria-describedby={undefined}
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -132,22 +117,18 @@ export function TaskDialog({
         <DialogHeader>
           <DialogTitle>
             <TitleView
-              id={id}
-              task={task!}
-              open={open}
-              close={close}
+              isChangeTitle={isChangeTitle}
+              pseudoId={pseudoId}
+              task={task}
+              toggleIsChangeTitle={toggleIsChangeTitle}
               containerId={containerId}
-              currentTaskId={currentTaskId}
-              setCurrentTaskId={setCurrentTaskId}
+              currentTaskId={currentTaskId as string}
               taskTitle={taskTitle}
-              setTaskTitle={setTaskTitle}
+              setTaskTitle={setTaskTitle!}
               inputTaskRef={inputTaskRef}
               handleChangeTaskTitle={handleChangeTaskTitle}
-              openChangeTaskTitle={openChangeTaskTitle}
-              toggleChangeTaskTitle={toggleChangeTaskTitle}
             />
           </DialogTitle>
-          <DialogDescription></DialogDescription>
         </DialogHeader>
         {/* Faire un composant */}
         <section className="flex w-full min-h-[600px] gap-4">
@@ -173,43 +154,52 @@ export function TaskDialog({
 }
 
 const TitleView = ({
-  currentTaskId,
-  id,
-  openChangeTaskTitle,
-  setTaskTitle,
-  handleChangeTaskTitle,
-  inputTaskRef,
-  taskTitle,
+  isChangeTitle,
+  pseudoId,
   task,
+  toggleIsChangeTitle,
   containerId,
-  setCurrentTaskId,
-  toggleChangeTaskTitle,
-}: TaskDialogInterface) => {
-  return currentTaskId === id &&
-    openChangeTaskTitle &&
-    setTaskTitle &&
-    handleChangeTaskTitle ? (
+  currentTaskId,
+  taskTitle,
+  setTaskTitle,
+  inputTaskRef,
+  handleChangeTaskTitle,
+}: {
+  isChangeTitle: boolean;
+  pseudoId: string;
+  task: ItemInterfaceType;
+  toggleIsChangeTitle: () => void;
+  containerId: string;
+  currentTaskId: string;
+  taskTitle: string;
+  setTaskTitle: (e: any) => void;
+  inputTaskRef?: MutableRefObject<HTMLInputElement | null>;
+  handleChangeTaskTitle: (
+    containerId: string,
+    id: string,
+    title: string
+  ) => void;
+}) => {
+  return currentTaskId === pseudoId && isChangeTitle ? (
     <Input
       ref={inputTaskRef}
-      key={id}
+      key={pseudoId}
       type="text"
-      name={id as string | undefined}
+      name={pseudoId as string | undefined}
       placeholder={task?.title}
       value={taskTitle}
-      onChange={(e: any) => setTaskTitle(e.target.value)}
+      onChange={(e: any) => setTaskTitle!(e.target.value)}
       onBlur={() => {
-        if (containerId && taskTitle) {
-          handleChangeTaskTitle(containerId, id, taskTitle);
-        }
+        handleChangeTaskTitle(containerId, pseudoId, taskTitle);
       }}
       className=" text-xl w-[90%]"
     />
   ) : (
     <div
       className="text-gray-800 text-xl w-[90%] cursor-pointer"
-      onClick={() => {
-        setCurrentTaskId && setCurrentTaskId(task?.id);
-        toggleChangeTaskTitle && toggleChangeTaskTitle();
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleIsChangeTitle();
       }}
     >
       {task?.title}

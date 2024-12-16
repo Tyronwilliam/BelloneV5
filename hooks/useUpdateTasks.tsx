@@ -1,11 +1,37 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { useToast } from "./use-toast";
-import { updateTaskMutation } from "@/service/Task/query";
+import { toast, useToast } from "./use-toast";
+import { createTaskMutation, updateTaskMutation } from "@/service/Task/query";
 
 const useUpdateTasks = () => {
-  const { toast } = useToast();
+  const createTask = useMutation({
+    mutationFn: async (variables: any) => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_PROTECTED_URL}/task`, // URL for your GraphQL endpoint
+        {
+          query: createTaskMutation, // Your GraphQL query
+          variables: variables, // Variables passed to the query
+        }
+      );
+      return response.data;
+    },
+    onError: (error) => {
+      console.error("Failed to update task:", error);
+      toast({
+        variant: "destructive",
+        title: `Failed to update task: ${error.message}`,
+      });
 
+      throw new Error(error?.message);
+    },
+    onSuccess: (data) => {
+      toast({
+        variant: "default",
+        title: "Task created successfully!",
+      });
+      return data;
+    },
+  });
   const updateTask = useMutation({
     mutationFn: async (variables: any) => {
       return await axios.post(
@@ -31,8 +57,51 @@ const useUpdateTasks = () => {
       return data;
     },
   });
+  const handleCreateTask = async ({
+    title,
+    description,
+    start_date,
+    due_date,
+    time,
+    members,
+    column_id,
+    project_id,
+    order,
+  }: {
+    title?: string;
+    description?: string;
+    start_date?: number;
+    due_date?: number;
+    time?: number;
+    members?: string[];
+    column_id?: string;
+    project_id?: string;
+    order?: number;
+  }) => {
+    try {
+      // Use the mutateAsync method to wait for the result of the mutation
+      const response = await createTask.mutateAsync({
+        title,
+        description,
+        start_date,
+        ...(due_date !== undefined && { due_date }),
+        time,
+        members,
+        column_id,
+        project_id,
+        order,
+      });
 
-  const handleUpdateTask = ({
+      console.log("Task created:", response); // Use the response here
+
+      // Optionally, you can return the response or handle it further
+      return response;
+    } catch (error) {
+      console.error("Error creating task:", error);
+      throw error; // If you want to propagate the error
+    }
+  };
+  const handleUpdateTask = async ({
     id,
     title,
     description,
@@ -57,7 +126,7 @@ const useUpdateTasks = () => {
     order?: number;
     pseudo_id?: string;
   }) => {
-    return updateTask.mutate({
+    return updateTask.mutateAsync({
       id,
       ...(title !== undefined && { title }),
       ...(description !== undefined && { description }),
@@ -72,7 +141,7 @@ const useUpdateTasks = () => {
     });
   };
 
-  return { handleUpdateTask };
+  return { handleUpdateTask, handleCreateTask };
 };
 
 export default useUpdateTasks;

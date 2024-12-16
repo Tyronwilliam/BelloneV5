@@ -20,8 +20,6 @@ export const ItemInterface = z.object({
   start_date: z.string(), // Start date in ISO 8601 format, assuming it's a string
   due_date: z.string(), // Due date in ISO 8601 format, assuming it's a string
   completed_at: z.string().nullable(), // Completion timestamp or null if not completed
-  created_at: z.string(), // Task creation timestamp, assuming it's a string
-  updated_at: z.string(), // Last updated timestamp, assuming it's a string
   time: z.number(), // Time spent on the task in seconds, a number
   members: z.array(z.string()).min(1), // Array for assigned members, assuming each member is represented by a string (e.g., user ID). You can extend this if needed.
   column_id: z.union([z.number(), z.string()]),
@@ -37,6 +35,5 @@ export const TaskFormDialogSchema = ItemInterface.omit({
   title: true,
   description: true,
   due_date: true,
-  created_at: true,
   column_id: true,
 });

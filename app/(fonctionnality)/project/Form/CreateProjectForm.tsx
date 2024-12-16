@@ -5,21 +5,16 @@ import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { toast } from "@/hooks/use-toast";
+import { useSelectableWithCreation } from "@/hooks/useSelectableWithCreation";
 import { addClient } from "@/service/Client/api";
-import { useToast } from "@/hooks/use-toast";
-import { useToggle } from "@/hooks/useToggle";
 import { ClientSchema } from "@/zodSchema/Client/zodSchema";
-import {
-  ProjectFormSchema,
-  ProjectType,
-  ProjectTypeSchema,
-} from "@/zodSchema/Project/project";
+import { ProjectFormSchema, ProjectType } from "@/zodSchema/Project/project";
 import { useState } from "react";
 import CustomFormItem from "./reusable/CustomFormItem";
 import { DateInput } from "./reusable/DateInput";
 import { SelectInput } from "./reusable/SelectInput";
 import { SelectableWithCreation } from "./SelectableWithCreation";
-import { useSelectableWithCreation } from "@/hooks/useSelectableWithCreation";
 
 const statusOptions = [
   { value: "OPEN", label: "Open", color: "text-green-700" },
@@ -38,7 +33,6 @@ export function CreateProjectForm({ clients }: CreateProjectProps) {
         label: client.email,
       }))
     : [];
-  const { toast } = useToast();
   const form = useForm<ProjectType>({
     resolver: zodResolver(ProjectFormSchema),
     defaultValues: {

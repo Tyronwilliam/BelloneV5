@@ -27,6 +27,7 @@ import { z } from "zod";
 import { AddTasks } from "./AddTasks";
 import KanbanBoard from "./KanbanBoard";
 import useUpdateTasks from "@/hooks/useUpdateTasks";
+import useKanbanState from "@/hooks/useKanbanState";
 
 // Components
 
@@ -41,27 +42,42 @@ export default function KanbanView({
   projectId: string;
   columnsWithTasks: DNDType[] | undefined;
 }) {
-  const [containers, setContainers] = useState<DNDType[] | []>([]);
-  const [isClient, setIsClient] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [currentContainerId, setCurrentContainerId] = useState<any>();
-  const [containerName, setContainerName] = useState("");
-  const [itemName, setItemName] = useState("");
-  const [showAddContainerModal, setShowAddContainerModal] = useState(false);
-  const [showAddItemModal, setShowAddItemModal] = useState(false);
-  const [containerTitle, setContainerTitle] = useState("");
-  const { value: openChangeTitle, toggleValue: toggleChangeTitle } =
-    useToggle();
-  const { value: openChangeTaskTitle, toggleValue: toggleChangeTaskTitle } =
-    useToggle();
-  const { value: openEditor, toggleValue: toggleOpenEditor } = useToggle();
-  const [currentIdTitle, setCurrentIdTitle] = useState<string | null>(null);
-  const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
-  const [taskTitle, setTaskTitle] = useState("");
-  const { handleUpdateColumns } = useUpdateColumns();
-  const { handleUpdateTask } = useUpdateTasks();
-  const inputTaskRef = useRef<HTMLInputElement | null>(null);
-  const inputTitleRef = useRef<HTMLInputElement | null>(null);
+  const {
+    containers,
+    setContainers,
+    isClient,
+    setIsClient,
+    activeId,
+    setActiveId,
+    currentContainerId,
+    setCurrentContainerId,
+    containerName,
+    setContainerName,
+    showAddContainerModal,
+    setShowAddContainerModal,
+    showAddItemModal,
+    setShowAddItemModal,
+    containerTitle,
+    setContainerTitle,
+    openChangeTitle,
+    toggleChangeTitle,
+    openChangeTaskTitle,
+    toggleChangeTaskTitle,
+    openEditor,
+    toggleOpenEditor,
+    currentIdTitle,
+    setCurrentIdTitle,
+    currentTaskId,
+    setCurrentTaskId,
+    taskTitle,
+    setTaskTitle,
+    handleUpdateColumns,
+    handleUpdateTask,
+    inputTaskRef,
+    inputTitleRef,
+    onAddItem,
+    onAddContainer,
+  } = useKanbanState(projectId);
   useEffect(() => {
     inputTitleRef?.current && inputTitleRef?.current?.focus();
   }, [toggleChangeTitle]);
@@ -72,33 +88,6 @@ export default function KanbanView({
     setContainers(columnsWithTasks!);
     setIsClient(true); // Only set the state once the component is mounted in the client
   }, [columnsWithTasks]);
-  // useEffect(() => {
-  //   if (containers.length > 0) {
-  //     // Optionnel : Re-fetch des données si nécessaire
-  //     getColumnsWithTasks(projectId).then((newColumns) => {
-  //       setContainers(newColumns);
-  //     });
-  //   }
-  // }, [containers]); // Cela se déclenche chaque fois que containers change
-  const onAddContainer = () => {
-    if (!containerName) return;
-
-    // Create functiion add container
-    const id = `container-${uuidv4()}`;
-    setContainers([
-      ...containers,
-      {
-        id,
-        title: containerName,
-        items: [],
-        color: "",
-        project_id: projectId,
-        order: containers?.length + 1,
-      },
-    ]);
-    setContainerName("");
-    setShowAddContainerModal(false);
-  };
 
   function handleChangeTaskTitle(
     containerId: string | undefined,
@@ -152,42 +141,6 @@ export default function KanbanView({
       setContainers(updateItemTitle);
     }
   }
-
-  const onAddItem = () => {
-    if (!itemName) return; // If no item name is provided, do nothing
-    const id = `item-${uuidv4()}`; // Generate a unique id for the new item
-    const container = containers.find(
-      (item) => item.pseudo_id === currentContainerId
-    ); // Find the container based on currentContainerId
-    if (!container) return; // If container is not found, do nothing
-    const formattedDate = customFormatDate(new Date()); // "en-CA" returns the date in YYYY-MM-DD format
-
-    const newItem: ItemInterfaceType = {
-      id, // Unique identifier for the item
-      project_id: parseInt(projectId), // Set a default project_id or get it dynamically
-      title: itemName, // Set the title from itemName
-      description: "", // Optionally, you can allow for description input
-      start_date: formattedDate, // Set a start date or use the current date
-      due_date: "", // Set a due date or allow input from the user
-      completed_at: null, // Initially, the task is not completed
-      created_at: new Date().toISOString(), // Current timestamp for when the task is created
-      updated_at: new Date().toISOString(), // Timestamp for when the task is updated
-      time: 0, // Initial time spent is 0
-      members: [], // Initially no members
-      column_id: container?.id,
-      order: container?.items?.length,
-    };
-
-    // Push the new item into the container's items array
-    container.items.push(newItem);
-
-    // Update the containers state with the new item added to the correct container
-    setContainers([...containers]);
-
-    // Reset the item name and close the modal
-    setItemName("");
-    setShowAddItemModal(false);
-  };
 
   const findValueOfItems = (
     id: UniqueIdentifier | undefined,
@@ -541,8 +494,8 @@ export default function KanbanView({
       <AddTasks
         showAddItemModal={showAddItemModal}
         setShowAddItemModal={setShowAddItemModal}
-        itemName={itemName}
-        setItemName={setItemName}
+        taskTitle={taskTitle}
+        setTaskTitle={setTaskTitle}
         onAddItem={onAddItem}
       />
       <Button className="w-fit">Background</Button>

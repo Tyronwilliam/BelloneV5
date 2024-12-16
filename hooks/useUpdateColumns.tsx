@@ -1,11 +1,9 @@
 import { updateColumnMutation } from "@/service/Kanban/columns/query";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { useToast } from "./use-toast";
+import { toast } from "./use-toast";
 
 const useUpdateColumns = () => {
-  const { toast } = useToast();
-
   const update = useMutation({
     mutationFn: async (variables: any) => {
       return await axios.post(

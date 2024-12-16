@@ -10,20 +10,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Input from "./Input";
+import { Dispatch } from "react";
 
 interface AddColumnProps {
   showAddItemModal: boolean;
   setShowAddItemModal: (arg: boolean) => void;
-  itemName: string;
-  setItemName: (e: any) => void;
+  taskTitle: string;
+  setTaskTitle: (e: any) => void;
   onAddItem: () => void;
 }
 
 export const AddTasks = ({
   showAddItemModal,
   setShowAddItemModal,
-  itemName,
-  setItemName,
+  taskTitle,
+  setTaskTitle,
   onAddItem,
 }: AddColumnProps) => {
   return (
@@ -36,10 +37,10 @@ export const AddTasks = ({
         <div>
           <Input
             type="text"
-            placeholder="Item Title"
-            name="itemname"
-            value={itemName}
-            onChange={(e: any) => setItemName(e.target.value)}
+            placeholder="Name your task"
+            name="taskTitle"
+            value={taskTitle}
+            onChange={(e: any) => setTaskTitle(e.target.value)}
           />
         </div>
         <DialogFooter className="flex justify-end">

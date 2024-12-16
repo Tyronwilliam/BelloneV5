@@ -19,12 +19,14 @@ export const ItemInterface = z.object({
   description: z.string().optional(), // Optional description of the task
   start_date: z.string(), // Start date in ISO 8601 format, assuming it's a string
   due_date: z.string(), // Due date in ISO 8601 format, assuming it's a string
-  completed_at: z.string().nullable(), // Completion timestamp or null if not completed
   time: z.number(), // Time spent on the task in seconds, a number
   members: z.array(z.string()).min(1), // Array for assigned members, assuming each member is represented by a string (e.g., user ID). You can extend this if needed.
   column_id: z.union([z.number(), z.string()]),
   order: z.number(),
   pseudo_id: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  completeAt: z.string().nullable(),
 });
 
 // If you want to infer the type from the schema, use this:

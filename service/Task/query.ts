@@ -36,6 +36,7 @@ export const updateTaskMutation = /* GraphQL */ `
       project_id
       order
       pseudo_id
+      completeAt
     }
   }
 `;
@@ -73,6 +74,7 @@ mutation CreateTask(
       project_id
       order
       pseudo_id
+      completeAt
   }
 }
 `;

@@ -34,9 +34,8 @@ const RightSide = ({ task }: { task: ItemInterfaceType }) => {
     resolver: zodResolver(TaskFormDialogSchema),
     defaultValues: {
       start_date: task?.start_date || "",
-      completed_at: task?.completed_at || "",
+      completeAt: task?.completeAt || "",
       members: task?.members || [],
-      updated_at: task?.updated_at || "",
       time: task?.time || 0,
     },
   });
@@ -58,28 +57,7 @@ const RightSide = ({ task }: { task: ItemInterfaceType }) => {
   }
 
   //FAIRE FONCTION DISTINCTE POUR CHAQUE ETAPE POUR EVITER LE SOUCIS DES STATES
-  const addClientToDatabase = async () => {
-    try {
-      toggleIsLoading();
-      // const response = await getClient();
-      const response = await addClient(newData);
-      if (response) {
-        console.log(response, "Create new Client");
-        toggleIsLoading();
-        // setClientOptions((prevState) => [
-        //   ...prevState,
-        //   { id: response.id, name: newClient },
-        // ]);
-        // setNewClientName("");
-        // setIsAddingNew(false);
-        // alert("Client added successfully!");
-      }
-    } catch (error) {
-      toggleIsLoading();
-      console.error("Error saving client", error);
-      alert("Failed to add client.");
-    }
-  };
+  const addClientToDatabase = async () => {};
 
   return (
     <section className="w-1/4 h-full  p-2">
@@ -116,8 +94,8 @@ const RightSide = ({ task }: { task: ItemInterfaceType }) => {
             />
             <DateInput
               control={form.control}
-              name={"completed_at"}
-              label={"Complete at"}
+              name={"completeAt"}
+              label={"Complete At"}
               isTasksDialog={true}
             />
           </form>{" "}

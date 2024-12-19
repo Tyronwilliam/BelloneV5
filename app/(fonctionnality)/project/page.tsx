@@ -25,8 +25,9 @@ const clients = [
   },
 ];
 const ProjectPage = async () => {
-  let projects = await fetchProjectsByCreator(1)
+  let projects = await fetchProjectsByCreator("675b17f42df59f1ce12a98e0")
     .then((res) => {
+      console.log(res)
       // Format the dates in each project
       return res.map((project: ProjectType) => ({
         ...project,

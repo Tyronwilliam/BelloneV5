@@ -14,10 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { FieldValues } from "react-hook-form";
 import { SelectFormProps } from "./FormCustom";
-import { cn } from "@/lib/utils";
-import MultiSelect from "./MultiSelect";
 // defaultValue={field.value}
 export function SelectInput<T extends FieldValues>({
   control,
@@ -26,9 +25,6 @@ export function SelectInput<T extends FieldValues>({
   options,
   placeholder,
 }: SelectFormProps<T>) {
-  const mock = () => {
-    return;
-  };
   return (
     <FormField
       control={control}
@@ -45,31 +41,23 @@ export function SelectInput<T extends FieldValues>({
                   />
                 </SelectTrigger>
               </FormControl>
-              {Array.isArray(field?.value) ? (
-                <MultiSelect
-                  options={options}
-                  value={field?.value}
-                  onChange={mock}
-                  placeholder={placeholder}
-                />
-              ) : (
-                <SelectContent defaultValue={field?.value} key={field?.value}>
-                  {options.map((option, index) => {
-                    return (
-                      <SelectItem
-                        key={index}
-                        value={option.value}
-                        className={cn(
-                          option?.color && option?.color,
-                          "mb-2 font-bold"
-                        )}
-                      >
-                        {option.label}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              )}
+
+              <SelectContent defaultValue={field?.value} key={field?.value}>
+                {options.map((option, index) => {
+                  return (
+                    <SelectItem
+                      key={index}
+                      value={option.value}
+                      className={cn(
+                        option?.color && option?.color,
+                        "mb-2 font-bold"
+                      )}
+                    >
+                      {option.label}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
             </Select>
             {/* Uncomment if you want to include form description and messages
           <FormDescription>

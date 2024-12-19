@@ -1,7 +1,7 @@
-export const fetchProjectsByCreator = async (creatorId: string | number) => {
+export const fetchProjectsByCreator = async (collaborator: string) => {
   const query = `
-    query GetProjects($creator: Int!) {
-      projects(creator: $creator) {
+    query GetProjects($collaborator: String) {
+      projects(collaborator: $collaborator) {
         id
         title
         description
@@ -14,12 +14,13 @@ export const fetchProjectsByCreator = async (creatorId: string | number) => {
         creator
         time
         image
+        collaborators
       }
     }
   `;
 
   const variables = {
-    creator: creatorId,
+    collaborator: collaborator,
   };
   try {
     const response = await fetch(

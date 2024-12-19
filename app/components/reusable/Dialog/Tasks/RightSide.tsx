@@ -1,12 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Ticket, Timer, User } from "lucide-react";
+import { Timer, User } from "lucide-react";
 import { BiDuplicate } from "react-icons/bi";
 
 import { DateInput } from "@/app/(fonctionnality)/project/Form/reusable/DateInput";
-import { SelectableWithCreation } from "@/app/(fonctionnality)/project/Form/SelectableWithCreation";
-import { addClient } from "@/service/Client/api";
 import { toast } from "@/hooks/use-toast";
 import { useSelectableWithCreation } from "@/hooks/useSelectableWithCreation";
 import {
@@ -18,18 +16,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useToggle } from "@/hooks/useToggle";
 
 const RightSide = ({ task }: { task: ItemInterfaceType }) => {
-  const {
-    isAddingNew,
-    newData,
-    handleChange,
-    reset,
-    toggleValue,
-    isLoading,
-    toggleIsLoading,
-  } = useSelectableWithCreation();
-
   const form = useForm<z.infer<typeof TaskFormDialogSchema>>({
     resolver: zodResolver(TaskFormDialogSchema),
     defaultValues: {
@@ -49,6 +38,7 @@ const RightSide = ({ task }: { task: ItemInterfaceType }) => {
       updated_at: new Date(),
     },
   });
+  const { value, toggleValue } = useToggle();
   function onSubmit(data: TaskFormDialogType) {
     toast({
       title: "You submitted the following values:",
@@ -73,25 +63,16 @@ const RightSide = ({ task }: { task: ItemInterfaceType }) => {
               label={"Date"}
               isTasksDialog={true}
             />
-            <SelectableWithCreation
-              control={form.control}
-              name="members"
-              label="Members"
-              placeholder="Look for members"
-              options={task?.members}
-              isLoading={isLoading}
-              addToDatabase={addClientToDatabase}
-              isAddingNew={isAddingNew}
-              newData={newData}
-              handleChange={handleChange}
-              toggleValue={toggleValue}
-              inputPlaceholder="Add members via email"
-              addButtonLabel="Add New Members"
-              saveButtonLabel="Save Members"
-              cancelButtonLabel="Cancel"
-              isPopover={true}
-              icon={<User />}
-            />
+            <Button
+              variant="outline"
+              className="w-full text-wrap flex justify-start "
+              onClick={toggleValue}
+            >
+              <User /> Members
+            </Button>{" "}
+            {/* {
+              value && 
+            } */}
             <DateInput
               control={form.control}
               name={"completeAt"}

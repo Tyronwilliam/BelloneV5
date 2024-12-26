@@ -1,33 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useEffect } from "react";
 
 // DnD
-import {
-  DragEndEvent,
-  DragMoveEvent,
-  DragStartEvent,
-  KeyboardSensor,
-  PointerSensor,
-  UniqueIdentifier,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import { Button } from "@/components/ui/button";
-import { useToggle } from "@/hooks/useToggle";
-import useUpdateColumns from "@/hooks/useUpdateColumns";
-import { getColumnsWithTasks } from "@/service/Task/api";
-import { customFormatDate } from "@/utils/date";
+import useKanbanState from "@/hooks/useKanbanState";
 import { ColumnsTypeSchema } from "@/zodSchema/Kanban/columns";
 import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
-import { useRef } from "react";
 import { z } from "zod";
 import { AddTasks } from "./AddTasks";
 import KanbanBoard from "./KanbanBoard";
-import useUpdateTasks from "@/hooks/useUpdateTasks";
-import useKanbanState from "@/hooks/useKanbanState";
 
 // Components
 

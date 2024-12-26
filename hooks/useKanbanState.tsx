@@ -16,6 +16,7 @@ import { toast } from "./use-toast";
 import { useToggle } from "./useToggle";
 import useUpdateColumns from "./useUpdateColumns";
 import useUpdateTasks from "./useUpdateTasks";
+
 const useKanbanState = (project_id: string) => {
   const [containers, setContainers] = useState<DNDType[] | []>([]);
   const [isClient, setIsClient] = useState(false);
@@ -237,6 +238,7 @@ const useKanbanState = (project_id: string) => {
   const handleDragMove = async (event: DragMoveEvent) => {
     const { active, over } = event;
     if (!over) return;
+    console.log("Active DRAGMOVE : ", active, "DRAG OVEr : ", over);
 
     if (
       active.id.toString().includes("item") &&
@@ -281,7 +283,7 @@ const useKanbanState = (project_id: string) => {
         };
 
         // Prévisualisation de la mise à jour
-        setContainers(newContainers);
+        // setContainers(newContainers);
       } else {
         // Déplacement entre deux containers différents
         const newContainers = [...containers]; // Copie immuable des containers
@@ -300,7 +302,7 @@ const useKanbanState = (project_id: string) => {
         );
 
         // Mise à jour des containers pour prévisualisation
-        setContainers(newContainers);
+        // setContainers(newContainers);
       }
     }
   };
@@ -310,7 +312,7 @@ const useKanbanState = (project_id: string) => {
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
-
+    console.log(active, "oVEr : ", over);
     if (
       active.id.toString().includes("container") &&
       over.id.toString().includes("container") &&
@@ -514,16 +516,18 @@ const useKanbanState = (project_id: string) => {
         });
 
         // Vérifie si la tâche déplacée a réellement changé de colonne ou d'ordre
-        if (
-          removedItem.column_id !== newItems[overContainerIndex].id ||
-          removedItem.order !== overItemIndex
-        ) {
-          handleUpdateTask({
-            id: removedItem.id,
-            column_id: newItems[overContainerIndex].id as string,
-            order: overItemIndex,
-          });
-        }
+        // if (
+        //   removedItem.column_id !== newItems[overContainerIndex].id ||
+        //   removedItem.order !== overItemIndex
+        // ) {
+        console.log("BETWEEN CONTAINER");
+
+        handleUpdateTask({
+          id: removedItem.id,
+          column_id: newItems[overContainerIndex].id as string,
+          order: overItemIndex,
+        });
+        // }
         setContainers(newItems);
       }
     }

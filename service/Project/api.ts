@@ -1,7 +1,7 @@
-export const fetchProjectsByCreator = async (collaborator: string) => {
+export const fetchProjectsByCollaborator = async (creator: string) => {
   const query = `
-    query GetProjects($collaborator: String) {
-      projects(collaborator: $collaborator) {
+    query GetProjects($creator: String) {
+      projects(creator: $creator) {
         id
         title
         description
@@ -14,13 +14,12 @@ export const fetchProjectsByCreator = async (collaborator: string) => {
         creator
         time
         image
-        collaborators
       }
     }
   `;
 
   const variables = {
-    collaborator: collaborator,
+    creator: creator,
   };
   try {
     const response = await fetch(
@@ -50,5 +49,3 @@ export const fetchProjectsByCreator = async (collaborator: string) => {
     throw error; // Relance l'erreur après l'avoir loggée
   }
 };
-
-// Usage example

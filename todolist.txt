@@ -15,3 +15,6 @@ Kanban
 - Revoir le handleDragMove  = OK 
 - Faire une recup des projets / Tache / Columns des taches via userId & projectId
 
+BACK 
+
+- Voir comment architect la table permissions 

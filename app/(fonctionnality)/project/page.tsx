@@ -2,7 +2,7 @@ import Entete from "@/app/components/reusable/Entete/Entete";
 import { DataTable } from "../../components/reusable/Table/DataTable";
 import { columns } from "./Table/column";
 import EmptyProjectView from "./Views/ProjectView";
-import { fetchProjectsByCreator } from "@/service/Project/api";
+import { fetchProjectsByCollaborator } from "@/service/Project/api";
 import { formatDateToTimestamp } from "@/utils/date";
 import { ProjectType } from "@/zodSchema/Project/project";
 
@@ -25,9 +25,9 @@ const clients = [
   },
 ];
 const ProjectPage = async () => {
-  let projects = await fetchProjectsByCreator("675b17f42df59f1ce12a98e0")
+  // let projects = await fetchProjectsByCreator("675b17f42df59f1ce12a98e0")
+  let projects = await fetchProjectsByCollaborator("6763f8583ddd86e73e00a11b")
     .then((res) => {
-      console.log(res)
       // Format the dates in each project
       return res.map((project: ProjectType) => ({
         ...project,
@@ -38,7 +38,6 @@ const ProjectPage = async () => {
       }));
     })
     .catch((error) => console.error("Error fetching projects:", error));
-  console.log(projects, "PROJECTS");
   const isProjectMoreThan0 = projects?.length > 0 ? true : false;
   return (
     <Entete word={"Projects"}>

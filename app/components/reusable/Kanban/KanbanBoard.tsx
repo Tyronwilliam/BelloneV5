@@ -155,6 +155,7 @@ const KanbanBoard = ({
                           openChangeTaskTitle={openChangeTaskTitle}
                           toggleChangeTaskTitle={toggleChangeTaskTitle}
                           handleChangeTaskTitle={handleChangeTaskTitle}
+                          // collaborators={container?.collaborators}
                         />
                       ))}
                   </div>

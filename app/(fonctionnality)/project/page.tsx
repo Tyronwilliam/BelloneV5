@@ -25,10 +25,8 @@ const clients = [
   },
 ];
 const ProjectPage = async () => {
-  // let projects = await fetchProjectsByCreator("675b17f42df59f1ce12a98e0")
   let projects = await fetchProjectsByCollaborator("6763f8583ddd86e73e00a11b")
     .then((res) => {
-      // Format the dates in each project
       return res.map((project: ProjectType) => ({
         ...project,
         startDate: formatDateToTimestamp(
@@ -43,7 +41,6 @@ const ProjectPage = async () => {
     <Entete word={"Projects"}>
       {isProjectMoreThan0 ? (
         <>
-          {/* Add project even when we have project */}
           <DataTable
             columns={columns}
             data={projects}

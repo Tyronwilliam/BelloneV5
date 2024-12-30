@@ -43,4 +43,3 @@ export const fetchKanbansByProjectId = async (projectId: string) => {
   }
 };
 
-// Example usage

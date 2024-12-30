@@ -23,7 +23,6 @@ const SingleProjectPage = async ({
   const columnsWithTasks = await getColumnsWithTasks(projectId); // Return the columns with tasks
   return (
     <Entete>
-      {/* <p>HELLO</p> */}
       <GridLayout
         kanban={kanbanData!}
         projectId={projectId}

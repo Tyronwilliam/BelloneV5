@@ -16,7 +16,7 @@ import { AddColumn } from "./AddColumn";
 import Container from "./Container";
 import Items from "./Item";
 import { DNDType } from "./KanbanView";
-import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
+import { TaskInterfaceType } from "@/zodSchema/Project/tasks";
 
 interface KanbanBoardProps {
   containers: DNDType[];
@@ -51,11 +51,6 @@ interface KanbanBoardProps {
     id: string | undefined,
     title: string | undefined
   ) => void;
-  showAddContainerModal: boolean;
-  setShowAddContainerModal: React.Dispatch<React.SetStateAction<boolean>>;
-  containerName: string;
-  setContainerName: React.Dispatch<React.SetStateAction<string>>;
-  onAddContainer: () => void;
   activeId: string | string | null;
   findItemTitle: (id: string) => string;
   findContainerTitle: (id: string) => string;
@@ -88,11 +83,6 @@ const KanbanBoard = ({
   openChangeTaskTitle,
   toggleChangeTaskTitle,
   handleChangeTaskTitle,
-  showAddContainerModal,
-  setShowAddContainerModal,
-  containerName,
-  setContainerName,
-  onAddContainer,
   activeId,
   findItemTitle,
   findContainerTitle,
@@ -138,7 +128,7 @@ const KanbanBoard = ({
                   <div className="custom-scrollbar flex items-start flex-col gap-y-4 h-full max-h-[220px] overflow-y-scroll">
                     {container.items
                       .sort((a, b) => a.order - b.order)
-                      .map((i: ItemInterfaceType) => (
+                      .map((i: TaskInterfaceType) => (
                         <Items
                           key={i.pseudo_id!}
                           title={i.title}
@@ -163,13 +153,6 @@ const KanbanBoard = ({
               </Container>
             ))}
         </SortableContext>{" "}
-        <AddColumn
-          showAddContainerModal={showAddContainerModal}
-          setShowAddContainerModal={setShowAddContainerModal}
-          containerName={containerName}
-          setContainerName={setContainerName}
-          onAddContainer={onAddContainer}
-        />
         <DragOverlay adjustScale={false}>
           {/* Drag Overlay For item Item */}
           {activeId && activeId.toString().includes("item") && (

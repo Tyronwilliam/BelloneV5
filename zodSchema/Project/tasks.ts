@@ -2,17 +2,8 @@ import { z } from "zod";
 
 export type TaskFormDialogType = z.infer<typeof TaskFormDialogSchema>;
 
-export const StickersInterface = z.object({
-  hexcode: z.string(),
-  id: z.string(),
-  title: z.string(),
-  taskId: z.array(z.string()),
-  created_at: z.date(),
-  updated_at: z.date(),
-});
-export type StickersType = z.infer<typeof StickersInterface>;
 // Zod schema for the ItemInterface
-export const ItemInterface = z.object({
+export const TaskInterface = z.object({
   id: z.string(), // Unique identifier for the item, assuming it's a string. You can adjust if it's a number or another type.
   project_id: z.number(), // Project ID, should be a number
   title: z.string().min(1, "Title is required"), // Title of the task/item, required as a string
@@ -30,8 +21,8 @@ export const ItemInterface = z.object({
 });
 
 // If you want to infer the type from the schema, use this:
-export type ItemInterfaceType = z.infer<typeof ItemInterface>;
-export const TaskFormDialogSchema = ItemInterface.omit({
+export type TaskInterfaceType = z.infer<typeof TaskInterface>;
+export const TaskFormDialogSchema = TaskInterface.omit({
   id: true,
   project_id: true,
   title: true,
@@ -39,3 +30,17 @@ export const TaskFormDialogSchema = ItemInterface.omit({
   due_date: true,
   column_id: true,
 });
+
+export const StickersInterface = z.object({
+  hexcode: z.string(),
+  id: z.string(),
+  title: z.string(),
+  taskId: z.array(z.string()),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+export const StickerFormInterface = StickersInterface.omit({
+  updated_at: true,
+  created_at: true,
+});
+export type StickersType = z.infer<typeof StickersInterface>;

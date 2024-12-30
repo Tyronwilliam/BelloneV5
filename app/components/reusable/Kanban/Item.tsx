@@ -1,4 +1,4 @@
-import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
+import { TaskInterfaceType } from "@/zodSchema/Project/tasks";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
@@ -10,7 +10,7 @@ type ItemsType = {
   pseudoId: string;
   title: string;
   containerId?: string;
-  item?: ItemInterfaceType;
+  item?: TaskInterfaceType;
   openEditor?: boolean;
   toggleOpenEditor?: () => void;
   taskTitle?: string;

@@ -12,46 +12,34 @@ import CustomFormItem from "@/app/(fonctionnality)/project/Form/reusable/CustomF
 type MembersModalProps<T extends FieldValues> = FormFieldComponentProps<T> & {
   toggleMembers: () => void;
   openMembers: boolean;
-  inputMemberRef: React.RefObject<HTMLDivElement>;
+  memberModalRef: React.RefObject<HTMLDivElement>;
   members: any[];
-  handleGetCollaboratorByProjectId: ({
-    projectId,
-  }: {
-    projectId: string;
-  }) => Promise<any>;
-  projectId: string;
 };
 
 const MembersModal = <T extends FieldValues>({
   toggleMembers,
   openMembers,
-  inputMemberRef,
+  memberModalRef,
   control,
   name,
   label,
   placeholder,
   className,
   members,
-  handleGetCollaboratorByProjectId,
-  projectId,
 }: MembersModalProps<T>) => {
   return (
     <div className="relative w-full">
       <Button
         variant="outline"
         className="w-full text-wrap flex justify-start "
-        onClick={async () => {
-          toggleMembers();
-          const res = await handleGetCollaboratorByProjectId({ projectId });
-          console.log(res);
-        }}
+        onClick={toggleMembers}
         type="button"
       >
         <User /> Members
       </Button>
       {openMembers && (
         <Card
-          ref={inputMemberRef}
+          ref={memberModalRef}
           className="absolute top-[130%] left-0 w-[304px] p-4 h-[176px] flex flex-col gap-2"
         >
           <div className="flex items-center relative">

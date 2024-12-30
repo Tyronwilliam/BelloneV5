@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import Input from "./Input";
 import { Dispatch } from "react";
+import { Loader2 } from "lucide-react";
 
 interface AddColumnProps {
   showAddItemModal: boolean;
@@ -18,6 +19,7 @@ interface AddColumnProps {
   taskTitle: string;
   setTaskTitle: (e: any) => void;
   onAddItem: () => void;
+  createTaskPending: boolean;
 }
 
 export const AddTasks = ({
@@ -26,9 +28,16 @@ export const AddTasks = ({
   taskTitle,
   setTaskTitle,
   onAddItem,
+  createTaskPending,
 }: AddColumnProps) => {
   return (
-    <Dialog open={showAddItemModal} onOpenChange={setShowAddItemModal}>
+    <Dialog
+      open={showAddItemModal}
+      onOpenChange={() => {
+        setTaskTitle("");
+        setShowAddItemModal(!showAddItemModal);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle> Add a Task</DialogTitle>
@@ -48,8 +57,15 @@ export const AddTasks = ({
             <Button type="button" variant="secondary">
               Close
             </Button>
-          </DialogClose>{" "}
-          <Button onClick={onAddItem}>Create a Task</Button>
+          </DialogClose>
+
+          <Button onClick={onAddItem}>
+            {createTaskPending ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Create a Task"
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

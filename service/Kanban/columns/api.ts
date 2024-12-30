@@ -1,46 +1,107 @@
-export const fetchColumnsByProjectId = async (projectId: string) => {
-  const query = `
-      query GetColumnsByProjectId($project_id: String!) {
-        columnsByProjectId(project_id: $project_id) {
-          id
-          title
-          color
-          project_id
-          order
-          pseudo_id
-        }
-      }
-    `;
+import { toast } from "@/hooks/use-toast";
+import {
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  UseQueryOptions,
+} from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
+import {
+  CREATE_COLUMN_MUTATION,
+  GET_COLUMNS_BY_PROJECT_ID,
+  UPDATE_COLUMN_MUTATION,
+} from "./query";
 
-  const variables = { project_id: projectId };
+interface Column {
+  id: string; // Required field of type string
+  title?: string; // Optional field of type string
+  color?: string; // Optional field of type string
+  project_id?: string; // Optional field of type string
+  order?: number; // Optional field of type number
+}
+type CreateColumnType = Omit<Column, "id">;
 
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Add any other headers if needed (like authorization)
+async function getColumnsByProjectId(projectId: string) {
+  const response = await axios.post(
+    `${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`,
+    { query: GET_COLUMNS_BY_PROJECT_ID, projectId }
+  );
+  return response?.data?.columnsByProjectId;
+}
+
+async function updateColumn(variables: Column) {
+  const response = await axios.post(
+    `${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`,
+    { query: UPDATE_COLUMN_MUTATION, variables }
+  );
+  return response?.data?.updateColumn;
+}
+async function createColumn(variables: CreateColumnType) {
+  const response = await axios.post(
+    `${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`,
+    { query: CREATE_COLUMN_MUTATION, variables }
+  );
+  return response?.data?.data?.addColumn;
+}
+
+export const Columns = {
+  GetColumnsByProjectId: {
+    useQuery: (
+      projectId: string,
+      options?: UseQueryOptions<any, AxiosError>
+    ) => {
+      return useQuery({
+        queryKey: ["columns", projectId],
+        queryFn: () => getColumnsByProjectId(projectId),
+        enabled: !!projectId,
+        ...options,
+      });
+    },
+  },
+  UpdateColumn: {
+    useMutation: (options?: UseMutationOptions<any, AxiosError, Column>) => {
+      return useMutation<any, AxiosError, any>({
+        mutationFn: (variables: Column) => updateColumn(variables),
+        onError: (error: AxiosError) => {
+          console.error("Failed to update column:", error);
+          toast({
+            variant: "destructive",
+            title: `Failed to update column: ${error.message}`,
+          });
         },
-        body: JSON.stringify({
-          query,
-          variables,
-        }),
-      }
-    );
-
-    // Check if response is ok (status 200)
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status} ${response.statusText}`);
-    }
-
-    const result = await response.json();
-
-    // Return the columns data if the query was successful
-    return result?.data?.columnsByProjectId || [];
-  } catch (error) {
-    console.error("Error fetching columns:", error);
-    throw error; // Rethrow error for further handling
-  }
+        onSuccess: (data: any) => {
+          toast({
+            variant: "default",
+            title: "Column updated successfully!",
+          });
+          return data;
+        },
+        ...options,
+      });
+    },
+  },
+  CreateColumn: {
+    useMutation: (
+      options?: UseMutationOptions<any, AxiosError, CreateColumnType>
+    ) => {
+      return useMutation<any, AxiosError, CreateColumnType>({
+        mutationFn: (variables: CreateColumnType) => createColumn(variables),
+        onError: (error: AxiosError) => {
+          console.error("Failed to create column:", error);
+          toast({
+            variant: "destructive",
+            title: `Failed to create column: ${error.message}`,
+          });
+        },
+        onSuccess: (data: any) => {
+          toast({
+            variant: "default",
+            title: "Column created successfully!",
+          });
+          return data;
+        },
+        ...options,
+      });
+    },
+  },
 };

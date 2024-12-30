@@ -1,5 +1,6 @@
 import { DNDType } from "@/app/components/reusable/Kanban/KanbanView";
-import { getColumnsWithTasks } from "@/service/Task/api";
+import ApiRequest from "@/service";
+import { getColumnsWithTasks } from "@/service/Task/uncommon";
 import {
   DragEndEvent,
   DragMoveEvent,
@@ -14,10 +15,20 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "./use-toast";
 import { useToggle } from "./useToggle";
-import useUpdateColumns from "./useUpdateColumns";
-import useUpdateTasks from "./useUpdateTasks";
+import { TaskInput } from "@/service/Task/api";
 
 const useKanbanState = (project_id: string) => {
+  const { mutateAsync: updateTaskMutation } =
+    ApiRequest.Task.UpdateTask.useMutation();
+  const {
+    mutateAsync: createTaskMutation,
+    isPending: createTaskPending,
+    isSuccess: createTaskSuccess,
+  } = ApiRequest.Task.CreateTask.useMutation();
+  const { mutateAsync: updateColumnMutation } =
+    ApiRequest.Columns.UpdateColumn.useMutation();
+  const { mutateAsync: createColumnMutation, isSuccess: createColumnSuccess } =
+    ApiRequest.Columns.CreateColumn.useMutation();
   const [containers, setContainers] = useState<DNDType[] | []>([]);
   const [isClient, setIsClient] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -34,8 +45,6 @@ const useKanbanState = (project_id: string) => {
   const [currentIdTitle, setCurrentIdTitle] = useState<string | null>(null);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [taskTitle, setTaskTitle] = useState("");
-  const { handleUpdateColumns, handleCreateColumn } = useUpdateColumns();
-  const { handleUpdateTask, handleCreateTask } = useUpdateTasks();
   const inputTaskRef = useRef<HTMLInputElement | null>(null);
   const inputTitleRef = useRef<HTMLInputElement | null>(null);
   const [itemFormState, setItemFormState] = useState({
@@ -63,7 +72,7 @@ const useKanbanState = (project_id: string) => {
       (item) => item.pseudo_id === currentContainerId
     ); // Find the container based on currentContainerId
     if (!container) return; // If container is not found, do nothing
-    const response = await handleCreateTask({
+    await createTaskMutation({
       title: taskTitle,
       description: "",
       start_date: Date.now(),
@@ -74,7 +83,7 @@ const useKanbanState = (project_id: string) => {
       project_id,
       order: container?.items.length + 1,
     });
-    if (response?.data?.createTask) {
+    if (createTaskSuccess) {
       const columnsWithTasks = await getColumnsWithTasks(project_id);
       setContainers(columnsWithTasks);
       setTaskTitle("");
@@ -91,14 +100,13 @@ const useKanbanState = (project_id: string) => {
   const onAddContainer = async () => {
     if (!containerName) return;
 
-    const response = await handleCreateColumn({
+    const response = await createColumnMutation({
       title: containerName,
       color: "",
       project_id,
       order: containers?.length + 1,
     });
-    console.log(response, "ADD COLUMNS");
-    if (response?.data?.data?.addColumn) {
+    if (createColumnSuccess) {
       const columnsWithTasks = await getColumnsWithTasks(project_id);
       setContainers(columnsWithTasks);
       setContainerName("");
@@ -143,11 +151,11 @@ const useKanbanState = (project_id: string) => {
             }
           : container
       );
-
-      await handleUpdateTask({
+      updateTaskMutation({
         id: itemToUpdate[0].id,
         title: trimmedTitle,
       });
+
       setTaskTitle(trimmedTitle);
       setContainers(updatedContainers); // Update the state with new containers
     }
@@ -176,7 +184,7 @@ const useKanbanState = (project_id: string) => {
           : container
       );
 
-      await handleUpdateColumns({
+      await updateColumnMutation({
         id: containerToUpdate?.id as string, // Pass the container's pseudo_id as the id
         title: trimmedTitle, // Pass the updated title
       });
@@ -238,7 +246,6 @@ const useKanbanState = (project_id: string) => {
   const handleDragMove = async (event: DragMoveEvent) => {
     const { active, over } = event;
     if (!over) return;
-    console.log("Active DRAGMOVE : ", active, "DRAG OVEr : ", over);
 
     if (
       active.id.toString().includes("item") &&
@@ -312,14 +319,11 @@ const useKanbanState = (project_id: string) => {
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
-    console.log(active, "oVEr : ", over);
     if (
       active.id.toString().includes("container") &&
       over.id.toString().includes("container") &&
       active.id !== over.id
     ) {
-      console.log("CONTAINER & CONTAINER");
-
       const activeContainerIndex = containers.findIndex(
         (container) => container.pseudo_id === active.id
       );
@@ -343,7 +347,7 @@ const useKanbanState = (project_id: string) => {
         // Synchroniser les changements avec le backend
         await Promise.all(
           newContainers.map(async (container) => {
-            await handleUpdateColumns({
+            await updateColumnMutation({
               id: container.id as string, // ID de la colonne
               order: container.order, // Nouvel ordre de la colonne
             });
@@ -356,9 +360,6 @@ const useKanbanState = (project_id: string) => {
       active.id.toString().includes("item") &&
       over.id.toString().includes("container")
     ) {
-      console.log("ITEM & CONTAINER");
-      console.log("FRERE");
-
       const activeContainer = findValueOfItems(active.id, "item");
       const overContainer = findValueOfItems(over.id, "container");
 
@@ -383,7 +384,7 @@ const useKanbanState = (project_id: string) => {
       // After updating the UI, update the backend
 
       // Update the task's column_id and order in the target container
-      await handleUpdateTask({
+      updateTaskMutation({
         id: removedItem.id,
         column_id: newItems[overContainerIndex].id as string,
         order: newItems[overContainerIndex].items.length - 1, // Place it at the end of the new container's list
@@ -392,7 +393,7 @@ const useKanbanState = (project_id: string) => {
       // Optionally update the tasks order in the source container if necessary
       newItems[activeContainerIndex].items.forEach(async (item, index) => {
         if (item.order !== index) {
-          await handleUpdateTask({
+          updateTaskMutation({
             id: item.id,
             column_id: newItems[activeContainerIndex].id as string,
             order: index,
@@ -403,9 +404,9 @@ const useKanbanState = (project_id: string) => {
       // Optionally update the tasks order in the target container after the move
       newItems[overContainerIndex].items.forEach(async (item, index) => {
         if (item.order !== index) {
-          await handleUpdateTask({
+          updateTaskMutation({
             id: item.id,
-            column_id: newItems[overContainerIndex].id as string,
+            column_id: newItems[activeContainerIndex].id as string,
             order: index,
           });
         }
@@ -418,7 +419,6 @@ const useKanbanState = (project_id: string) => {
       over.id.toString().includes("item") &&
       active.id !== over.id
     ) {
-      console.log("ITEM & ITEM ");
       const activeContainer = findValueOfItems(active.id, "item");
       const overContainer = findValueOfItems(over.id, "item");
       if (!activeContainer || !overContainer) return;
@@ -466,10 +466,10 @@ const useKanbanState = (project_id: string) => {
         // Mettez à jour les ordres dans le backend
         await Promise.all(
           newItems[activeContainerIndex].items.map(async (item) => {
-            await handleUpdateTask({
+            updateTaskMutation({
               id: item.id,
               column_id: newItems[activeContainerIndex].id as string, // ID du container
-              order: item.order, // Nouvel ordre de l'item
+              order: item.order,
             });
           })
         );
@@ -477,7 +477,6 @@ const useKanbanState = (project_id: string) => {
         // Mettez à jour l'état pour refléter les changements dans l'UI
         setContainers([...newItems]); // Créez une nouvelle référence pour forcer le re-render
       } else {
-        console.log("BETWEEN CONTAINER");
         // Between different containers
         const newItems = [...containers];
         const [removedItem] = newItems[activeContainerIndex].items.splice(
@@ -495,7 +494,7 @@ const useKanbanState = (project_id: string) => {
         newItems[activeContainerIndex].items.forEach((item, index) => {
           // Vérifie si l'ordre a changé avant d'envoyer la requête
           if (item.order !== index) {
-            handleUpdateTask({
+            updateTaskMutation({
               id: item.id,
               column_id: newItems[activeContainerIndex].id as string,
               order: index,
@@ -507,7 +506,7 @@ const useKanbanState = (project_id: string) => {
         newItems[overContainerIndex].items.forEach((item, index) => {
           // Vérifie si l'ordre a changé avant d'envoyer la requête
           if (item.order !== index) {
-            handleUpdateTask({
+            updateTaskMutation({
               id: item.id,
               column_id: newItems[overContainerIndex].id as string,
               order: index,
@@ -520,9 +519,8 @@ const useKanbanState = (project_id: string) => {
         //   removedItem.column_id !== newItems[overContainerIndex].id ||
         //   removedItem.order !== overItemIndex
         // ) {
-        console.log("BETWEEN CONTAINER");
 
-        handleUpdateTask({
+        updateTaskMutation({
           id: removedItem.id,
           column_id: newItems[overContainerIndex].id as string,
           order: overItemIndex,
@@ -564,8 +562,6 @@ const useKanbanState = (project_id: string) => {
     setCurrentTaskId,
     taskTitle,
     setTaskTitle,
-    handleUpdateColumns,
-    handleUpdateTask,
     inputTaskRef,
     inputTitleRef,
     onAddItem,
@@ -579,6 +575,7 @@ const useKanbanState = (project_id: string) => {
     findItemTitle,
     findContainerItems,
     findContainerTitle,
+    createTaskPending,
   };
 };
 

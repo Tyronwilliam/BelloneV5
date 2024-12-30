@@ -30,4 +30,4 @@ export const createCollaborator = `mutation AddCollaborator($projectId: String!,
 
 `;
 
-export const getCollaboratorsByProjectId = `query CollaboratorsByProjectId($projectId: String!) { collaboratorsByProjectId(projectId: $projectId) { id projectId userId roles { projectId role } creator } }`;
+export const GET_COLLABORATORS_BY_PROJECT_ID = `query CollaboratorsByProjectId($projectId: String!) { collaboratorsByProjectId(projectId: $projectId) { id projectId userId roles { projectId role } creator } }`;

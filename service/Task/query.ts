@@ -1,4 +1,4 @@
-export const updateTaskMutation = /* GraphQL */ `
+export const UPDATE_TASK_MUTATION = /* GraphQL */ `
   mutation UpdateTasks(
     $id: String!
     $title: String
@@ -40,7 +40,7 @@ export const updateTaskMutation = /* GraphQL */ `
     }
   }
 `;
-export const createTaskMutation = `
+export const CREATE_TASK_MUTATION = `
 mutation CreateTask(
   $project_id: String,
   $title: String!,
@@ -75,6 +75,22 @@ mutation CreateTask(
       order
       pseudo_id
       completeAt
+  }
+}
+`;
+export const GET_TASKS_BY_PROJECT_ID = `
+query GetTasksByProject($project_id: String!) {
+  tasksByProject(project_id: $project_id) {
+    id
+    title
+    description
+    start_date
+    due_date
+    members
+    column_id
+    project_id
+    pseudo_id
+    order
   }
 }
 `;

@@ -1,29 +1,36 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Timer, User, X } from "lucide-react";
+import { Timer } from "lucide-react";
 import { BiDuplicate } from "react-icons/bi";
 
 import { DateInput } from "@/app/(fonctionnality)/project/Form/reusable/DateInput";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import useClickOutside from "@/hooks/useClickOutside";
 import { useToggle } from "@/hooks/useToggle";
 import {
-  ItemInterfaceType,
+  TaskInterfaceType,
+  StickerFormInterface,
   StickersInterface,
   TaskFormDialogSchema,
   TaskFormDialogType,
 } from "@/zodSchema/Project/tasks";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useEffect, useRef } from "react";
 import MembersModal from "./RightSIdeItem/MembersModal";
-import useCollaborator from "@/hooks/useCollaborator";
+import ApiRequest from "@/service";
 
-const RightSide = ({ task }: { task: ItemInterfaceType }) => {
+const RightSide = ({ task }: { task: TaskInterfaceType }) => {
   const projectId = "676d3c3ed610fd3d18462e24";
+  const { data, error, isLoading } =
+    ApiRequest.Collabo.GetCollaboByProjectId.useQuery(projectId);
+  const { value: openMembers, toggleValue: toggleMembers } = useToggle();
+  const memberModalRef = useRef<HTMLDivElement | null>(null);
+
+  useClickOutside(memberModalRef, () => toggleMembers(), openMembers);
+
   const form = useForm<z.infer<typeof TaskFormDialogSchema>>({
     resolver: zodResolver(TaskFormDialogSchema),
     defaultValues: {
@@ -33,18 +40,17 @@ const RightSide = ({ task }: { task: ItemInterfaceType }) => {
       time: task?.time || 0,
     },
   });
-  const stickerForm = useForm<z.infer<typeof StickersInterface>>({
-    resolver: zodResolver(StickersInterface),
+  const stickerForm = useForm<z.infer<typeof StickerFormInterface>>({
+    resolver: zodResolver(StickerFormInterface),
     defaultValues: {
       hexcode: "",
       title: "",
       taskId: [],
-      created_at: new Date(),
-      updated_at: new Date(),
     },
   });
-  const { value: openMembers, toggleValue: toggleMembers } = useToggle();
-  const inputMemberRef = useRef<HTMLDivElement | null>(null);
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   function onSubmit(data: TaskFormDialogType) {
     toast({
@@ -52,27 +58,6 @@ const RightSide = ({ task }: { task: ItemInterfaceType }) => {
       description: "Sucess",
     });
   }
-  const { handleGetCollaboratorByProjectId } = useCollaborator();
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        inputMemberRef.current &&
-        !inputMemberRef.current.contains(event.target as Node)
-      ) {
-        toggleMembers();
-      }
-    };
-
-    if (openMembers) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [openMembers]);
-  //FAIRE FONCTION DISTINCTE POUR CHAQUE ETAPE POUR EVITER LE SOUCIS DES STATES
-  const addClientToDatabase = async () => {};
 
   return (
     <section className="w-1/4 h-full  p-2">
@@ -93,14 +78,10 @@ const RightSide = ({ task }: { task: ItemInterfaceType }) => {
               name={"members"}
               toggleMembers={toggleMembers}
               openMembers={openMembers}
-              inputMemberRef={inputMemberRef}
+              memberModalRef={memberModalRef}
               placeholder="Search for members"
               className="rounded-none"
               members={task?.members}
-              handleGetCollaboratorByProjectId={
-                handleGetCollaboratorByProjectId
-              }
-              projectId={projectId}
             />
             <DateInput
               control={form.control}

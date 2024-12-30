@@ -1,8 +1,8 @@
 import Entete from "@/app/components/reusable/Entete/Entete";
 import { fetchKanbansByProjectId } from "@/service/Kanban/api";
-import { getColumnsWithTasks } from "@/service/Task/api";
 import { KanbanType } from "@/zodSchema/Kanban/kanban";
 import GridLayout from "../GridLayout/GridLayout";
+import { getColumnsWithTasks } from "@/service/Task/uncommon";
 
 // const GridLayout = dynamic(() => import("../GridLayout/GridLayout"));
 
@@ -19,8 +19,8 @@ const SingleProjectPage = async ({
     .catch((error) => {
       console.error("Error fetching kanbans:", error); // Handle the error
     });
- 
-  const columnsWithTasks = await getColumnsWithTasks(projectId);
+
+  const columnsWithTasks = await getColumnsWithTasks(projectId); // Return the columns with tasks
   return (
     <Entete>
       {/* <p>HELLO</p> */}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Editor from "../../MarkDown/Editor.tsx";
 import RightSide from "./RightSide.tsx";
-import { ItemInterfaceType, StickersType } from "@/zodSchema/Project/tasks";
+import { TaskInterfaceType, StickersType } from "@/zodSchema/Project/tasks";
 import { MutableRefObject } from "react";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import {
@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input.tsx";
 
 export interface TaskDialogInterface {
   pseudoId: string;
-  task: ItemInterfaceType;
+  task: TaskInterfaceType;
   open: boolean;
   close: () => void;
   containerId: string;
@@ -167,7 +167,7 @@ const TitleView = ({
 }: {
   isChangeTitle: boolean;
   pseudoId: string;
-  task: ItemInterfaceType;
+  task: TaskInterfaceType;
   toggleIsChangeTitle: () => void;
   containerId: string;
   currentTaskId: string;

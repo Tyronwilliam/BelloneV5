@@ -6,15 +6,16 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import useKanbanState from "@/hooks/useKanbanState";
 import { ColumnsTypeSchema } from "@/zodSchema/Kanban/columns";
-import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
+import { TaskInterfaceType } from "@/zodSchema/Project/tasks";
 import { z } from "zod";
 import { AddTasks } from "./AddTasks";
 import KanbanBoard from "./KanbanBoard";
+import { AddColumn } from "./AddColumn";
 
 // Components
 
 export type DNDType = z.infer<typeof ColumnsTypeSchema> & {
-  items: ItemInterfaceType[];
+  items: TaskInterfaceType[];
 };
 
 export default function KanbanView({
@@ -64,6 +65,7 @@ export default function KanbanView({
     findItemTitle,
     findContainerItems,
     findContainerTitle,
+    createTaskPending,
   } = useKanbanState(projectId);
 
   useEffect(() => {
@@ -80,8 +82,18 @@ export default function KanbanView({
         taskTitle={taskTitle}
         setTaskTitle={setTaskTitle}
         onAddItem={onAddItem}
-      />
-      <Button className="w-fit">Background</Button>
+        createTaskPending={createTaskPending}
+      />{" "}
+      <div className="flex gap-2 items-center">
+        <Button className="w-fit">Background</Button>
+        <AddColumn
+          showAddContainerModal={showAddContainerModal}
+          setShowAddContainerModal={setShowAddContainerModal}
+          containerName={containerName}
+          setContainerName={setContainerName}
+          onAddContainer={onAddContainer}
+        />
+      </div>
       {/* Kanban */}
       <div
         className="w-full overflow-x-scroll "
@@ -115,11 +127,6 @@ export default function KanbanView({
           handleChangeTaskTitle={handleChangeTaskTitle}
           setShowAddItemModal={setShowAddItemModal}
           setCurrentContainerId={setCurrentContainerId}
-          showAddContainerModal={showAddContainerModal}
-          setShowAddContainerModal={setShowAddContainerModal}
-          containerName={containerName}
-          setContainerName={setContainerName}
-          onAddContainer={onAddContainer}
           openEditor={openEditor}
           toggleOpenEditor={toggleOpenEditor}
         />

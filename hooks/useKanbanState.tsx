@@ -29,8 +29,12 @@ const useKanbanState = (project_id: string) => {
   } = ApiRequest.Task.CreateTask.useMutation();
   const { mutateAsync: updateColumnMutation } =
     ApiRequest.Columns.UpdateColumn.useMutation();
-  const { mutateAsync: createColumnMutation, isSuccess: createColumnSuccess } =
-    ApiRequest.Columns.CreateColumn.useMutation();
+  const {
+    mutateAsync: createColumnMutation,
+    isSuccess: createColumnSuccess,
+    isError: createColumnError,
+    isPending: createColumnPending,
+  } = ApiRequest.Columns.CreateColumn.useMutation();
   const [containers, setContainers] = useState<DNDType[] | []>([]);
   const [isClient, setIsClient] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -65,7 +69,6 @@ const useKanbanState = (project_id: string) => {
     ); // Find the container based on currentContainerId
 
     if (!container) return; // If container is not found, do nothing
-    console.log((container?.items?.length ?? 0) + 1, "WESH", typeof Date.now());
     const res = await createTaskMutation({
       title: taskTitle,
       description: "",
@@ -94,17 +97,11 @@ const useKanbanState = (project_id: string) => {
       project_id,
       order: containers?.length + 1,
     });
-    if (createColumnSuccess) {
+    if (!createColumnPending && createColumnError) {
       const columnsWithTasks = await getColumnsWithTasks(project_id);
-      setContainers(columnsWithTasks);
-      setContainerName("");
       setShowAddContainerModal(false);
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Fail to create a new Column",
-        description: "Error",
-      });
+      setContainerName("");
+      setContainers(columnsWithTasks);
     }
   };
   async function handleChangeTaskTitle(
@@ -564,6 +561,7 @@ const useKanbanState = (project_id: string) => {
     findContainerItems,
     findContainerTitle,
     createTaskPending,
+    createColumnPending,
   };
 };
 

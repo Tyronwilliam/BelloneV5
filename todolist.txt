@@ -18,3 +18,5 @@ Kanban
 BACK 
 
 - Voir comment architect la table permissions 
+31/12 ----------
+Voir bug lors des ajouts des tache et column 

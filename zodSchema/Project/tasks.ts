@@ -8,14 +8,12 @@ export const TaskInterface = z.object({
   start_date: z.string(),
   due_date: z.string(),
   time: z.number(),
-  members: z
-    .array(
-      z.object({
-        id: z.string(),
-        email: z.string().email("Invalid email format"),
-      })
-    )
-    .min(1, "At least one member is required"),
+  members: z.array(
+    z.object({
+      id: z.string(),
+      email: z.string().email("Invalid email format"),
+    })
+  ),
   column_id: z.union([z.number(), z.string()]),
   order: z.number(),
   pseudo_id: z.string().optional(),

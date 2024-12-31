@@ -66,6 +66,7 @@ export default function KanbanView({
     findContainerItems,
     findContainerTitle,
     createTaskPending,
+    createColumnPending,
   } = useKanbanState(projectId);
 
   useEffect(() => {
@@ -92,6 +93,7 @@ export default function KanbanView({
           containerName={containerName}
           setContainerName={setContainerName}
           onAddContainer={onAddContainer}
+          createColumnPending={createColumnPending}
         />
       </div>
       {/* Kanban */}

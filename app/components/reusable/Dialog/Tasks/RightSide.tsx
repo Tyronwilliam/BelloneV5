@@ -17,7 +17,7 @@ import {
 } from "@/zodSchema/Project/tasks";
 import z from "@/zodSchema/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import MembersModal from "./RightSIdeItem/MembersModal";
 import { CollaboratorType } from "@/zodSchema/Collaborators/collabo";
@@ -25,13 +25,17 @@ import { CollaboratorType } from "@/zodSchema/Collaborators/collabo";
 const RightSide = ({ task }: { task: TaskInterfaceType }) => {
   const projectId = "676d3c3ed610fd3d18462e24";
   const creatorId = "6763f8583ddd86e73e00a11b";
-  const { data, error, isLoading } =
-    ApiRequest.Collabo.GetCollaboByCreatorId.useQuery(creatorId);
+  const {
+    data: collaboByCreator,
+    error,
+    isLoading,
+    refetch,
+  } = ApiRequest.Collabo.GetCollaboByCreatorId.useQuery(creatorId);
   const { mutateAsync: updateTaskMutation } =
     ApiRequest.Task.UpdateTask.useMutation();
   const { value: openMembers, toggleValue: toggleMembers } = useToggle();
   const memberModalRef = useRef<HTMLDivElement | null>(null);
-
+  const [selectedMember, setSelectedMember] = useState<string | null>(null);
   useClickOutside(memberModalRef, () => toggleMembers(), openMembers);
 
   const form = useForm<z.infer<typeof TaskFormDialogSchema>>({
@@ -43,12 +47,26 @@ const RightSide = ({ task }: { task: TaskInterfaceType }) => {
       time: task?.time || 0,
     },
   });
-  const { watch, setValue } = form;
+  const { watch } = form;
   const member = watch("member");
-
   const [filteredCollaborators, setFilteredCollaborators] = useState<
     CollaboratorType[]
   >([]);
+  const handleRemoveMember = async () => {
+    if (selectedMember === null) return;
+    console.log(selectedMember, "MEMBER");
+    const filterMember = task?.members?.filter(
+      (item) => item?.id !== selectedMember
+    );
+
+    console.log(filterMember, "filterMember");
+    const res = await updateTaskMutation({
+      id: task?.id,
+      members: filterMember,
+    });
+    await refetch();
+    console.log(res);
+  };
   const stickerForm = useForm<z.infer<typeof StickerFormInterface>>({
     resolver: zodResolver(StickerFormInterface),
     defaultValues: {
@@ -57,9 +75,19 @@ const RightSide = ({ task }: { task: TaskInterfaceType }) => {
       taskId: [],
     },
   });
-
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  useEffect(() => {
+    if (member) {
+      const filtered = collaboByCreator?.filter((collabo: CollaboratorType) =>
+        collabo?.email
+          ?.trim()
+          .toLowerCase()
+          .includes(member.trim().toLowerCase())
+      );
+      setFilteredCollaborators(filtered || []);
+    } else {
+      setFilteredCollaborators([]);
+    }
+  }, [member]);
 
   function onSubmit(data: TaskFormDialogType) {
     toast({
@@ -90,14 +118,10 @@ const RightSide = ({ task }: { task: TaskInterfaceType }) => {
               memberModalRef={memberModalRef}
               placeholder="Search for members"
               className="rounded-none"
-              memberState={member}
-              collaborators={data}
-              setFilteredCollaborators={setFilteredCollaborators}
               filteredCollaborators={filteredCollaborators}
-              projectId={projectId}
-              removeMember={updateTaskMutation}
-              taskId={task?.id}
+              removeMember={handleRemoveMember}
               membersAssigned={task?.members}
+              setSelectedMember={setSelectedMember}
             />
             <DateInput
               control={form.control}

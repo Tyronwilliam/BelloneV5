@@ -36,14 +36,14 @@ export async function createTask(variables: TaskInput) {
 }
 
 export async function updateTask(variables: TaskInput) {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_PROTECTED_URL}/task`,
-    {
+  const response = await axios
+    .post(`${process.env.NEXT_PUBLIC_PROTECTED_URL}/task`, {
       query: UPDATE_TASK_MUTATION,
       variables: variables,
-    }
-  );
-  return response.data.updateTask;
+    })
+    .then((res) => res)
+    .catch((err) => err);
+  return response.data.updateTask;;
 }
 
 export const Task = {
@@ -63,7 +63,6 @@ export const Task = {
             variant: "default",
             title: "Task created successfully!",
           });
-          console.log(data, "2 LEVEL");
           return data;
         },
         ...options,
@@ -87,7 +86,8 @@ export const Task = {
             variant: "default",
             title: "Task updated successfully!",
           });
-          return data;
+          console.log(data, ": DATA TASK LEVEL 2 TASK UPDATE");
+          return data
         },
         ...options,
       });

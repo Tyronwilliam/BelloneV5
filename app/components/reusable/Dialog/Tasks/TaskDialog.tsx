@@ -1,20 +1,17 @@
-import { useEffect, useState } from "react";
-import Editor from "../../MarkDown/Editor.tsx";
-import RightSide from "./RightSide.tsx";
-import { TaskInterfaceType, StickersType } from "@/zodSchema/Project/tasks";
-import { MutableRefObject } from "react";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import {
-  DialogHeader,
-  DialogFooter,
   Dialog,
   DialogContent,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog.tsx";
 import { useToggle } from "@/hooks/useToggle.tsx";
 import { cn } from "@/lib/utils.ts";
-import { getAllSticker } from "@/service/Stickers/api.ts";
+import { StickersType, TaskInterfaceType } from "@/zodSchema/Project/tasks";
+import { MutableRefObject, useEffect, useState } from "react";
+import Editor from "../../MarkDown/Editor.tsx";
+import RightSide from "./RightSide.tsx";
 
 import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";

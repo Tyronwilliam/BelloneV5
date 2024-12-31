@@ -6,30 +6,18 @@ import { Card } from "@/components/ui/card";
 
 import CustomFormItem from "@/app/(fonctionnality)/project/Form/reusable/CustomFormItem";
 import { FormFieldComponentProps } from "@/app/(fonctionnality)/project/Form/reusable/FormCustom";
-import { useEffect, useState } from "react";
-import { FieldValues } from "react-hook-form"; // Ensure you import FieldValues
 import { CollaboratorType } from "@/zodSchema/Collaborators/collabo";
-import { UseMutateAsyncFunction } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import { TaskInput } from "@/service/Task/api";
 import { TaskInterfaceType } from "@/zodSchema/Project/tasks";
+import { useEffect } from "react";
+import { FieldValues } from "react-hook-form"; // Ensure you import FieldValues
 type MembersModalProps<T extends FieldValues> = FormFieldComponentProps<T> & {
   toggleMembers: () => void;
   openMembers: boolean;
   memberModalRef: React.RefObject<HTMLDivElement>;
-  memberState: string;
-  collaborators: [];
-  setFilteredCollaborators: (collaborators: CollaboratorType[]) => void; // Fonction pour filtrer les collaborateurs
   filteredCollaborators: CollaboratorType[];
-  projectId: string;
-  removeMember: UseMutateAsyncFunction<
-    any,
-    AxiosError<unknown, any>,
-    TaskInput,
-    unknown
-  >;
-  taskId: string;
+  removeMember: () => void;
   membersAssigned: TaskInterfaceType["members"];
+  setSelectedMember: (memberId: string) => void;
 };
 
 const MembersModal = <T extends FieldValues>({
@@ -41,28 +29,11 @@ const MembersModal = <T extends FieldValues>({
   label,
   placeholder,
   className,
-  memberState,
-  collaborators,
-  setFilteredCollaborators,
   filteredCollaborators,
-  projectId,
   removeMember,
-  taskId,
   membersAssigned,
+  setSelectedMember,
 }: MembersModalProps<T>) => {
-  useEffect(() => {
-    if (memberState) {
-      const filtered = collaborators?.filter((collabo: CollaboratorType) =>
-        collabo?.email
-          ?.trim()
-          .toLowerCase()
-          .includes(memberState.trim().toLowerCase())
-      );
-      setFilteredCollaborators(filtered || []);
-    } else {
-      setFilteredCollaborators([]);
-    }
-  }, [memberState, collaborators]);
   return (
     <div className="relative w-full " ref={memberModalRef}>
       <Button
@@ -119,16 +90,15 @@ const MembersModal = <T extends FieldValues>({
                   <div
                     key={member?.id}
                     className="flex items-center justify-between w-full h-12 bg-black bg-opacity-0 hover:bg-opacity-5 cursor-pointer rounded-sm px-2"
+                    onClick={() => {
+                      setSelectedMember(member?.id);
+                      removeMember();
+                    }}
                   >
                     <p className="truncate w-[90%] overflow-hidden text-ellipsis">
                       {member?.email}
                     </p>
-                    <X
-                      className="w-4 h-4 flex-shrink-0-"
-                      onClick={() =>
-                        removeMember({ id: taskId, project_id: projectId })
-                      }
-                    />
+                    <X className="w-4 h-4 flex-shrink-0-" />
                   </div>
                 )
             )}

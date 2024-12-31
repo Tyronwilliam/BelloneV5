@@ -6,13 +6,17 @@ import {
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 
+type Member = {
+  id: string;
+  email: string;
+};
 export type TaskInput = {
   title?: string;
   description?: string;
   start_date?: number;
   due_date?: number;
   time?: number;
-  members?: string[];
+  members?: Member[];
   column_id?: string;
   project_id?: string;
   order?: number;

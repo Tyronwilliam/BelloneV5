@@ -24,7 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import EmptyProjectView from "@/app/(fonctionnality)/project/Views/ProjectView";
-import { z } from "zod";
+import z from "@/zodSchema/zod";
 import { ClientSchema } from "@/zodSchema/Client/zodSchema";
 
 interface DataTableProps<TData, TValue> {

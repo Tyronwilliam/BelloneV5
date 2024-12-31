@@ -8,24 +8,27 @@ import { DateInput } from "@/app/(fonctionnality)/project/Form/reusable/DateInpu
 import { toast } from "@/hooks/use-toast";
 import useClickOutside from "@/hooks/useClickOutside";
 import { useToggle } from "@/hooks/useToggle";
+import ApiRequest from "@/service";
 import {
-  TaskInterfaceType,
   StickerFormInterface,
-  StickersInterface,
   TaskFormDialogSchema,
   TaskFormDialogType,
+  TaskInterfaceType,
 } from "@/zodSchema/Project/tasks";
+import z from "@/zodSchema/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import MembersModal from "./RightSIdeItem/MembersModal";
-import ApiRequest from "@/service";
+import { CollaboratorType } from "@/zodSchema/Collaborators/collabo";
 
 const RightSide = ({ task }: { task: TaskInterfaceType }) => {
   const projectId = "676d3c3ed610fd3d18462e24";
+  const creatorId = "6763f8583ddd86e73e00a11b";
   const { data, error, isLoading } =
-    ApiRequest.Collabo.GetCollaboByProjectId.useQuery(projectId);
+    ApiRequest.Collabo.GetCollaboByCreatorId.useQuery(creatorId);
+  const { mutateAsync: updateTaskMutation } =
+    ApiRequest.Task.UpdateTask.useMutation();
   const { value: openMembers, toggleValue: toggleMembers } = useToggle();
   const memberModalRef = useRef<HTMLDivElement | null>(null);
 
@@ -36,10 +39,16 @@ const RightSide = ({ task }: { task: TaskInterfaceType }) => {
     defaultValues: {
       start_date: task?.start_date || "",
       completeAt: task?.completeAt || "",
-      members: [],
+      member: "",
       time: task?.time || 0,
     },
   });
+  const { watch, setValue } = form;
+  const member = watch("member");
+
+  const [filteredCollaborators, setFilteredCollaborators] = useState<
+    CollaboratorType[]
+  >([]);
   const stickerForm = useForm<z.infer<typeof StickerFormInterface>>({
     resolver: zodResolver(StickerFormInterface),
     defaultValues: {
@@ -75,13 +84,20 @@ const RightSide = ({ task }: { task: TaskInterfaceType }) => {
             />{" "}
             <MembersModal
               control={form.control}
-              name={"members"}
+              name={"member"}
               toggleMembers={toggleMembers}
               openMembers={openMembers}
               memberModalRef={memberModalRef}
               placeholder="Search for members"
               className="rounded-none"
-              members={task?.members}
+              memberState={member}
+              collaborators={data}
+              setFilteredCollaborators={setFilteredCollaborators}
+              filteredCollaborators={filteredCollaborators}
+              projectId={projectId}
+              removeMember={updateTaskMutation}
+              taskId={task?.id}
+              membersAssigned={task?.members}
             />
             <DateInput
               control={form.control}

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "@/zodSchema/zod";
 export const ColumnsTypeSchema = z.object({
   id: z.union([z.number(), z.string()]),
   title: z.string().min(1, "Title is required"), // Project title

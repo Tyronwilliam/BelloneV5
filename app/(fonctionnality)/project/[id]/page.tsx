@@ -1,8 +1,8 @@
 import Entete from "@/app/components/reusable/Entete/Entete";
-import { fetchKanbansByProjectId } from "@/service/Kanban/api";
 import { KanbanType } from "@/zodSchema/Kanban/kanban";
 import GridLayout from "../GridLayout/GridLayout";
 import { getColumnsWithTasks } from "@/service/Task/uncommon";
+import { fetchKanbansByProjectId } from "@/service/Kanban/uncommon";
 
 // const GridLayout = dynamic(() => import("../GridLayout/GridLayout"));
 

@@ -1,17 +1,14 @@
 "use client";
+import SimplePopover from "@/app/components/reusable/Popover/SimplePopover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   QuickFormProps,
   SelectableWithCreationProps,
 } from "@/zodSchema/Client/type";
-import { ClientSchema } from "@/zodSchema/Client/zodSchema";
 import React, { ReactNode } from "react";
 import { FieldValues } from "react-hook-form";
-import { z } from "zod";
 import { SelectInput } from "./reusable/SelectInput";
-import SimplePopover from "@/app/components/reusable/Popover/SimplePopover";
-import { User } from "lucide-react";
 
 export const QuickForm: React.FC<QuickFormProps> = ({
   isAddingNew,

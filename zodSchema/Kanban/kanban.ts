@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "@/zodSchema/zod";
 
 const KanbanSchema = z.object({
   id: z.union([z.number(), z.string()]),

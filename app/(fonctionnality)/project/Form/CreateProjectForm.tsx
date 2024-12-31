@@ -1,13 +1,11 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
 import { useSelectableWithCreation } from "@/hooks/useSelectableWithCreation";
-import { addClient } from "@/service/Client/api";
 import { ClientSchema } from "@/zodSchema/Client/zodSchema";
 import { ProjectFormSchema, ProjectType } from "@/zodSchema/Project/project";
 import { useState } from "react";
@@ -15,6 +13,7 @@ import CustomFormItem from "./reusable/CustomFormItem";
 import { DateInput } from "./reusable/DateInput";
 import { SelectInput } from "./reusable/SelectInput";
 import { SelectableWithCreation } from "./SelectableWithCreation";
+import z from "@/zodSchema/zod";
 
 const statusOptions = [
   { value: "OPEN", label: "Open", color: "text-green-700" },
@@ -61,26 +60,26 @@ export function CreateProjectForm({ clients }: CreateProjectProps) {
 
   // Add client to the database and update local state
   const addClientToDatabase = async () => {
-    try {
-      toggleIsLoading();
-      // const response = await getClient();
-      const response = await addClient(newData);
-      if (response) {
-        console.log(response, "Create new Client");
-        toggleIsLoading();
-        // setClientOptions((prevState) => [
-        //   ...prevState,
-        //   { id: response.id, name: newClient },
-        // ]);
-        // setNewClientName("");
-        // setIsAddingNew(false);
-        // alert("Client added successfully!");
-      }
-    } catch (error) {
-      toggleIsLoading();
-      console.error("Error saving client", error);
-      alert("Failed to add client.");
-    }
+    // try {
+    //   toggleIsLoading();
+    // const response = await getClient();
+    // const response = await addClient(newData);
+    // if (response) {
+    //   console.log(response, "Create new Client");
+    //   toggleIsLoading();
+    // setClientOptions((prevState) => [
+    //   ...prevState,
+    //   { id: response.id, name: newClient },
+    // ]);
+    // setNewClientName("");
+    // setIsAddingNew(false);
+    // alert("Client added successfully!");
+    // }
+    // } catch (error) {
+    // toggleIsLoading();
+    // console.error("Error saving client", error);
+    // alert("Failed to add client.");
+    // }
   };
   function onSubmit(data: ProjectType) {
     console.log("Form Submitted!", data); // Debugging

@@ -45,12 +45,12 @@ mutation CreateTask(
   $project_id: String,
   $title: String!,
   $description: String!,
-  $start_date: Float!,
-  $due_date: Int,
+  $start_date: Float,
+  $due_date: Float,
   $time: Int!,
-  $members: [String!]!,
+  $members: [MemberInputType!]!,
   $column_id: String!,
-  $order: Int!
+  $order: Int
 ) {
   createTask(
     project_id: $project_id,
@@ -69,7 +69,10 @@ mutation CreateTask(
       start_date
       due_date
       time
-      members
+      members {
+      id
+      email
+    }
       column_id
       project_id
       order
@@ -81,16 +84,21 @@ mutation CreateTask(
 export const GET_TASKS_BY_PROJECT_ID = `
 query GetTasksByProject($project_id: String!) {
   tasksByProject(project_id: $project_id) {
-    id
-    title
-    description
-    start_date
-    due_date
-    members
-    column_id
-    project_id
-    pseudo_id
-    order
+     id
+      title
+      description
+      start_date
+      due_date
+      time
+      members {
+      id
+      email
+    }
+      column_id
+      project_id
+      order
+      pseudo_id
+      completeAt
   }
 }
 `;

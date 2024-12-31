@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import useKanbanState from "@/hooks/useKanbanState";
 import { ColumnsTypeSchema } from "@/zodSchema/Kanban/columns";
 import { TaskInterfaceType } from "@/zodSchema/Project/tasks";
-import { z } from "zod";
+import z from "@/zodSchema/zod";
 import { AddTasks } from "./AddTasks";
 import KanbanBoard from "./KanbanBoard";
 import { AddColumn } from "./AddColumn";

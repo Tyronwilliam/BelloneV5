@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "@/zodSchema/zod";
 
 export const ClientSchema = z.object({
   id: z.string().uuid().optional(), // UUID optionnel car il peut être généré par la base de données

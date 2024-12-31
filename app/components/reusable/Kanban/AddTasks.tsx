@@ -7,11 +7,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import Input from "./Input";
-import { Dispatch } from "react";
 import { Loader2 } from "lucide-react";
+import Input from "./Input";
 
 interface AddColumnProps {
   showAddItemModal: boolean;
@@ -40,7 +38,7 @@ export const AddTasks = ({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle> Add a Task</DialogTitle>
+          <DialogTitle>Add a Task</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <div>

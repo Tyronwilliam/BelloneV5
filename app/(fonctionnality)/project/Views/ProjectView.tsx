@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToggle } from "@/hooks/useToggle";
 import { CreateProjectForm } from "../Form/CreateProjectForm";
 import { ClientSchema } from "@/zodSchema/Client/zodSchema";
-import { z } from "zod";
+import z from "@/zodSchema/zod";
 import { cn } from "@/lib/utils";
 import { IoMdClose } from "react-icons/io";
 

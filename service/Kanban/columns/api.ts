@@ -36,6 +36,7 @@ async function updateColumn(variables: Column) {
   );
   return response?.data?.updateColumn;
 }
+
 async function createColumn(variables: CreateColumnType) {
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`,

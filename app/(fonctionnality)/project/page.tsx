@@ -2,9 +2,9 @@ import Entete from "@/app/components/reusable/Entete/Entete";
 import { DataTable } from "../../components/reusable/Table/DataTable";
 import { columns } from "./Table/column";
 import EmptyProjectView from "./Views/ProjectView";
-import { fetchProjectsByCollaborator } from "@/service/Project/api";
 import { formatDateToTimestamp } from "@/utils/date";
 import { ProjectType } from "@/zodSchema/Project/project";
+import { fetchProjectsByCollaborator } from "@/service/Project/uncommon";
 
 const clients = [
   {

@@ -15,8 +15,9 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "./use-toast";
 import { useToggle } from "./useToggle";
-import { TaskInput } from "@/service/Task/api";
 
+const userId = "676d57193e5d1eb79574e8d5";
+const userEmail = "tyronwilliamchanu@gmail.com";
 const useKanbanState = (project_id: string) => {
   const { mutateAsync: updateTaskMutation } =
     ApiRequest.Task.UpdateTask.useMutation();
@@ -24,6 +25,7 @@ const useKanbanState = (project_id: string) => {
     mutateAsync: createTaskMutation,
     isPending: createTaskPending,
     isSuccess: createTaskSuccess,
+    isError: createTaskError,
   } = ApiRequest.Task.CreateTask.useMutation();
   const { mutateAsync: updateColumnMutation } =
     ApiRequest.Columns.UpdateColumn.useMutation();
@@ -47,18 +49,7 @@ const useKanbanState = (project_id: string) => {
   const [taskTitle, setTaskTitle] = useState("");
   const inputTaskRef = useRef<HTMLInputElement | null>(null);
   const inputTitleRef = useRef<HTMLInputElement | null>(null);
-  const [itemFormState, setItemFormState] = useState({
-    project_id: "",
-    title: "", // Le titre de l'item
-    description: "", // Description vide initialement
-    start_date: "", // La date de début de l'item
-    due_date: "", // Date de fin vide initialement
-    completed_at: null, // L'item n'est pas complété au début
-    time: 0, // Temps initial à 0
-    members: [], // Pas de membre au début
-    column_id: "", // ID de la colonne associée
-    order: null, // L'ordre est basé sur le nombre d'items existants
-  });
+
   useEffect(() => {
     inputTitleRef?.current && inputTitleRef?.current?.focus();
   }, [toggleChangeTitle]);
@@ -68,33 +59,30 @@ const useKanbanState = (project_id: string) => {
 
   const onAddItem = async () => {
     if (!taskTitle) return; // If no item name is provided, do nothing
+
     const container = containers.find(
-      (item) => item.pseudo_id === currentContainerId
+      (container) => container.pseudo_id === currentContainerId
     ); // Find the container based on currentContainerId
+
     if (!container) return; // If container is not found, do nothing
-    await createTaskMutation({
+    console.log((container?.items?.length ?? 0) + 1, "WESH", typeof Date.now());
+    const res = await createTaskMutation({
       title: taskTitle,
       description: "",
       start_date: Date.now(),
       time: 0,
-      // Put user id here
-      members: ["675b1b5271482367aedba253"],
+      members: [{ id: userId, email: userEmail }],
       column_id: container?.id as string,
       project_id,
-      order: container?.items.length + 1,
+      order: container?.items?.length + 1,
     });
-    if (createTaskSuccess) {
+
+    if (!createTaskPending && !createTaskError) {
       const columnsWithTasks = await getColumnsWithTasks(project_id);
-      setContainers(columnsWithTasks);
-      setTaskTitle("");
       setShowAddItemModal(false);
       setCurrentContainerId(null);
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Fail to create a new Item",
-        description: "Error",
-      });
+      setTaskTitle("");
+      setContainers(columnsWithTasks);
     }
   };
   const onAddContainer = async () => {

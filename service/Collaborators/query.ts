@@ -1,4 +1,4 @@
-export const createCollaborator = `mutation AddCollaborator($projectId: String!, $roles: [RoleInput]!, $creator: String!, $email: String!, $phone: String, $notes: String, $address: AddressInput) {
+export const CREATE_COLLABORATOR = `mutation AddCollaborator($projectId: String!, $roles: [RoleInput]!, $creator: String!, $email: String!, $phone: String, $notes: String, $address: AddressInput) {
   addCollaborator(
     projectId: $projectId,
     roles: $roles,
@@ -30,4 +30,15 @@ export const createCollaborator = `mutation AddCollaborator($projectId: String!,
 
 `;
 
-export const GET_COLLABORATORS_BY_PROJECT_ID = `query CollaboratorsByProjectId($projectId: String!) { collaboratorsByProjectId(projectId: $projectId) { id projectId userId roles { projectId role } creator } }`;
+export const GET_COLLABORATORS_BY_PROJECT_ID = `query CollaboratorsByProjectId($projectId: String!) { collaboratorsByProjectId(projectId: $projectId) { id projectId userId roles { projectId role } creator email } }`;
+
+export const GET_COLLABORATORS_BY_CREATOR_ID = `query CollaboratorsByCreator($creator: String!) { collaboratorsByCreator(creator: $creator)
+ { 
+ id 
+ projectId 
+ userId 
+ roles { projectId role } 
+ creator 
+ email 
+ } 
+ }`;

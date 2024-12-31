@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "@/zodSchema/zod";
 
 // Zod schema for ProjectType
 export const ProjectTypeSchema = z.object({

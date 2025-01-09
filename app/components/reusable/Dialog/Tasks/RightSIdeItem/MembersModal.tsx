@@ -15,9 +15,9 @@ type MembersModalProps<T extends FieldValues> = FormFieldComponentProps<T> & {
   openMembers: boolean;
   memberModalRef: React.RefObject<HTMLDivElement>;
   filteredCollaborators: CollaboratorType[];
-  removeMember: () => void;
+  removeMember: (memberId: string) => void;
+  addMember: (id: string, email: string) => void;
   membersAssigned: TaskInterfaceType["members"];
-  setSelectedMember: (memberId: string) => void;
 };
 
 const MembersModal = <T extends FieldValues>({
@@ -31,8 +31,8 @@ const MembersModal = <T extends FieldValues>({
   className,
   filteredCollaborators,
   removeMember,
+  addMember,
   membersAssigned,
-  setSelectedMember,
 }: MembersModalProps<T>) => {
   return (
     <div className="relative w-full " ref={memberModalRef}>
@@ -69,10 +69,11 @@ const MembersModal = <T extends FieldValues>({
             />
             {filteredCollaborators?.map((item, index) => {
               return (
-                item.email && (
+                item?.email && (
                   <div
                     key={index}
                     className="flex items-center justify-between w-full h-12 mt-2 bg-black bg-opacity-0 hover:bg-opacity-5 cursor-pointer rounded-sm px-2"
+                    onClick={() => addMember(item.userId, item?.email!)}
                   >
                     {item.email}
                   </div>
@@ -90,10 +91,7 @@ const MembersModal = <T extends FieldValues>({
                   <div
                     key={member?.id}
                     className="flex items-center justify-between w-full h-12 bg-black bg-opacity-0 hover:bg-opacity-5 cursor-pointer rounded-sm px-2"
-                    onClick={() => {
-                      setSelectedMember(member?.id);
-                      removeMember();
-                    }}
+                    onClick={() => removeMember(member?.id)}
                   >
                     <p className="truncate w-[90%] overflow-hidden text-ellipsis">
                       {member?.email}

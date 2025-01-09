@@ -6,19 +6,43 @@ import {
 } from "./query";
 
 async function getCollaboratorsByProjectId(projectId: string) {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_PROTECTED_URL}/collaborators`,
-    { query: GET_COLLABORATORS_BY_PROJECT_ID, variables: { projectId } }
-  );
-  return response.data?.data?.collaboratorsByProjectId;
+  return await axios
+    .post(`${process.env.NEXT_PUBLIC_PROTECTED_URL}/collaborators`, {
+      query: GET_COLLABORATORS_BY_PROJECT_ID,
+      variables: { projectId },
+    })
+    .then((response) => {
+      if (response.data.errors) {
+        throw new Error(
+          response.data.errors.map((error: any) => error.message).join(", ")
+        );
+      }
+      return response.data.data.collaboratorsByProjectId;
+    })
+    .catch((error) => {
+      console.error("Erreur capturée dans collaboratorsByCreator:", error);
+      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+    });
 }
 async function getCollaboratorsByCreatorId(creatorId: string) {
   const variables = { creator: creatorId };
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_PROTECTED_URL}/collaborators`,
-    { query: GET_COLLABORATORS_BY_CREATOR_ID, variables }
-  );
-  return response.data?.data?.collaboratorsByCreator;
+  return await axios
+    .post(`${process.env.NEXT_PUBLIC_PROTECTED_URL}/collaborators`, {
+      query: GET_COLLABORATORS_BY_CREATOR_ID,
+      variables,
+    })
+    .then((response) => {
+      if (response.data.errors) {
+        throw new Error(
+          response.data.errors.map((error: any) => error.message).join(", ")
+        );
+      }
+      return response.data.data.collaboratorsByCreator;
+    })
+    .catch((error) => {
+      console.error("Erreur capturée dans collaboratorsByCreator:", error);
+      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+    });
 }
 
 export const Collabo = {

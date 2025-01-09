@@ -105,46 +105,60 @@ const useKanbanState = (project_id: string) => {
     }
   };
   async function handleChangeTaskTitle(
-    containerId: string | undefined,
+    containerId: string,
     taskId: string | undefined,
     title: string | undefined
   ) {
-    if (title && containerId && taskId) {
-      // Trim the title and toggle task title change state
-      const trimmedTitle = title.trim();
-      const indexContainer = containers?.findIndex(
-        (container) => container?.pseudo_id === containerId
-      );
-      const itemToUpdate = containers[indexContainer]?.items?.filter(
-        (item) => item.pseudo_id === taskId
-      );
-      if (trimmedTitle === itemToUpdate[0].title.trim()) {
-        return;
-      }
-      // Update the containers state with the modified task title
-      const updatedContainers = containers.map((container) =>
-        // Find the container by id
-        container.pseudo_id === containerId
-          ? {
-              ...container,
-              items: container.items.map((item) =>
-                // Find the task within the container by its id and update the title
-                item.pseudo_id === taskId
-                  ? { ...item, title: trimmedTitle }
-                  : item
-              ),
-            }
-          : container
-      );
-      updateTaskMutation({
-        id: itemToUpdate[0].id,
-        title: trimmedTitle,
-      });
+    if (!title || !containerId || !taskId) return;
 
-      setTaskTitle(trimmedTitle);
-      setContainers(updatedContainers); // Update the state with new containers
-    }
+    // Trim the title
+    const trimmedTitle = title.trim();
+
+    // Find the container by id
+    const indexContainer = containers?.findIndex(
+      (container) => container?.pseudo_id === containerId
+    );
+    if (indexContainer === -1 || indexContainer === undefined) return;
+
+    // Find the task within the container by its id
+    const container = containers[indexContainer];
+    const itemToUpdate = container?.items?.find(
+      (item) => item.pseudo_id === taskId
+    );
+
+    if (!itemToUpdate) return;
+
+    // Check if the trimmed title matches the current title
+    if (trimmedTitle === itemToUpdate.title.trim()) return;
+
+    // Update the task title in the containers state
+    const updatedContainers = containers.map((container) => {
+      if (container.pseudo_id !== containerId) return container;
+
+      return {
+        ...container,
+        items: container.items.map((item) => {
+          if (item.pseudo_id !== taskId) return item;
+
+          return {
+            ...item,
+            title: trimmedTitle,
+          };
+        }),
+      };
+    });
+
+    // Trigger mutation to update the task title in the database
+    await updateTaskMutation({
+      id: itemToUpdate.id,
+      title: trimmedTitle,
+    });
+
+    // Update the state with the modified title and containers
+    setTaskTitle(trimmedTitle);
+    setContainers(updatedContainers);
   }
+
   async function changeContainerTitle(
     id: string | undefined,
     title: string | undefined

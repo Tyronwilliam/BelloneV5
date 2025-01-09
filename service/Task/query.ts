@@ -6,7 +6,7 @@ export const UPDATE_TASK_MUTATION = /* GraphQL */ `
     $start_date: Float
     $due_date: Float
     $time: Int
-    $members: [MemberInputType!]!
+    $members: [MemberInputType]
     $column_id: String
     $project_id: String
     $order: Int

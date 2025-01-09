@@ -30,19 +30,43 @@ async function getColumnsByProjectId(projectId: string) {
 }
 
 async function updateColumn(variables: Column) {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`,
-    { query: UPDATE_COLUMN_MUTATION, variables }
-  );
-  return response?.data?.updateColumn;
+  return await axios
+    .post(`${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`, {
+      query: UPDATE_COLUMN_MUTATION,
+      variables,
+    })
+    .then((response) => {
+      if (response.data.errors) {
+        throw new Error(
+          response.data.errors.map((error: any) => error.message).join(", ")
+        );
+      }
+      return response?.data?.updateColumn;
+    })
+    .catch((error) => {
+      console.error("Erreur capturée dans updateColumn:", error);
+      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+    });
 }
 
 async function createColumn(variables: CreateColumnType) {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`,
-    { query: CREATE_COLUMN_MUTATION, variables }
-  );
-  return response?.data?.data?.addColumn;
+  return await axios
+    .post(`${process.env.NEXT_PUBLIC_PROTECTED_URL}/columns`, {
+      query: CREATE_COLUMN_MUTATION,
+      variables,
+    })
+    .then((response) => {
+      if (response.data.errors) {
+        throw new Error(
+          response.data.errors.map((error: any) => error.message).join(", ")
+        );
+      }
+      return response?.data?.data?.addColumn;
+    })
+    .catch((error) => {
+      console.error("Erreur capturée dans addColumn:", error);
+      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+    });
 }
 
 export const Columns = {

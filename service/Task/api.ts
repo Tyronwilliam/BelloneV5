@@ -24,26 +24,43 @@ export type TaskInput = {
   pseudo_id?: string; // For updates only
 };
 export async function createTask(variables: TaskInput) {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_PROTECTED_URL}/task`,
-    {
+  return await axios
+    .post(`${process.env.NEXT_PUBLIC_PROTECTED_URL}/task`, {
       query: CREATE_TASK_MUTATION,
       variables: variables,
-    }
-  );
-  console.log(response, "FROM 1 LEVEL ");
-  return response.data.data.createTask;
+    })
+    .then((response) => {
+      if (response.data.errors) {
+        throw new Error(
+          response.data.errors.map((error: any) => error.message).join(", ")
+        );
+      }
+      return response.data.data.createTask;
+    })
+    .catch((error) => {
+      console.error("Erreur capturée dans updateTask:", error);
+      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+    });
 }
 
 export async function updateTask(variables: TaskInput) {
-  const response = await axios
+  return await axios
     .post(`${process.env.NEXT_PUBLIC_PROTECTED_URL}/task`, {
       query: UPDATE_TASK_MUTATION,
       variables: variables,
     })
-    .then((res) => res)
-    .catch((err) => err);
-  return response.data.updateTask;;
+    .then((response) => {
+      if (response.data.errors) {
+        throw new Error(
+          response.data.errors.map((error: any) => error.message).join(", ")
+        );
+      }
+      return response.data.data.updateTask;
+    })
+    .catch((error) => {
+      console.error("Erreur capturée dans updateTask:", error);
+      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+    });
 }
 
 export const Task = {
@@ -87,7 +104,7 @@ export const Task = {
             title: "Task updated successfully!",
           });
           console.log(data, ": DATA TASK LEVEL 2 TASK UPDATE");
-          return data
+          return data;
         },
         ...options,
       });

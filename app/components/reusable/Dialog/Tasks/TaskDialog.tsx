@@ -9,12 +9,13 @@ import {
 import { useToggle } from "@/hooks/useToggle.tsx";
 import { cn } from "@/lib/utils.ts";
 import { StickersType, TaskInterfaceType } from "@/zodSchema/Project/tasks";
-import { MutableRefObject, useEffect, useState } from "react";
+import { MutableRefObject, RefObject, useEffect, useState } from "react";
 import Editor from "../../MarkDown/Editor.tsx";
 import RightSide from "./RightSide.tsx";
 
 import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
+import useClickOutside from "@/hooks/useClickOutside.tsx";
 
 export interface TaskDialogInterface {
   pseudoId: string;
@@ -51,56 +52,18 @@ export function TaskDialog({
   const { value: isOpen, toggleValue: toggleIsOpen } = useToggle();
   const { value: isChangeTitle, toggleValue: toggleIsChangeTitle } =
     useToggle();
-  const [stickers, setStickers] = useState<StickersType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   const fetchStickers = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const data = await getAllSticker();
-  //       console.log(data, "DATA MY MAN", currentTaskId);
-  //       if (data) {
-  //         const filteredStickers = stickers?.filter((sticker) =>
-  //           sticker?.taskId?.includes(currentTaskId as string)
-  //         );
 
-  //         setStickers(filteredStickers); // Update state with stickers data
-  //       }
-  //     } catch (err) {
-  //       console.error("Error fetching stickers:", err);
-  //       setError("Failed to load stickers.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+  const handleUpdateTitleTask = () => {
+    handleChangeTaskTitle(containerId, pseudoId, taskTitle);
+    toggleIsChangeTitle();
+  };
+  useClickOutside(
+    inputTaskRef as RefObject<HTMLInputElement>,
+    () => handleUpdateTitleTask(),
+    isChangeTitle
+  );
 
-  //   fetchStickers(); // Call the fetch function on mount
-  // }, [open, currentTaskId]); // Empty dependency array to run only once on component mount
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        currentTaskId === pseudoId &&
-        isChangeTitle &&
-        inputTaskRef &&
-        inputTaskRef.current &&
-        !inputTaskRef.current.contains(event.target as Node)
-      ) {
-        handleChangeTaskTitle(containerId, pseudoId, taskTitle); // Save title
-        toggleIsChangeTitle();
-      }
-    };
-
-    if (isChangeTitle) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isChangeTitle, pseudoId, currentTaskId, taskTitle]);
   return (
     <Dialog key={pseudoId} open={open} onOpenChange={close}>
       <DialogContent

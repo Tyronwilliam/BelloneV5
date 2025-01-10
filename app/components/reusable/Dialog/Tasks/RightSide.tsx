@@ -25,7 +25,7 @@ import { TaskDialogInterface } from "./TaskDialog";
 import { TaskInput } from "@/service/Task/api";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { revalidateTag } from "next/cache";
-import { getColumnsWithTasks } from "@/app/(fonctionnality)/project/[id]/actions";
+import { getColumnsWithTasks } from "@/service/Task/uncommon";
 import { DNDType } from "../../Kanban/KanbanView";
 
 const RightSide = ({

@@ -1,4 +1,3 @@
-"use server";
 import { GET_COLUMNS_BY_PROJECT_ID } from "@/service/Kanban/columns/query";
 import { GET_TASKS_BY_PROJECT_ID } from "@/service/Task/query";
 import { ColumnsType } from "@/zodSchema/Kanban/columns";

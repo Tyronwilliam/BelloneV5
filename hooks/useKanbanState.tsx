@@ -14,7 +14,7 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "./use-toast";
 import { useToggle } from "./useToggle";
-import { getColumnsWithTasks } from "@/app/(fonctionnality)/project/[id]/actions";
+import { getColumnsWithTasks } from "@/service/Task/uncommon";
 
 const userId = "676d57193e5d1eb79574e8d5";
 const userEmail = "tyronwilliamchanu@gmail.com";
@@ -62,13 +62,13 @@ const useKanbanState = (project_id: string) => {
   }, [toggleChangeTaskTitle]);
 
   const onAddItem = async () => {
-    if (!taskTitle) return; 
+    if (!taskTitle) return;
 
     const container = containers.find(
       (container) => container.pseudo_id === currentContainerId
-    ); 
+    );
 
-    if (!container) return; 
+    if (!container) return;
     const res = await createTaskMutation({
       title: taskTitle,
       description: "",
@@ -171,17 +171,17 @@ const useKanbanState = (project_id: string) => {
         container.pseudo_id === id
           ? {
               ...container,
-              title: trimmedTitle, 
+              title: trimmedTitle,
             }
           : container
       );
 
       await updateColumnMutation({
         id: containerToUpdate?.id as string,
-        title: trimmedTitle, 
+        title: trimmedTitle,
       });
 
-      setContainers(updatedContainers); 
+      setContainers(updatedContainers);
 
       setContainerTitle(trimmedTitle);
     }
@@ -264,7 +264,7 @@ const useKanbanState = (project_id: string) => {
       );
 
       if (activeContainerIndex === overContainerIndex) {
-        const newContainers = [...containers]; 
+        const newContainers = [...containers];
 
         const updatedItems = arrayMove(
           newContainers[activeContainerIndex].items, // Items dans le container actif

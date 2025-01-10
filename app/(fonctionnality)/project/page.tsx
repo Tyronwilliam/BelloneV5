@@ -1,10 +1,9 @@
 import Entete from "@/app/components/reusable/Entete/Entete";
+import { fetchProjectsByCollaborator } from "@/service/Project/uncommon";
+import { ProjectType } from "@/zodSchema/Project/project";
 import { DataTable } from "../../components/reusable/Table/DataTable";
 import { columns } from "./Table/column";
 import EmptyProjectView from "./Views/ProjectView";
-import { formatDateToTimestamp } from "@/utils/date";
-import { ProjectType } from "@/zodSchema/Project/project";
-import { fetchProjectsByCollaborator } from "@/service/Project/uncommon";
 
 const clients = [
   {
@@ -29,10 +28,8 @@ const ProjectPage = async () => {
     .then((res) => {
       return res.map((project: ProjectType) => ({
         ...project,
-        startDate: formatDateToTimestamp(
-          project.startDate as unknown as string
-        ),
-        endDate: formatDateToTimestamp(project.endDate as unknown as string),
+        startDate: new Date(project?.startDate),
+        endDate: project?.endDate && new Date(project?.endDate),
       }));
     })
     .catch((error) => console.error("Error fetching projects:", error));

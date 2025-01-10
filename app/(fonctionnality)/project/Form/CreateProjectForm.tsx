@@ -40,12 +40,12 @@ export function CreateProjectForm({ clients }: CreateProjectProps) {
       clientId: null,
       budget: 0,
       startDate: new Date(),
-      endDate: undefined, // Optional
+      endDate: undefined, 
       status: "OPEN",
       progress: 0,
-      creator: 1, // Replace with an actual user ID if applicable
-      time: 0, // No time spent initially
-      image: undefined, // Optional
+      creator: 1,
+      time: 0, 
+      image: undefined, 
     },
   });
   const {
@@ -58,7 +58,6 @@ export function CreateProjectForm({ clients }: CreateProjectProps) {
     toggleIsLoading,
   } = useSelectableWithCreation();
 
-  // Add client to the database and update local state
   const addClientToDatabase = async () => {
     // try {
     //   toggleIsLoading();

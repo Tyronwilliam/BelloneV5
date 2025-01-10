@@ -13,11 +13,11 @@ import {
 } from "./query";
 
 interface Column {
-  id: string; // Required field of type string
-  title?: string; // Optional field of type string
-  color?: string; // Optional field of type string
-  project_id?: string; // Optional field of type string
-  order?: number; // Optional field of type number
+  id: string; 
+  title?: string; 
+  color?: string; 
+  project_id?: string; 
+  order?: number; 
 }
 type CreateColumnType = Omit<Column, "id">;
 
@@ -45,7 +45,7 @@ async function updateColumn(variables: Column) {
     })
     .catch((error) => {
       console.error("Erreur capturée dans updateColumn:", error);
-      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+      throw error; 
     });
 }
 
@@ -65,7 +65,7 @@ async function createColumn(variables: CreateColumnType) {
     })
     .catch((error) => {
       console.error("Erreur capturée dans addColumn:", error);
-      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+      throw error; 
     });
 }
 

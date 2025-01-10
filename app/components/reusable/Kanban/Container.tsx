@@ -49,11 +49,9 @@ const Container = React.memo(
     } = useSortable({
       id,
       data: {
-        type: "container", // Stable data reference
+        type: "container", 
       },
     });
-
-    // Memoize styles to prevent unnecessary re-renders
     const containerStyle = React.useMemo(
       () => ({
         transition,
@@ -71,8 +69,8 @@ const Container = React.memo(
           !inputTitleRef.current.contains(event.target as Node)
         ) {
           if (title?.trim() !== containerTitle?.trim()) {
-            changeContainerTitle && changeContainerTitle(id, containerTitle); // Save title
-            toggleChangeTitle && toggleChangeTitle(); // Toggle view
+            changeContainerTitle && changeContainerTitle(id, containerTitle); 
+            toggleChangeTitle && toggleChangeTitle();
           }
         }
       };

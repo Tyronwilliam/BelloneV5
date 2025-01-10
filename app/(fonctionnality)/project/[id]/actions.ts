@@ -1,7 +1,8 @@
+"use server";
+import { GET_COLUMNS_BY_PROJECT_ID } from "@/service/Kanban/columns/query";
+import { GET_TASKS_BY_PROJECT_ID } from "@/service/Task/query";
 import { ColumnsType } from "@/zodSchema/Kanban/columns";
 import { TaskInterfaceType } from "@/zodSchema/Project/tasks";
-import { GET_COLUMNS_BY_PROJECT_ID } from "../Kanban/columns/query";
-import { GET_TASKS_BY_PROJECT_ID } from "./query";
 
 export const fetchTasksByProject = async (projectId: string) => {
   const variables = { project_id: projectId };
@@ -29,7 +30,7 @@ export const fetchTasksByProject = async (projectId: string) => {
     return result?.data?.tasksByProject || [];
   } catch (error) {
     console.error("Error fetching tasks:", error);
-    throw error; 
+    throw error;
   }
 };
 export async function getColumnsByProjectId(projectId: string) {
@@ -69,12 +70,13 @@ export async function getColumnsWithTasks(projectId: string) {
       );
       return {
         ...column,
-        items: tasksForColumn, 
+        items: tasksForColumn,
       };
     });
-    return columnsWithTasks; 
+
+    return columnsWithTasks;
   } catch (error) {
     console.error("Error fetching columns or tasks:", error);
-    throw error; 
+    throw error;
   }
 }

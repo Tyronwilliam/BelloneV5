@@ -53,7 +53,8 @@ mutation CreateTask(
   $time: Int!,
   $members: [MemberInputType!]!,
   $column_id: String!,
-  $order: Int
+  $order: Int,
+  $completeAt :Float
 ) {
   createTask(
     project_id: $project_id,
@@ -64,7 +65,8 @@ mutation CreateTask(
     time: $time,
     members: $members,
     column_id: $column_id,
-    order: $order
+    order: $order,
+    completeAt : $completeAt
   ) {
        id
       title

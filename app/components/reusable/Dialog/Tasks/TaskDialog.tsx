@@ -9,13 +9,21 @@ import {
 import { useToggle } from "@/hooks/useToggle.tsx";
 import { cn } from "@/lib/utils.ts";
 import { StickersType, TaskInterfaceType } from "@/zodSchema/Project/tasks";
-import { MutableRefObject, RefObject, useEffect, useState } from "react";
+import {
+  Dispatch,
+  MutableRefObject,
+  RefObject,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import Editor from "../../MarkDown/Editor.tsx";
 import RightSide from "./RightSide.tsx";
 
 import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import useClickOutside from "@/hooks/useClickOutside.tsx";
+import { DNDType } from "../../Kanban/KanbanView.tsx";
 
 export interface TaskDialogInterface {
   pseudoId: string;
@@ -35,6 +43,7 @@ export interface TaskDialogInterface {
   currentTaskId?: string | null;
   setCurrentTaskId?: (value: string | null) => void;
   inputTaskRef?: MutableRefObject<HTMLInputElement | null>;
+  setContainers?: Dispatch<SetStateAction<[] | DNDType[]>>;
 }
 
 export function TaskDialog({
@@ -48,11 +57,11 @@ export function TaskDialog({
   inputTaskRef,
   taskTitle,
   containerId,
+  setContainers,
 }: TaskDialogInterface) {
   const { value: isOpen, toggleValue: toggleIsOpen } = useToggle();
   const { value: isChangeTitle, toggleValue: toggleIsChangeTitle } =
     useToggle();
-
 
   const handleUpdateTitleTask = () => {
     handleChangeTaskTitle(containerId, pseudoId, taskTitle);
@@ -68,7 +77,6 @@ export function TaskDialog({
     <Dialog key={pseudoId} open={open} onOpenChange={close}>
       <DialogContent
         className="min-w-[800px] z-50"
-        // aria-describedby={"Task dialog"}
         aria-describedby={undefined}
         onClick={(e) => {
           e.stopPropagation();
@@ -101,7 +109,7 @@ export function TaskDialog({
             <EditorView isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
             <div>Remarques : Text area pour annoter</div>
           </section>
-          <RightSide task={task} />
+          <RightSide task={task} setContainers={setContainers} />
         </section>
         <DialogFooter className="flex items-center gap-2 w-full">
           <Button type="button" variant="secondary" onClick={close}>
@@ -197,17 +205,14 @@ const EditorView = ({
   return (
     <section className="flex flex-col">
       <h2>Description</h2>
-      {/* Faire condition pour ouvrir l'editeur */}
       {isOpen ? (
         <section>
-          {/* Ajouter un form pour l'editeur  */}
           <Editor />
           <Button
             className="block ml-auto"
             type="submit"
             onClick={(e) => {
               e.stopPropagation();
-              // On sauvegarde l'Editeur
             }}
           >
             Save changes

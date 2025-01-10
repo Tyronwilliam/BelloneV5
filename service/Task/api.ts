@@ -5,6 +5,7 @@ import {
 } from "@/service/Task/query";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
+import { revalidateTag } from "next/cache";
 
 type Member = {
   id: string;
@@ -13,15 +14,15 @@ type Member = {
 export type TaskInput = {
   title?: string;
   description?: string;
-  start_date?: number;
-  due_date?: number;
+  start_date?: Date | number;
+  due_date?: Date;
   time?: number;
   members?: Member[];
   column_id?: string;
   project_id?: string;
   order?: number;
-  id?: string; // For updates only
-  pseudo_id?: string; // For updates only
+  id?: string; 
+  pseudo_id?: string; 
 };
 export async function createTask(variables: TaskInput) {
   return await axios
@@ -39,7 +40,7 @@ export async function createTask(variables: TaskInput) {
     })
     .catch((error) => {
       console.error("Erreur capturée dans updateTask:", error);
-      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+      throw error; 
     });
 }
 
@@ -59,7 +60,7 @@ export async function updateTask(variables: TaskInput) {
     })
     .catch((error) => {
       console.error("Erreur capturée dans updateTask:", error);
-      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+      throw error; 
     });
 }
 
@@ -80,6 +81,7 @@ export const Task = {
             variant: "default",
             title: "Task created successfully!",
           });
+
           return data;
         },
         ...options,

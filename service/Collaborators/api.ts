@@ -21,7 +21,7 @@ async function getCollaboratorsByProjectId(projectId: string) {
     })
     .catch((error) => {
       console.error("Erreur capturée dans collaboratorsByCreator:", error);
-      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+      throw error; 
     });
 }
 async function getCollaboratorsByCreatorId(creatorId: string) {
@@ -41,7 +41,7 @@ async function getCollaboratorsByCreatorId(creatorId: string) {
     })
     .catch((error) => {
       console.error("Erreur capturée dans collaboratorsByCreator:", error);
-      throw error; // Propager l'erreur pour le gestionnaire d'erreur (onError)
+      throw error; 
     });
 }
 

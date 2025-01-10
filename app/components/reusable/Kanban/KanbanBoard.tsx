@@ -1,6 +1,5 @@
 "use client";
 
-// DnD
 import {
   DndContext,
   DragEndEvent,
@@ -17,10 +16,11 @@ import Container from "./Container";
 import Items from "./Item";
 import { DNDType } from "./KanbanView";
 import { TaskInterfaceType } from "@/zodSchema/Project/tasks";
+import { Dispatch, SetStateAction } from "react";
 
 interface KanbanBoardProps {
   containers: DNDType[];
-  sensors: any; // Type this properly based on your `DndContext` sensor configuration
+  sensors: any; 
   handleDragStart: (event: DragStartEvent) => void;
   handleDragMove: (event: DragMoveEvent) => void;
   handleDragEnd: (event: DragEndEvent) => void;
@@ -55,6 +55,7 @@ interface KanbanBoardProps {
   findItemTitle: (id: string) => string;
   findContainerTitle: (id: string) => string;
   findContainerItems: (id: string | undefined) => any[];
+  setContainers: Dispatch<SetStateAction<[] | DNDType[]>>;
 }
 
 const KanbanBoard = ({
@@ -87,6 +88,7 @@ const KanbanBoard = ({
   findItemTitle,
   findContainerTitle,
   findContainerItems,
+  setContainers,
 }: KanbanBoardProps) => {
   return (
     <div className="flex gap-4 h-full">
@@ -145,7 +147,7 @@ const KanbanBoard = ({
                           openChangeTaskTitle={openChangeTaskTitle}
                           toggleChangeTaskTitle={toggleChangeTaskTitle}
                           handleChangeTaskTitle={handleChangeTaskTitle}
-                          // collaborators={container?.collaborators}
+                          setContainers={setContainers}
                         />
                       ))}
                   </div>

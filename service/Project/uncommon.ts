@@ -19,7 +19,6 @@ export const fetchProjectsByCollaborator = async (creator: string) => {
       }
     );
 
-    // Vérification de la réponse du serveur
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
@@ -29,6 +28,6 @@ export const fetchProjectsByCollaborator = async (creator: string) => {
     return result?.data?.projects || [];
   } catch (error) {
     console.error("Error fetching projects:", error);
-    throw error; // Relance l'erreur après l'avoir loggée
+    throw error; 
   }
 };

@@ -9,7 +9,7 @@ import { FormFieldComponentProps } from "@/app/(fonctionnality)/project/Form/reu
 import { CollaboratorType } from "@/zodSchema/Collaborators/collabo";
 import { TaskInterfaceType } from "@/zodSchema/Project/tasks";
 import { useEffect } from "react";
-import { FieldValues } from "react-hook-form"; // Ensure you import FieldValues
+import { FieldValues } from "react-hook-form";
 type MembersModalProps<T extends FieldValues> = FormFieldComponentProps<T> & {
   toggleMembers: () => void;
   openMembers: boolean;

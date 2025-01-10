@@ -1,7 +1,6 @@
 "use client";
 import { useEffect } from "react";
 
-// DnD
 
 import { Button } from "@/components/ui/button";
 import useKanbanState from "@/hooks/useKanbanState";
@@ -12,7 +11,6 @@ import { AddTasks } from "./AddTasks";
 import KanbanBoard from "./KanbanBoard";
 import { AddColumn } from "./AddColumn";
 
-// Components
 
 export type DNDType = z.infer<typeof ColumnsTypeSchema> & {
   items: TaskInterfaceType[];
@@ -71,12 +69,12 @@ export default function KanbanView({
 
   useEffect(() => {
     setContainers(columnsWithTasks!);
-    setIsClient(true); // Only set the state once the component is mounted in the client
+    setIsClient(true); 
   }, [columnsWithTasks]);
 
   if (!isClient) return null;
   return (
-    <div className="mx-auto max-w-7xl h-full flex flex-col gap-5 pt-4">
+    <div className="w-full h-full flex flex-col gap-5 pt-4">
       <AddTasks
         showAddItemModal={showAddItemModal}
         setShowAddItemModal={setShowAddItemModal}
@@ -131,6 +129,7 @@ export default function KanbanView({
           setCurrentContainerId={setCurrentContainerId}
           openEditor={openEditor}
           toggleOpenEditor={toggleOpenEditor}
+          setContainers={setContainers}
         />
       </div>
     </div>

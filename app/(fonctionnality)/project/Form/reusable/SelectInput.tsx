@@ -17,7 +17,6 @@ import {
 import { cn } from "@/lib/utils";
 import { FieldValues } from "react-hook-form";
 import { SelectFormProps } from "./FormCustom";
-// defaultValue={field.value}
 export function SelectInput<T extends FieldValues>({
   control,
   name,

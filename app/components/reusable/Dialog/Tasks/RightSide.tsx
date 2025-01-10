@@ -9,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import useClickOutside from "@/hooks/useClickOutside";
 import { useToggle } from "@/hooks/useToggle";
 import ApiRequest from "@/service";
+import { customFormatDate } from "@/utils/date";
 import { CollaboratorType } from "@/zodSchema/Collaborators/collabo";
 import {
   TaskFormDialogSchema,
@@ -17,33 +18,64 @@ import {
 } from "@/zodSchema/Project/tasks";
 import z from "@/zodSchema/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import MembersModal from "./RightSIdeItem/MembersModal";
+import { TaskDialogInterface } from "./TaskDialog";
+import { TaskInput } from "@/service/Task/api";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { revalidateTag } from "next/cache";
+import { getColumnsWithTasks } from "@/app/(fonctionnality)/project/[id]/actions";
+import { DNDType } from "../../Kanban/KanbanView";
 
-const RightSide = ({ task }: { task: TaskInterfaceType }) => {
-  const projectId = "676d3c3ed610fd3d18462e24";
+const RightSide = ({
+  task,
+  setContainers,
+}: {
+  task: TaskInterfaceType;
+  setContainers?: Dispatch<SetStateAction<[] | DNDType[]>>;
+}) => {
+  const pathname = usePathname();
+  const projectId = pathname.split("/project/")[1];
+
+  console.log(projectId, "HELLO ");
   const creatorId = "6763f8583ddd86e73e00a11b";
   const { data: collaboByCreator } =
     ApiRequest.Collabo.GetCollaboByCreatorId.useQuery(creatorId);
   const { mutateAsync: updateTaskMutation } =
     ApiRequest.Task.UpdateTask.useMutation();
+  const {
+    mutateAsync: createTaskMutation,
+    isPending: createTaskPending,
+    isSuccess: createTaskSuccess,
+    isError: createTaskError,
+  } = ApiRequest.Task.CreateTask.useMutation();
   const { value: openMembers, toggleValue: toggleMembers } = useToggle();
   const memberModalRef = useRef<HTMLDivElement | null>(null);
   const [currentTask, setCurrentTask] = useState<TaskInterfaceType>(task);
-
   const form = useForm<z.infer<typeof TaskFormDialogSchema>>({
     resolver: zodResolver(TaskFormDialogSchema),
     defaultValues: {
-      start_date: task?.start_date || "",
-      completeAt: task?.completeAt || "",
+      start_date: task?.start_date ? new Date(task?.start_date) : undefined,
+      completeAt: task?.completeAt ? new Date(task?.completeAt) : undefined,
+      due_date: task?.due_date ? new Date(task?.due_date) : undefined,
       member: "",
       time: task?.time || 0,
     },
   });
   const { watch } = form;
   const member = watch("member");
-
+  const resetForm = (arg: string, value: any | undefined) => {
+    form.reset(
+      {
+        ...form.getValues(),
+        [arg]: value ? value : "",
+      },
+      {
+        keepDirty: true,
+      }
+    );
+  };
   const removeMember = async (id: string) => {
     if (!id) return;
     const updatedMembers = currentTask?.members?.filter(
@@ -73,17 +105,37 @@ const RightSide = ({ task }: { task: TaskInterfaceType }) => {
     }
   };
   const handleCloseMembersModal = () => {
-    form.reset(
-      {
-        ...form.getValues(), // Conserve les valeurs actuelles du formulaire
-        member: "", // Réinitialise uniquement le champ "member"
-      },
-      {
-        keepDirty: true, // Conserve les états "dirty" pour les champs modifiés
-      }
-    );
+    resetForm("member", undefined);
     toggleMembers();
   };
+  const changeDate = async (date: Date, arg: string) => {
+    const timestamp: number = date?.getTime();
+    try {
+      await updateTaskMutation({
+        id: task?.id,
+        [arg]: timestamp,
+      });
+      resetForm(arg, date);
+    } catch (error) {
+      console.error("Error update date:", error);
+    }
+  };
+  const duplicateTask = async () => {
+    try {
+      const duplicatedTaskData = {
+        ...task,
+        id: undefined,
+        title: `${task.title} (Copy)`,
+        column_id: task?.column_id!,
+      };
+      const newTask = await createTaskMutation(duplicatedTaskData);
+      const columnsWithTasks = await getColumnsWithTasks(projectId);
+      setContainers && setContainers(columnsWithTasks);
+    } catch (error) {
+      console.error("Error duplicating task:", error);
+    }
+  };
+
   // const stickerForm = useForm<z.infer<typeof StickerFormInterface>>({
   //   resolver: zodResolver(StickerFormInterface),
   //   defaultValues: {
@@ -132,6 +184,7 @@ const RightSide = ({ task }: { task: TaskInterfaceType }) => {
               name={"start_date"}
               label={"Start Date"}
               isTasksDialog={true}
+              changeDate={changeDate}
             />{" "}
             <MembersModal
               control={form.control}
@@ -148,10 +201,32 @@ const RightSide = ({ task }: { task: TaskInterfaceType }) => {
             />
             <DateInput
               control={form.control}
+              name={"due_date"}
+              label={"Due date"}
+              isTasksDialog={true}
+              changeDate={changeDate}
+            />
+            <DateInput
+              control={form.control}
               name={"completeAt"}
               label={"Complete At"}
               isTasksDialog={true}
-            />
+              changeDate={changeDate}
+            />{" "}
+            {/* <Button
+              variant="outline"
+              className="w-full text-wrap flex justify-start "
+            >
+              <Timer /> Timer
+            </Button> */}
+            <Button
+              variant="outline"
+              className="w-full text-wrap flex justify-start "
+              onClick={duplicateTask}
+              type="button"
+            >
+              <BiDuplicate /> Dupliquer
+            </Button>
           </form>
           {/* <SelectableWithCreation
             control={stickerForm.control}
@@ -172,18 +247,6 @@ const RightSide = ({ task }: { task: TaskInterfaceType }) => {
             isPopover={true}
             icon={<Ticket />}
           /> */}
-          <Button
-            variant="outline"
-            className="w-full text-wrap flex justify-start "
-          >
-            <Timer /> Timer
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full text-wrap flex justify-start "
-          >
-            <BiDuplicate /> Dupliquer
-          </Button>
         </Form>
       </section>
     </section>

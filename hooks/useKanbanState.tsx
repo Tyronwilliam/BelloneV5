@@ -1,6 +1,5 @@
 import { DNDType } from "@/app/components/reusable/Kanban/KanbanView";
 import ApiRequest from "@/service";
-import { getColumnsWithTasks } from "@/service/Task/uncommon";
 import {
   DragEndEvent,
   DragMoveEvent,
@@ -15,6 +14,7 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "./use-toast";
 import { useToggle } from "./useToggle";
+import { getColumnsWithTasks } from "@/app/(fonctionnality)/project/[id]/actions";
 
 const userId = "676d57193e5d1eb79574e8d5";
 const userEmail = "tyronwilliamchanu@gmail.com";
@@ -62,13 +62,13 @@ const useKanbanState = (project_id: string) => {
   }, [toggleChangeTaskTitle]);
 
   const onAddItem = async () => {
-    if (!taskTitle) return; // If no item name is provided, do nothing
+    if (!taskTitle) return; 
 
     const container = containers.find(
       (container) => container.pseudo_id === currentContainerId
-    ); // Find the container based on currentContainerId
+    ); 
 
-    if (!container) return; // If container is not found, do nothing
+    if (!container) return; 
     const res = await createTaskMutation({
       title: taskTitle,
       description: "",
@@ -111,16 +111,13 @@ const useKanbanState = (project_id: string) => {
   ) {
     if (!title || !containerId || !taskId) return;
 
-    // Trim the title
     const trimmedTitle = title.trim();
 
-    // Find the container by id
     const indexContainer = containers?.findIndex(
       (container) => container?.pseudo_id === containerId
     );
     if (indexContainer === -1 || indexContainer === undefined) return;
 
-    // Find the task within the container by its id
     const container = containers[indexContainer];
     const itemToUpdate = container?.items?.find(
       (item) => item.pseudo_id === taskId
@@ -128,10 +125,8 @@ const useKanbanState = (project_id: string) => {
 
     if (!itemToUpdate) return;
 
-    // Check if the trimmed title matches the current title
     if (trimmedTitle === itemToUpdate.title.trim()) return;
 
-    // Update the task title in the containers state
     const updatedContainers = containers.map((container) => {
       if (container.pseudo_id !== containerId) return container;
 
@@ -148,13 +143,11 @@ const useKanbanState = (project_id: string) => {
       };
     });
 
-    // Trigger mutation to update the task title in the database
     await updateTaskMutation({
       id: itemToUpdate.id,
       title: trimmedTitle,
     });
 
-    // Update the state with the modified title and containers
     setTaskTitle(trimmedTitle);
     setContainers(updatedContainers);
   }
@@ -178,19 +171,19 @@ const useKanbanState = (project_id: string) => {
         container.pseudo_id === id
           ? {
               ...container,
-              title: trimmedTitle, // Update the title of the matched container
+              title: trimmedTitle, 
             }
           : container
       );
 
       await updateColumnMutation({
-        id: containerToUpdate?.id as string, // Pass the container's pseudo_id as the id
-        title: trimmedTitle, // Pass the updated title
+        id: containerToUpdate?.id as string,
+        title: trimmedTitle, 
       });
 
-      setContainers(updatedContainers); // Update the containers state with the new container title
+      setContainers(updatedContainers); 
 
-      setContainerTitle(trimmedTitle); // Update containerTitle state
+      setContainerTitle(trimmedTitle);
     }
   }
   const findValueOfItems = (
@@ -228,7 +221,6 @@ const useKanbanState = (project_id: string) => {
     return container.items;
   };
 
-  // DND Handlers
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -272,10 +264,8 @@ const useKanbanState = (project_id: string) => {
       );
 
       if (activeContainerIndex === overContainerIndex) {
-        // Déplacement au sein du même container
-        const newContainers = [...containers]; // Copie immuable des containers
+        const newContainers = [...containers]; 
 
-        // Réorganisation des items dans le container actif
         const updatedItems = arrayMove(
           newContainers[activeContainerIndex].items, // Items dans le container actif
           activeItemIndex, // Index de l'item déplacé

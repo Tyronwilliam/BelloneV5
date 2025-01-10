@@ -3,8 +3,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { GripVertical } from "lucide-react";
-import { MutableRefObject } from "react";
+import { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { TaskDialog } from "../Dialog/Tasks/TaskDialog";
+import { DNDType } from "./KanbanView";
 
 type ItemsType = {
   pseudoId: string;
@@ -25,6 +26,7 @@ type ItemsType = {
   currentTaskId?: string | null;
   setCurrentTaskId?: (value: string | null) => void;
   inputTaskRef?: MutableRefObject<HTMLInputElement | null>;
+  setContainers?: Dispatch<SetStateAction<[] | DNDType[]>>;
 };
 
 const Items = ({
@@ -42,6 +44,7 @@ const Items = ({
   toggleChangeTaskTitle,
   containerId,
   openChangeTaskTitle,
+  setContainers,
 }: ItemsType) => {
   const {
     attributes,
@@ -97,6 +100,7 @@ const Items = ({
           handleChangeTaskTitle={handleChangeTaskTitle!}
           openChangeTaskTitle={openChangeTaskTitle}
           toggleChangeTaskTitle={toggleChangeTaskTitle!}
+          setContainers={setContainers}
         />
       )}
     </div>

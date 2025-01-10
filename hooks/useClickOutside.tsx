@@ -14,7 +14,7 @@ function useClickOutside<T extends HTMLElement>(
   active: boolean = false
 ) {
   useEffect(() => {
-    if (!active) return; // If active is false, early return without adding event listener
+    if (!active) return; 
 
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -22,14 +22,12 @@ function useClickOutside<T extends HTMLElement>(
       }
     };
 
-    // Attach the event listener to the document
     document.addEventListener("mousedown", handleClickOutside);
 
-    // Cleanup on component unmount or when active changes
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [ref, handler, active]); // Depend on ref, handler, and active state
+  }, [ref, handler, active]); 
 }
 
 export default useClickOutside;

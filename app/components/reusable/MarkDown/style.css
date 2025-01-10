@@ -465,12 +465,13 @@ i.bullet {
 }
 i.check {
   background-image: url(../../../public/icons/check-list.svg);
+  background-size: 10px;
 }
 i.order {
   background-image: url(../../../public/icons/order-list.svg);
 }
 i.link {
-  background-image: url(../../../public/icons/link.svg);
+  background-image: url(../../../public/icons/link.png);
 }
 
 .editor-list-ul {

@@ -11,6 +11,7 @@ export const UPDATE_TASK_MUTATION = /* GraphQL */ `
     $project_id: String
     $order: Int
     $pseudo_id: String
+    $content: String
   ) {
     updateTask(
       id: $id
@@ -24,6 +25,7 @@ export const UPDATE_TASK_MUTATION = /* GraphQL */ `
       project_id: $project_id
       order: $order
       pseudo_id: $pseudo_id
+      content: $content
     ) {
       id
       title
@@ -40,6 +42,7 @@ export const UPDATE_TASK_MUTATION = /* GraphQL */ `
       order
       pseudo_id
       completeAt
+      content
     }
   }
 `;
@@ -55,6 +58,7 @@ mutation CreateTask(
   $column_id: String!,
   $order: Int,
   $completeAt :Float
+  $content : String
 ) {
   createTask(
     project_id: $project_id,
@@ -67,6 +71,7 @@ mutation CreateTask(
     column_id: $column_id,
     order: $order,
     completeAt : $completeAt
+    content :$content
   ) {
        id
       title
@@ -83,6 +88,7 @@ mutation CreateTask(
       order
       pseudo_id
       completeAt
+      content
   }
 }
 `;

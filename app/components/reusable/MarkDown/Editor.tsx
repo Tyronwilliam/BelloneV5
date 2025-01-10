@@ -64,7 +64,6 @@ const exportMap: DOMExportOutputMap = new Map<
 ]);
 
 const getExtraStyles = (element: HTMLElement): string => {
-
   let extraStyles = "";
   const fontSize = parseAllowedFontSize(element.style.fontSize);
   const backgroundColor = parseAllowedColor(element.style.backgroundColor);
@@ -165,7 +164,7 @@ export default function Editor() {
           />
           <HistoryPlugin />
           <AutoFocusPlugin />
-          {/* <TreeViewPlugin /> */}
+          <TreeViewPlugin />
           <ClickableLinkPlugin />
           <AutoLinkPlugin matchers={MATCHERS} /> <ListPlugin />
           <CheckListPlugin />

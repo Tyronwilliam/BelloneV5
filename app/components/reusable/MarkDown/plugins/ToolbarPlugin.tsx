@@ -149,7 +149,7 @@ export default function Toolbar() {
         toast({
           title: "Text or Link need a value",
           description: "Please add a link and a text",
-          variant: "destructive", // Variante destructrice pour les messages d'erreur
+          variant: "destructive",
         });
         return;
       }
@@ -163,11 +163,12 @@ export default function Toolbar() {
         const linkNode = $createLinkNode(normalizedLink); // Create a link node with the given URL.
 
         linkNode.append($createTextNode(text)); // Add text inside the link node.
+        // A voir si vraiment utile
         paragraph.append(linkNode); // Add the link node to the paragraph.
         root.append(paragraph); // Add the paragraph to the root.
       });
 
-      toggleDialogLink(); // Close the dialog.
+      toggleDialogLink();
     },
     [editor]
   );
@@ -270,39 +271,7 @@ export default function Toolbar() {
       >
         <i className="format check" />
       </button>
-      {/* <button onClick={toggleDialogImage} className={"toolbar-item spaced "}>
-        <i className="format order" />
-      </button> */}
-      {/* <Dialog open={isDialogLink} onOpenChange={toggleDialogLink}>
-        <DialogContent aria-label="custom-dialog-link-editor">
-          <DialogHeader>
-            <DialogTitle>Insert Link</DialogTitle>
-            <DialogDescription>
-              Enter the URL for the link you want to add.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 flex flex-col">
-            <Input
-              value={textUrl}
-              onChange={(e: any) => setTextUrl(e.target.value)}
-              placeholder="Mon lien"
-              className="w-full"
-            />
-            <Input
-              value={url}
-              onChange={(e: any) => setUrl(e.target.value)}
-              placeholder="https://example.com"
-              className="w-full"
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={toggleDialogLink}>
-              Cancel
-            </Button>
-            <Button onClick={() => insertUrl(textUrl, url)}>Insert Link</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>{" "} */}
+
       <LinkDialog
         isOpen={isDialogLink}
         onClose={toggleDialogLink}
@@ -315,6 +284,3 @@ export default function Toolbar() {
     </div>
   );
 }
-// `toolbar-item spaced ${
-//   currentList === "bullet" && "editor-list-ol"
-// } `

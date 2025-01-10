@@ -138,7 +138,7 @@ const RightSide: React.FC<RightSideProps> = ({
             <DateInput
               control={form.control}
               name={"completeAt"}
-              label={"Complete At"}
+              label={"Complete at"}
               isTasksDialog={true}
               changeDate={changeDate}
             />

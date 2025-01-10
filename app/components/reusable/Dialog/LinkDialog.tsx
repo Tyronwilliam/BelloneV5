@@ -63,7 +63,6 @@ const LinkDialog: React.FC<LinkDialogProps> = ({
           <Button
             onClick={() => {
               onInsert(textUrl, url);
-              onClose();
             }}
           >
             Insert Link

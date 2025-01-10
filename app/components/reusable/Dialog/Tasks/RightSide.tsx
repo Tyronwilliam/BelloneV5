@@ -27,15 +27,16 @@ interface RightSideProps {
   task: TaskInterfaceType;
   setContainers: Dispatch<SetStateAction<[] | DNDType[]>>;
   close: () => void;
+  projectId: string;
 }
 
 const RightSide: React.FC<RightSideProps> = ({
   task,
   setContainers,
   close,
+  projectId,
 }: RightSideProps) => {
   const pathname = usePathname();
-  const projectId = pathname.split("/project/")[1];
   const creatorId = "6763f8583ddd86e73e00a11b";
   const form = useForm<z.infer<typeof TaskFormDialogSchema>>({
     resolver: zodResolver(TaskFormDialogSchema),

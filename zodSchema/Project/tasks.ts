@@ -20,6 +20,7 @@ export const TaskInterface = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   completeAt: z.date().nullable(),
+  content: z.string().optional(),
 });
 
 export type TaskInterfaceType = z.infer<typeof TaskInterface>;
@@ -31,8 +32,9 @@ export const TaskFormDialogSchema = TaskInterface.omit({
   description: true,
   column_id: true,
   members: true,
+  content: true,
 }).extend({
-  member: z.string(), 
+  member: z.string(),
 });
 export type TaskFormDialogType = z.infer<typeof TaskFormDialogSchema>;
 

@@ -24,6 +24,7 @@ export type TaskInput = {
   order?: number;
   id?: string;
   pseudo_id?: string;
+  content?: string;
 };
 export async function createTask(variables: TaskInput) {
   return await axios

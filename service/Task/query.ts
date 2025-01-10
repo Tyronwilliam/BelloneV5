@@ -110,6 +110,7 @@ query GetTasksByProject($project_id: String!) {
       order
       pseudo_id
       completeAt
+      content
   }
 }
 `;

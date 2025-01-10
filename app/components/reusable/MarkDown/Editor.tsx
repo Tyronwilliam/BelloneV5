@@ -32,6 +32,9 @@ import {
   parseAllowedColor,
   parseAllowedFontSize,
 } from "./styleConfig";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useState } from "react";
+import { LoadInitialContent, MyOnChangePlugin } from "./MyOnChangePlugin";
 const placeholder = "Enter some rich text...";
 
 const removeStylesExportDOM = (
@@ -129,7 +132,7 @@ const editorConfig = {
     export: exportMap,
     import: constructImportMap(),
   },
-  namespace: "React.js Demo",
+  namespace: "Editor",
   nodes: [
     ParagraphNode,
     TextNode,
@@ -144,9 +147,27 @@ const editorConfig = {
   theme: ExampleTheme,
 };
 
-export default function Editor() {
+export default function Editor({
+  editorState,
+  setEditorState,
+  initialContent,
+}: {
+  editorState: any;
+  setEditorState: any;
+  initialContent: string | undefined;
+}) {
+  function onChange(editorState: any) {
+    // Call toJSON on the EditorState object, which produces a serialization safe string
+    const editorStateJSON = editorState.toJSON();
+    // However, we still have a JavaScript object, so we need to convert it to an actual string with JSON.stringify
+    const editorToString = JSON.stringify(editorStateJSON);
+    console.log(editorToString);
+    setEditorState(editorToString);
+  }
   return (
     <LexicalComposer initialConfig={editorConfig}>
+      {" "}
+      <LoadInitialContent initialContent={initialContent} />
       <div className="editor-container" onClick={(e) => e.stopPropagation()}>
         <ToolbarPlugin />
         <div className="editor-inner">
@@ -164,10 +185,10 @@ export default function Editor() {
           />
           <HistoryPlugin />
           <AutoFocusPlugin />
-          <TreeViewPlugin />
+          {/* <TreeViewPlugin /> */}
           <ClickableLinkPlugin />
           <AutoLinkPlugin matchers={MATCHERS} /> <ListPlugin />
-          <CheckListPlugin />
+          <CheckListPlugin /> <MyOnChangePlugin onChange={onChange} />
           {/* <ListPlugin /> */}
         </div>
       </div>

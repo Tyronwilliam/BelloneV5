@@ -24,6 +24,12 @@ import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import useClickOutside from "@/hooks/useClickOutside.tsx";
 import { DNDType } from "../../Kanban/KanbanView.tsx";
+import ApiRequest from "@/service/index.ts";
+import { TaskInput } from "@/service/Task/api.ts";
+import { AxiosError } from "axios";
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
+import { getColumnsWithTasks } from "@/service/Task/uncommon.ts";
+import { usePathname } from "next/navigation";
 
 export interface TaskDialogInterface {
   pseudoId: string;
@@ -62,7 +68,11 @@ export function TaskDialog({
   const { value: isOpen, toggleValue: toggleIsOpen } = useToggle();
   const { value: isChangeTitle, toggleValue: toggleIsChangeTitle } =
     useToggle();
-
+  const [editorState, setEditorState] = useState<any>();
+  const pathname = usePathname();
+  const projectId = pathname.split("/project/")[1];
+  const { mutateAsync: updateTaskMutation } =
+    ApiRequest.Task.UpdateTask.useMutation();
   const handleUpdateTitleTask = () => {
     handleChangeTaskTitle(containerId, pseudoId, taskTitle);
     toggleIsChangeTitle();
@@ -72,7 +82,12 @@ export function TaskDialog({
     () => handleUpdateTitleTask(),
     isChangeTitle
   );
-
+  const saveEditor = async () => {
+    console.log(editorState);
+    await updateTaskMutation({ id: task?.id, content: editorState });
+    const columnsWithTasks = await getColumnsWithTasks(projectId);
+    setContainers && setContainers(columnsWithTasks);
+  };
   return (
     <Dialog key={pseudoId} open={open} onOpenChange={close}>
       <DialogContent
@@ -106,10 +121,22 @@ export function TaskDialog({
             {error && <div>{error}</div>}
             {!error && !loading && <LabelsView stickers={stickers} />} */}
             {/* LABELS VIEWS */}
-            <EditorView isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
+            <EditorView
+              isOpen={isOpen}
+              toggleIsOpen={toggleIsOpen}
+              editorState={editorState}
+              setEditorState={setEditorState}
+              saveEditor={saveEditor}
+              initialContent={task?.content}
+            />
             <div>Remarques : Text area pour annoter</div>
           </section>
-          <RightSide task={task} setContainers={setContainers!} close={close} />
+          <RightSide
+            task={task}
+            setContainers={setContainers!}
+            close={close}
+            projectId={projectId}
+          />
         </section>
         <DialogFooter className="flex items-center gap-2 w-full">
           <Button type="button" variant="secondary" onClick={close}>
@@ -198,25 +225,50 @@ export const LabelsView = ({ stickers }: { stickers: StickersType[] }) => {
 const EditorView = ({
   isOpen,
   toggleIsOpen,
+  editorState,
+  setEditorState,
+  saveEditor,
+  initialContent,
 }: {
   isOpen: boolean;
   toggleIsOpen: () => void;
+  editorState: any;
+  setEditorState: any;
+  saveEditor: () => void;
+  initialContent: string | undefined;
 }) => {
   return (
     <section className="flex flex-col">
       <h2>Description</h2>
       {isOpen ? (
         <section>
-          <Editor />
-          <Button
-            className="block ml-auto"
-            type="submit"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            Save changes
-          </Button>
+          <Editor
+            editorState={editorState}
+            setEditorState={setEditorState}
+            initialContent={initialContent}
+          />
+          <div className="flex gap-2 justify-end">
+            {" "}
+            <Button
+              type="button"
+              variant={"outline"}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleIsOpen();
+              }}
+            >
+              Close
+            </Button>
+            <Button
+              type="submit"
+              onClick={(e) => {
+                e.stopPropagation();
+                saveEditor();
+              }}
+            >
+              Save changes
+            </Button>
+          </div>
         </section>
       ) : (
         <Card

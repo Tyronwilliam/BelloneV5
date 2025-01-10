@@ -32,6 +32,9 @@ import {
   parseAllowedColor,
   parseAllowedFontSize,
 } from "./styleConfig";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useState } from "react";
+import { LoadInitialContent, MyOnChangePlugin } from "./MyOnChangePlugin";
 const placeholder = "Enter some rich text...";
 
 const removeStylesExportDOM = (
@@ -40,9 +43,6 @@ const removeStylesExportDOM = (
 ): DOMExportOutput => {
   const output = target.exportDOM(editor);
   if (output && output.element instanceof HTMLElement) {
-    // Remove all inline styles and classes if the element is an HTMLElement
-    // Children are checked as well since TextNode can be nested
-    // in i, b, and strong tags.
     for (const el of [
       output.element,
       ...output.element.querySelectorAll('[style],[class],[dir="ltr"]'),
@@ -67,8 +67,6 @@ const exportMap: DOMExportOutputMap = new Map<
 ]);
 
 const getExtraStyles = (element: HTMLElement): string => {
-  // Parse styles from pasted input, but only if they match exactly the
-  // sort of styles that would be produced by exportDOM
   let extraStyles = "";
   const fontSize = parseAllowedFontSize(element.style.fontSize);
   const backgroundColor = parseAllowedColor(element.style.backgroundColor);
@@ -88,8 +86,6 @@ const getExtraStyles = (element: HTMLElement): string => {
 const constructImportMap = (): DOMConversionMap => {
   const importMap: DOMConversionMap = {};
 
-  // Wrap all TextNode importers with a function that also imports
-  // the custom styles implemented by the playground
   for (const [tag, fn] of Object.entries(TextNode.importDOM() || {})) {
     importMap[tag] = (importNode) => {
       const importer = fn(importNode);
@@ -136,7 +132,7 @@ const editorConfig = {
     export: exportMap,
     import: constructImportMap(),
   },
-  namespace: "React.js Demo",
+  namespace: "Editor",
   nodes: [
     ParagraphNode,
     TextNode,
@@ -151,9 +147,27 @@ const editorConfig = {
   theme: ExampleTheme,
 };
 
-export default function Editor() {
+export default function Editor({
+  editorState,
+  setEditorState,
+  initialContent,
+}: {
+  editorState: any;
+  setEditorState: any;
+  initialContent: string | undefined;
+}) {
+  function onChange(editorState: any) {
+    // Call toJSON on the EditorState object, which produces a serialization safe string
+    const editorStateJSON = editorState.toJSON();
+    // However, we still have a JavaScript object, so we need to convert it to an actual string with JSON.stringify
+    const editorToString = JSON.stringify(editorStateJSON);
+    console.log(editorToString);
+    setEditorState(editorToString);
+  }
   return (
     <LexicalComposer initialConfig={editorConfig}>
+      {" "}
+      <LoadInitialContent initialContent={initialContent} />
       <div className="editor-container" onClick={(e) => e.stopPropagation()}>
         <ToolbarPlugin />
         <div className="editor-inner">
@@ -174,7 +188,7 @@ export default function Editor() {
           {/* <TreeViewPlugin /> */}
           <ClickableLinkPlugin />
           <AutoLinkPlugin matchers={MATCHERS} /> <ListPlugin />
-          <CheckListPlugin />
+          <CheckListPlugin /> <MyOnChangePlugin onChange={onChange} />
           {/* <ListPlugin /> */}
         </div>
       </div>

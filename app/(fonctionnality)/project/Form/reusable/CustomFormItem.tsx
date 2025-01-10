@@ -27,7 +27,7 @@ function CustomFormItem<T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="font-semibold">{label}</FormLabel>
+          {label && <FormLabel className="font-semibold">{label}</FormLabel>}
           <FormControl>
             {type === "number" ? (
               <div className="relative  w-full">

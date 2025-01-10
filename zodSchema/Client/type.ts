@@ -5,8 +5,8 @@ export interface SelectableWithCreationProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   label: string;
-  options: any[]; // Array of options
-  placeholder?: string; // Optional placeholder
+  options: any[]; 
+  placeholder?: string; 
   isAddingNew: boolean;
   addToDatabase: () => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

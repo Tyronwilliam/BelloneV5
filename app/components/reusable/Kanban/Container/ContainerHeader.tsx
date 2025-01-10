@@ -1,22 +1,21 @@
 import { Input } from "@/components/ui/input";
-import { UniqueIdentifier } from "@dnd-kit/core";
 import { GripVertical } from "lucide-react";
 import { MutableRefObject } from "react";
 
 export interface ContainerHeaderProps {
-  id: UniqueIdentifier; // Unique identifier for the container
-  title?: string; // The title of the container
-  description?: string; // Optional description
-  color?: string; // Background color for the container
-  containerTitle?: string; // Title of the container when in edit mode
-  setContainerTitle?: (value: string) => void; // Function to update the container title
-  changeContainerTitle?: (id: UniqueIdentifier, title: string) => void; // Function to save the new title
-  toggleChangeTitle?: () => void; // Function to toggle the edit mode
-  currentIdTitle?: UniqueIdentifier | null; // Current active container being edited
-  setCurrentIdTitle?: (value: UniqueIdentifier | null) => void; // Function to set the active container for editing
-  openChangeTitle?: boolean; // Boolean to indicate if the title is being edited
-  inputTitleRef?: MutableRefObject<HTMLInputElement | null>; // Ref for the input field
-  listeners?: any; // DND Kit listeners for dragging
+  id: string;
+  title?: string;
+  description?: string; 
+  color?: string; 
+  containerTitle?: string; 
+  setContainerTitle?: (value: string) => void;
+  changeContainerTitle?: (id: string, title: string) => void;
+  toggleChangeTitle?: () => void; 
+  currentIdTitle?: string | null;
+  setCurrentIdTitle?: (value: string | null) => void; 
+  openChangeTitle?: boolean; 
+  inputTitleRef?: MutableRefObject<HTMLInputElement | null>;
+  listeners?: any; 
 }
 
 const ContainerHeader = ({
@@ -52,12 +51,12 @@ const ContainerHeader = ({
           value={containerTitle}
           onChange={(e: any) => setContainerTitle(e.target.value)}
           onBlur={() => {
-            toggleChangeTitle && toggleChangeTitle(); // Toggle view
+            toggleChangeTitle && toggleChangeTitle(); 
             if (title?.trim() !== containerTitle?.trim()) {
               changeContainerTitle &&
                 containerTitle &&
-                changeContainerTitle(id, containerTitle); // Save title
-              toggleChangeTitle && toggleChangeTitle(); // Toggle view
+                changeContainerTitle(id, containerTitle); 
+              toggleChangeTitle && toggleChangeTitle();
             }
           }}
         />

@@ -1,39 +1,40 @@
-import { ItemInterfaceType } from "@/zodSchema/Project/tasks";
-import { UniqueIdentifier } from "@dnd-kit/core";
+import { TaskInterfaceType } from "@/zodSchema/Project/tasks";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { GripVertical } from "lucide-react";
-import { MutableRefObject } from "react";
+import { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { TaskDialog } from "../Dialog/Tasks/TaskDialog";
+import { DNDType } from "./KanbanView";
 
 type ItemsType = {
-  id: UniqueIdentifier;
+  pseudoId: string;
   title: string;
-  containerId?: UniqueIdentifier;
-  item?: ItemInterfaceType;
-  open?: boolean;
-  close?: () => void;
+  containerId?: string;
+  item?: TaskInterfaceType;
+  openEditor?: boolean;
+  toggleOpenEditor?: () => void;
   taskTitle?: string;
   setTaskTitle?: (e: any) => void;
   handleChangeTaskTitle?: (
-    containerId: UniqueIdentifier,
-    id: UniqueIdentifier | undefined,
+    containerId: string,
+    id: string | undefined,
     title: string | undefined
   ) => void;
   toggleChangeTaskTitle?: () => void;
   openChangeTaskTitle?: boolean;
-  currentTaskId?: UniqueIdentifier | null;
-  setCurrentTaskId?: (value: UniqueIdentifier | null) => void;
+  currentTaskId?: string | null;
+  setCurrentTaskId?: (value: string | null) => void;
   inputTaskRef?: MutableRefObject<HTMLInputElement | null>;
+  setContainers?: Dispatch<SetStateAction<[] | DNDType[]>>;
 };
 
 const Items = ({
-  id,
+  pseudoId,
   title,
   item,
-  open,
-  close,
+  openEditor,
+  toggleOpenEditor,
   currentTaskId,
   handleChangeTaskTitle,
   setTaskTitle,
@@ -43,6 +44,7 @@ const Items = ({
   toggleChangeTaskTitle,
   containerId,
   openChangeTaskTitle,
+  setContainers,
 }: ItemsType) => {
   const {
     attributes,
@@ -52,7 +54,7 @@ const Items = ({
     transition,
     isDragging,
   } = useSortable({
-    id: id,
+    id: pseudoId,
     data: {
       type: "item",
     },
@@ -70,9 +72,9 @@ const Items = ({
         isDragging && "opacity-50"
       )}
       onClick={() => {
-        setCurrentTaskId && setCurrentTaskId(id);
+        setCurrentTaskId && setCurrentTaskId(pseudoId);
         setTaskTitle && setTaskTitle(title);
-        close && close();
+        toggleOpenEditor && toggleOpenEditor();
         toggleChangeTaskTitle && openChangeTaskTitle && toggleChangeTaskTitle();
       }}
     >
@@ -83,21 +85,22 @@ const Items = ({
           {...listeners}
         />
       </div>
-      {open && close && currentTaskId === id && (
+      {openEditor && currentTaskId === pseudoId && (
         <TaskDialog
-          id={currentTaskId}
+          pseudoId={currentTaskId}
           task={item!}
-          open={open}
-          close={close}
-          containerId={containerId}
+          open={openEditor}
+          close={toggleOpenEditor!}
+          containerId={containerId!}
           currentTaskId={currentTaskId}
           setCurrentTaskId={setCurrentTaskId}
-          taskTitle={taskTitle}
+          taskTitle={taskTitle!}
           setTaskTitle={setTaskTitle}
           inputTaskRef={inputTaskRef}
-          handleChangeTaskTitle={handleChangeTaskTitle}
+          handleChangeTaskTitle={handleChangeTaskTitle!}
           openChangeTaskTitle={openChangeTaskTitle}
-          toggleChangeTaskTitle={toggleChangeTaskTitle}
+          toggleChangeTaskTitle={toggleChangeTaskTitle!}
+          setContainers={setContainers}
         />
       )}
     </div>

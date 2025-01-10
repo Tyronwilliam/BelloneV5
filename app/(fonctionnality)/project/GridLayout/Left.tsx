@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/resizable";
 import { KanbanType } from "@/zodSchema/Kanban/kanban";
 import Image from "next/image";
+import { Suspense } from "react";
 
 const Left = ({
   kanban,
@@ -27,23 +28,25 @@ const Left = ({
         defaultSize={70}
         className="custom-scrollbar overflow-x-scroll "
       >
-        <div className="h-full w-full relative px-2 ">
-          {kanban?.image && (
-            <Image
-              src={kanban?.image}
-              alt="image"
-              className="absolute object-cover -z-10 w-[95%] h-[90%] pt-2 rounded-sm"
-              fill
-              unoptimized={true}
-            />
-          )}
-          {columnsWithTasks && columnsWithTasks?.length > 0 && (
-            <KanbanView
-              projectId={projectId}
-              columnsWithTasks={columnsWithTasks}
-            />
-          )}
-        </div>
+        <Suspense fallback={"Loading ...."}>
+          <div className="h-full w-full relative px-2 ">
+            {kanban?.image && (
+              <Image
+                src={kanban?.image}
+                alt="image"
+                className="absolute object-cover -z-10 w-[95%] h-[90%] pt-2 rounded-sm"
+                fill
+                unoptimized={true}
+              />
+            )}
+            {columnsWithTasks && columnsWithTasks?.length > 0 && (
+              <KanbanView
+                projectId={projectId}
+                columnsWithTasks={columnsWithTasks}
+              />
+            )}
+          </div>
+        </Suspense>
       </ResizablePanel>
     </ResizablePanelGroup>
   );

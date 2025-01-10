@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Input from "./Input";
+import { Loader2 } from "lucide-react";
 
 interface AddColumnProps {
   showAddContainerModal: boolean;
@@ -17,6 +18,7 @@ interface AddColumnProps {
   containerName: string;
   setContainerName: (e: any) => void;
   onAddContainer: () => void;
+  createColumnPending: boolean;
 }
 
 export const AddColumn = ({
@@ -25,6 +27,7 @@ export const AddColumn = ({
   containerName,
   setContainerName,
   onAddContainer,
+  createColumnPending,
 }: AddColumnProps) => {
   return (
     <Dialog
@@ -32,16 +35,13 @@ export const AddColumn = ({
       onOpenChange={setShowAddContainerModal}
     >
       <DialogTrigger asChild>
-        <Button
-          variant={"secondary"}
-          className="w-[280px] h-5  p-4 bg-gray-50  flex flex-col gap-y-4 flex-shrink-0 mb-10"
-        >
-          Add a list
+        <Button variant={"secondary"} className="w-fit p-4 bg-gray-50">
+          Add a Column
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle> Add a list</DialogTitle>
+          <DialogTitle> Add a Column</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <div>
@@ -58,8 +58,14 @@ export const AddColumn = ({
             <Button type="button" variant="secondary">
               Close
             </Button>
-          </DialogClose>{" "}
-          <Button onClick={onAddContainer}>Create a list</Button>
+          </DialogClose>
+          <Button onClick={onAddContainer}>
+            {createColumnPending ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Create a Column"
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

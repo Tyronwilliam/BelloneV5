@@ -7,8 +7,6 @@ import { ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 import { ReactNode } from "react";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
 
 export const columns: ColumnDef<ProjectType>[] = [
   {

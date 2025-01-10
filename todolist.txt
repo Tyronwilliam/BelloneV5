@@ -6,5 +6,17 @@ Task Dialog
 
 Kanban 
 
-- Faire les requetes changement de columns ordre
-- Same pour changement de task entre columns et ordre entre tasks 
+- Faire les requetes changement de columns ordre = OK
+- Same pour changement de task entre columns et ordre entre tasks =OK 
+- Faire function change titre des tache et columns  = OK
+- Extract la logique dans un hook poutr reduire la taille du composant = OK 
+- Refactor les props des composants enfants pour y voir plus clair 
+- Revoir les functions d'Update de l'UI pour rendre l'animation plus fluide  =  
+- Revoir le handleDragMove  = OK 
+- Faire une recup des projets / Tache / Columns des taches via userId & projectId
+
+BACK 
+
+- Voir comment architect la table permissions 
+31/12 ----------
+Voir bug lors des ajouts des tache et column 

@@ -1,88 +1,108 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Ticket, Timer, User } from "lucide-react";
+import { Trash } from "lucide-react";
 import { BiDuplicate } from "react-icons/bi";
 
 import { DateInput } from "@/app/(fonctionnality)/project/Form/reusable/DateInput";
-import { SelectableWithCreation } from "@/app/(fonctionnality)/project/Form/SelectableWithCreation";
-import { addClient } from "@/service/Client/api";
 import { toast } from "@/hooks/use-toast";
-import { useSelectableWithCreation } from "@/hooks/useSelectableWithCreation";
+import useClickOutside from "@/hooks/useClickOutside";
+import { useMembers } from "@/hooks/useMembers";
+import { useTask } from "@/hooks/useTask";
+import ApiRequest from "@/service";
 import {
-  ItemInterfaceType,
-  StickersInterface,
   TaskFormDialogSchema,
   TaskFormDialogType,
+  TaskInterfaceType,
 } from "@/zodSchema/Project/tasks";
+import z from "@/zodSchema/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePathname } from "next/navigation";
+import { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { DNDType } from "../../Kanban/KanbanView";
+import MembersModal from "./RightSIdeItem/MembersModal";
 
-const RightSide = ({ task }: { task: ItemInterfaceType }) => {
-  const {
-    isAddingNew,
-    newData,
-    handleChange,
-    reset,
-    toggleValue,
-    isLoading,
-    toggleIsLoading,
-  } = useSelectableWithCreation();
+interface RightSideProps {
+  task: TaskInterfaceType;
+  setContainers: Dispatch<SetStateAction<[] | DNDType[]>>;
+  close: () => void;
+  projectId: string;
+}
 
+const RightSide: React.FC<RightSideProps> = ({
+  task,
+  setContainers,
+  close,
+  projectId,
+}: RightSideProps) => {
+  const pathname = usePathname();
+  const creatorId = "6763f8583ddd86e73e00a11b";
   const form = useForm<z.infer<typeof TaskFormDialogSchema>>({
     resolver: zodResolver(TaskFormDialogSchema),
     defaultValues: {
-      start_date: task?.start_date || "",
-      completed_at: task?.completed_at || "",
-      members: task?.members || [],
-      updated_at: task?.updated_at || "",
+      start_date: task?.start_date ? new Date(task?.start_date) : undefined,
+      completeAt: task?.completeAt ? new Date(task?.completeAt) : undefined,
+      due_date: task?.due_date ? new Date(task?.due_date) : undefined,
+      member: "",
       time: task?.time || 0,
     },
   });
-  const stickerForm = useForm<z.infer<typeof StickersInterface>>({
-    resolver: zodResolver(StickersInterface),
-    defaultValues: {
-      hexcode: "",
-      title: "",
-      taskId: [],
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
-  });
-  function onSubmit(data: TaskFormDialogType) {
-    toast({
-      title: "You submitted the following values:",
-      description: "Sucess",
-    });
-  }
-
-  //FAIRE FONCTION DISTINCTE POUR CHAQUE ETAPE POUR EVITER LE SOUCIS DES STATES
-  const addClientToDatabase = async () => {
-    try {
-      toggleIsLoading();
-      // const response = await getClient();
-      const response = await addClient(newData);
-      if (response) {
-        console.log(response, "Create new Client");
-        toggleIsLoading();
-        // setClientOptions((prevState) => [
-        //   ...prevState,
-        //   { id: response.id, name: newClient },
-        // ]);
-        // setNewClientName("");
-        // setIsAddingNew(false);
-        // alert("Client added successfully!");
+  const resetForm = (arg: string, value: any | undefined) => {
+    form.reset(
+      {
+        ...form.getValues(),
+        [arg]: value ? value : "",
+      },
+      {
+        keepDirty: true,
       }
-    } catch (error) {
-      toggleIsLoading();
-      console.error("Error saving client", error);
-      alert("Failed to add client.");
-    }
+    );
+  };
+  const { watch } = form;
+  const member = watch("member");
+
+  const { data: collaboByCreator } =
+    ApiRequest.Collabo.GetCollaboByCreatorId.useQuery(creatorId);
+
+  const {
+    updateTask,
+    deleteTask,
+    createTask,
+    changeDate,
+    currentTask,
+    setCurrentTask,
+  } = useTask(task, task.id, setContainers, projectId, close, resetForm);
+
+  const {
+    filteredCollaborators,
+    addMember,
+    removeMember,
+    toggleMembers,
+    openMembers,
+    handleCloseMembersModal,
+    memberModalRef,
+  } = useMembers(
+    task,
+    collaboByCreator,
+    member,
+    updateTask,
+    currentTask,
+    setCurrentTask,
+    resetForm
+  );
+
+  useClickOutside(memberModalRef, handleCloseMembersModal, openMembers);
+
+  const onSubmit = (data: TaskFormDialogType) => {
+    toast({
+      title: "Task updated",
+      description: "Successfully submitted task values.",
+    });
   };
 
   return (
-    <section className="w-1/4 h-full  p-2">
+    <section className="w-1/4 h-full p-2">
       <section className="w-full flex flex-col gap-4">
         <Form {...form}>
           <form
@@ -92,66 +112,52 @@ const RightSide = ({ task }: { task: ItemInterfaceType }) => {
             <DateInput
               control={form.control}
               name={"start_date"}
-              label={"Date"}
+              label={"Start Date"}
               isTasksDialog={true}
+              changeDate={changeDate}
             />
-            <SelectableWithCreation
+            <MembersModal
               control={form.control}
-              name="members"
-              label="Members"
-              placeholder="Look for members"
-              options={task?.members}
-              isLoading={isLoading}
-              addToDatabase={addClientToDatabase}
-              isAddingNew={isAddingNew}
-              newData={newData}
-              handleChange={handleChange}
-              toggleValue={toggleValue}
-              inputPlaceholder="Add members via email"
-              addButtonLabel="Add New Members"
-              saveButtonLabel="Save Members"
-              cancelButtonLabel="Cancel"
-              isPopover={true}
-              icon={<User />}
+              name={"member"}
+              toggleMembers={toggleMembers}
+              openMembers={openMembers}
+              memberModalRef={memberModalRef}
+              placeholder="Search for members"
+              className="rounded-none"
+              filteredCollaborators={filteredCollaborators}
+              removeMember={removeMember}
+              addMember={addMember}
+              membersAssigned={currentTask?.members}
             />
             <DateInput
               control={form.control}
-              name={"completed_at"}
+              name={"due_date"}
+              label={"Due date"}
+              isTasksDialog={true}
+              changeDate={changeDate}
+            />
+            <DateInput
+              control={form.control}
+              name={"completeAt"}
               label={"Complete at"}
               isTasksDialog={true}
+              changeDate={changeDate}
             />
-          </form>{" "}
-          {/* <SelectableWithCreation
-            control={stickerForm.control}
-            name="stickers"
-            label="Labels"
-            placeholder="Look for label"
-            options={task?.members}
-            isLoading={isLoading}
-            addToDatabase={addClientToDatabase}
-            isAddingNew={isAddingNew}
-            newData={newData}
-            handleChange={handleChange}
-            toggleValue={toggleValue}
-            inputPlaceholder="Add a label"
-            addButtonLabel="Add New Label"
-            saveButtonLabel="Save Label"
-            cancelButtonLabel="Cancel"
-            isPopover={true}
-            icon={<Ticket />}
-          /> */}
-          <Button
-            variant="outline"
-            className="w-full text-wrap flex justify-start "
-          >
-            <Timer /> Timer
-          </Button>{" "}
-          <Button
-            variant="outline"
-            className="w-full text-wrap flex justify-start "
-          >
-            <BiDuplicate /> Dupliquer
-          </Button>
+            <Button
+              variant="outline"
+              className="w-full flex justify-start"
+              onClick={createTask}
+            >
+              <BiDuplicate /> Dupliquer
+            </Button>
+            <Button
+              variant="destructive"
+              className="w-full flex justify-start"
+              onClick={deleteTask}
+            >
+              <Trash /> Delete
+            </Button>
+          </form>
         </Form>
       </section>
     </section>

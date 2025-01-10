@@ -1,26 +1,59 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card.tsx";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input.tsx";
+} from "@/components/ui/dialog.tsx";
 import { useToggle } from "@/hooks/useToggle.tsx";
-import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils.ts";
+import { StickersType, TaskInterfaceType } from "@/zodSchema/Project/tasks";
+import {
+  Dispatch,
+  MutableRefObject,
+  RefObject,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import Editor from "../../MarkDown/Editor.tsx";
 import RightSide from "./RightSide.tsx";
-import { TaskDialogInterface } from "./TaskDialog.ts";
-import { ItemInterfaceType, StickersType } from "@/zodSchema/Project/tasks.ts";
-import { cn } from "@/lib/utils.ts";
-import { UniqueIdentifier } from "@dnd-kit/core";
-import { getAllSticker } from "@/service/Stickers/api.ts";
+
+import { Button } from "@/components/ui/button.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import useClickOutside from "@/hooks/useClickOutside.tsx";
+import { DNDType } from "../../Kanban/KanbanView.tsx";
+import ApiRequest from "@/service/index.ts";
+import { TaskInput } from "@/service/Task/api.ts";
+import { AxiosError } from "axios";
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
+import { getColumnsWithTasks } from "@/service/Task/uncommon.ts";
+import { usePathname } from "next/navigation";
+
+export interface TaskDialogInterface {
+  pseudoId: string;
+  task: TaskInterfaceType;
+  open: boolean;
+  close: () => void;
+  containerId: string;
+  taskTitle: string;
+  setTaskTitle?: (e: any) => void;
+  handleChangeTaskTitle: (
+    containerId: string,
+    id: string,
+    title: string
+  ) => void;
+  toggleChangeTaskTitle: () => void;
+  openChangeTaskTitle?: boolean;
+  currentTaskId?: string | null;
+  setCurrentTaskId?: (value: string | null) => void;
+  inputTaskRef?: MutableRefObject<HTMLInputElement | null>;
+  setContainers?: Dispatch<SetStateAction<[] | DNDType[]>>;
+}
 
 export function TaskDialog({
-  id,
+  pseudoId,
   task,
   open,
   close,
@@ -29,81 +62,37 @@ export function TaskDialog({
   setTaskTitle,
   inputTaskRef,
   taskTitle,
-  setCurrentTaskId,
-  toggleChangeTaskTitle,
   containerId,
-  openChangeTaskTitle,
+  setContainers,
 }: TaskDialogInterface) {
   const { value: isOpen, toggleValue: toggleIsOpen } = useToggle();
-  const [stickers, setStickers] = useState<StickersType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchStickers = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllSticker();
-        console.log(data, "DATA MY MAN", currentTaskId);
-        if (data) {
-          const filteredStickers = stickers?.filter((sticker) =>
-            sticker?.taskId?.includes(currentTaskId as string)
-          );
-
-          setStickers(filteredStickers); // Update state with stickers data
-        }
-      } catch (err) {
-        console.error("Error fetching stickers:", err);
-        setError("Failed to load stickers.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStickers(); // Call the fetch function on mount
-  }, [open, currentTaskId]); // Empty dependency array to run only once on component mount
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // Save task title if clicked outside and the input is focused
-      if (
-        currentTaskId === id &&
-        openChangeTaskTitle &&
-        inputTaskRef &&
-        inputTaskRef.current &&
-        containerId &&
-        !inputTaskRef.current.contains(event.target as Node)
-      ) {
-        if (task?.title?.trim() !== taskTitle?.trim()) {
-          handleChangeTaskTitle &&
-            handleChangeTaskTitle(containerId, id, taskTitle); // Save title
-          toggleChangeTaskTitle && toggleChangeTaskTitle(); // Toggle edit mode
-        }
-      }
-    };
-
-    if (openChangeTaskTitle) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [
-    openChangeTaskTitle,
-    inputTaskRef,
-    toggleChangeTaskTitle,
-    handleChangeTaskTitle,
-    id,
-    taskTitle,
-    containerId,
-    currentTaskId,
-  ]);
+  const { value: isChangeTitle, toggleValue: toggleIsChangeTitle } =
+    useToggle();
+  const [editorState, setEditorState] = useState<any>();
+  const pathname = usePathname();
+  const projectId = pathname.split("/project/")[1];
+  const { mutateAsync: updateTaskMutation } =
+    ApiRequest.Task.UpdateTask.useMutation();
+  const handleUpdateTitleTask = () => {
+    handleChangeTaskTitle(containerId, pseudoId, taskTitle);
+    toggleIsChangeTitle();
+  };
+  useClickOutside(
+    inputTaskRef as RefObject<HTMLInputElement>,
+    () => handleUpdateTitleTask(),
+    isChangeTitle
+  );
+  const saveEditor = async () => {
+    console.log(editorState);
+    await updateTaskMutation({ id: task?.id, content: editorState });
+    const columnsWithTasks = await getColumnsWithTasks(projectId);
+    setContainers && setContainers(columnsWithTasks);
+  };
   return (
-    <Dialog key={id} open={open} onOpenChange={close}>
+    <Dialog key={pseudoId} open={open} onOpenChange={close}>
       <DialogContent
-        className="min-w-[800px]"
-        aria-describedby={"Task dialog"}
+        className="min-w-[800px] z-50"
+        aria-describedby={undefined}
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -111,35 +100,43 @@ export function TaskDialog({
         <DialogHeader>
           <DialogTitle>
             <TitleView
-              id={id}
-              task={task!}
-              open={open}
-              close={close}
+              isChangeTitle={isChangeTitle}
+              pseudoId={pseudoId}
+              task={task}
+              toggleIsChangeTitle={toggleIsChangeTitle}
               containerId={containerId}
-              currentTaskId={currentTaskId}
-              setCurrentTaskId={setCurrentTaskId}
+              currentTaskId={currentTaskId as string}
               taskTitle={taskTitle}
-              setTaskTitle={setTaskTitle}
+              setTaskTitle={setTaskTitle!}
               inputTaskRef={inputTaskRef}
               handleChangeTaskTitle={handleChangeTaskTitle}
-              openChangeTaskTitle={openChangeTaskTitle}
-              toggleChangeTaskTitle={toggleChangeTaskTitle}
             />
           </DialogTitle>
-          <DialogDescription></DialogDescription>
         </DialogHeader>
         {/* Faire un composant */}
         <section className="flex w-full min-h-[600px] gap-4">
           <section className="w-[75%] flex flex-col gap-12 ">
             {/* LABELS VIEWS */}
-            {loading && <div>Loading...</div>}
+            {/* {loading && <div>Loading...</div>}
             {error && <div>{error}</div>}
-            {!error && !loading && <LabelsView stickers={stickers} />}
+            {!error && !loading && <LabelsView stickers={stickers} />} */}
             {/* LABELS VIEWS */}
-            <EditorView isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
+            <EditorView
+              isOpen={isOpen}
+              toggleIsOpen={toggleIsOpen}
+              editorState={editorState}
+              setEditorState={setEditorState}
+              saveEditor={saveEditor}
+              initialContent={task?.content}
+            />
             <div>Remarques : Text area pour annoter</div>
           </section>
-          <RightSide task={task} />
+          <RightSide
+            task={task}
+            setContainers={setContainers!}
+            close={close}
+            projectId={projectId}
+          />
         </section>
         <DialogFooter className="flex items-center gap-2 w-full">
           <Button type="button" variant="secondary" onClick={close}>
@@ -152,43 +149,52 @@ export function TaskDialog({
 }
 
 const TitleView = ({
-  currentTaskId,
-  id,
-  openChangeTaskTitle,
-  setTaskTitle,
-  handleChangeTaskTitle,
-  inputTaskRef,
-  taskTitle,
+  isChangeTitle,
+  pseudoId,
   task,
+  toggleIsChangeTitle,
   containerId,
-  setCurrentTaskId,
-  toggleChangeTaskTitle,
-}: TaskDialogInterface) => {
-  return currentTaskId === id &&
-    openChangeTaskTitle &&
-    setTaskTitle &&
-    handleChangeTaskTitle ? (
+  currentTaskId,
+  taskTitle,
+  setTaskTitle,
+  inputTaskRef,
+  handleChangeTaskTitle,
+}: {
+  isChangeTitle: boolean;
+  pseudoId: string;
+  task: TaskInterfaceType;
+  toggleIsChangeTitle: () => void;
+  containerId: string;
+  currentTaskId: string;
+  taskTitle: string;
+  setTaskTitle: (e: any) => void;
+  inputTaskRef?: MutableRefObject<HTMLInputElement | null>;
+  handleChangeTaskTitle: (
+    containerId: string,
+    id: string,
+    title: string
+  ) => void;
+}) => {
+  return currentTaskId === pseudoId && isChangeTitle ? (
     <Input
       ref={inputTaskRef}
-      key={id}
+      key={pseudoId}
       type="text"
-      name={id as string | undefined}
+      name={pseudoId as string | undefined}
       placeholder={task?.title}
       value={taskTitle}
-      onChange={(e: any) => setTaskTitle(e.target.value)}
+      onChange={(e: any) => setTaskTitle!(e.target.value)}
       onBlur={() => {
-        if (containerId && taskTitle) {
-          handleChangeTaskTitle(containerId, id, taskTitle);
-        }
+        handleChangeTaskTitle(containerId, pseudoId, taskTitle);
       }}
       className=" text-xl w-[90%]"
     />
   ) : (
     <div
       className="text-gray-800 text-xl w-[90%] cursor-pointer"
-      onClick={() => {
-        setCurrentTaskId && setCurrentTaskId(task?.id);
-        toggleChangeTaskTitle && toggleChangeTaskTitle();
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleIsChangeTitle();
       }}
     >
       {task?.title}
@@ -219,28 +225,50 @@ export const LabelsView = ({ stickers }: { stickers: StickersType[] }) => {
 const EditorView = ({
   isOpen,
   toggleIsOpen,
+  editorState,
+  setEditorState,
+  saveEditor,
+  initialContent,
 }: {
   isOpen: boolean;
   toggleIsOpen: () => void;
+  editorState: any;
+  setEditorState: any;
+  saveEditor: () => void;
+  initialContent: string | undefined;
 }) => {
   return (
     <section className="flex flex-col">
       <h2>Description</h2>
-      {/* Faire condition pour ouvrir l'editeur */}
       {isOpen ? (
         <section>
-          {/* Ajouter un form pour l'editeur  */}
-          <Editor />
-          <Button
-            className="block ml-auto"
-            type="submit"
-            onClick={(e) => {
-              e.stopPropagation();
-              // On sauvegarde l'Editeur
-            }}
-          >
-            Save changes
-          </Button>
+          <Editor
+            editorState={editorState}
+            setEditorState={setEditorState}
+            initialContent={initialContent}
+          />
+          <div className="flex gap-2 justify-end">
+            {" "}
+            <Button
+              type="button"
+              variant={"outline"}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleIsOpen();
+              }}
+            >
+              Close
+            </Button>
+            <Button
+              type="submit"
+              onClick={(e) => {
+                e.stopPropagation();
+                saveEditor();
+              }}
+            >
+              Save changes
+            </Button>
+          </div>
         </section>
       ) : (
         <Card

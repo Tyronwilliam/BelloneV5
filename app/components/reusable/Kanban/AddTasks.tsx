@@ -7,39 +7,47 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
+import { Loader2 } from "lucide-react";
 import Input from "./Input";
 
 interface AddColumnProps {
   showAddItemModal: boolean;
   setShowAddItemModal: (arg: boolean) => void;
-  itemName: string;
-  setItemName: (e: any) => void;
+  taskTitle: string;
+  setTaskTitle: (e: any) => void;
   onAddItem: () => void;
+  createTaskPending: boolean;
 }
 
 export const AddTasks = ({
   showAddItemModal,
   setShowAddItemModal,
-  itemName,
-  setItemName,
+  taskTitle,
+  setTaskTitle,
   onAddItem,
+  createTaskPending,
 }: AddColumnProps) => {
   return (
-    <Dialog open={showAddItemModal} onOpenChange={setShowAddItemModal}>
+    <Dialog
+      open={showAddItemModal}
+      onOpenChange={() => {
+        setTaskTitle("");
+        setShowAddItemModal(!showAddItemModal);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle> Add a Task</DialogTitle>
+          <DialogTitle>Add a Task</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <div>
           <Input
             type="text"
-            placeholder="Item Title"
-            name="itemname"
-            value={itemName}
-            onChange={(e: any) => setItemName(e.target.value)}
+            placeholder="Name your task"
+            name="taskTitle"
+            value={taskTitle}
+            onChange={(e: any) => setTaskTitle(e.target.value)}
           />
         </div>
         <DialogFooter className="flex justify-end">
@@ -47,8 +55,15 @@ export const AddTasks = ({
             <Button type="button" variant="secondary">
               Close
             </Button>
-          </DialogClose>{" "}
-          <Button onClick={onAddItem}>Create a Task</Button>
+          </DialogClose>
+
+          <Button onClick={onAddItem}>
+            {createTaskPending ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Create a Task"
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

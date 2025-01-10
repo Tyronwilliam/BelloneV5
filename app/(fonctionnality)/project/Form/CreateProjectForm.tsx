@@ -1,25 +1,19 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { addClient } from "@/service/Client/api";
-import { useToast } from "@/hooks/use-toast";
-import { useToggle } from "@/hooks/useToggle";
+import { toast } from "@/hooks/use-toast";
+import { useSelectableWithCreation } from "@/hooks/useSelectableWithCreation";
 import { ClientSchema } from "@/zodSchema/Client/zodSchema";
-import {
-  ProjectFormSchema,
-  ProjectType,
-  ProjectTypeSchema,
-} from "@/zodSchema/Project/project";
+import { ProjectFormSchema, ProjectType } from "@/zodSchema/Project/project";
 import { useState } from "react";
 import CustomFormItem from "./reusable/CustomFormItem";
 import { DateInput } from "./reusable/DateInput";
 import { SelectInput } from "./reusable/SelectInput";
 import { SelectableWithCreation } from "./SelectableWithCreation";
-import { useSelectableWithCreation } from "@/hooks/useSelectableWithCreation";
+import z from "@/zodSchema/zod";
 
 const statusOptions = [
   { value: "OPEN", label: "Open", color: "text-green-700" },
@@ -38,7 +32,6 @@ export function CreateProjectForm({ clients }: CreateProjectProps) {
         label: client.email,
       }))
     : [];
-  const { toast } = useToast();
   const form = useForm<ProjectType>({
     resolver: zodResolver(ProjectFormSchema),
     defaultValues: {
@@ -47,12 +40,12 @@ export function CreateProjectForm({ clients }: CreateProjectProps) {
       clientId: null,
       budget: 0,
       startDate: new Date(),
-      endDate: undefined, // Optional
+      endDate: undefined, 
       status: "OPEN",
       progress: 0,
-      creator: 1, // Replace with an actual user ID if applicable
-      time: 0, // No time spent initially
-      image: undefined, // Optional
+      creator: 1,
+      time: 0, 
+      image: undefined, 
     },
   });
   const {
@@ -65,28 +58,27 @@ export function CreateProjectForm({ clients }: CreateProjectProps) {
     toggleIsLoading,
   } = useSelectableWithCreation();
 
-  // Add client to the database and update local state
   const addClientToDatabase = async () => {
-    try {
-      toggleIsLoading();
-      // const response = await getClient();
-      const response = await addClient(newData);
-      if (response) {
-        console.log(response, "Create new Client");
-        toggleIsLoading();
-        // setClientOptions((prevState) => [
-        //   ...prevState,
-        //   { id: response.id, name: newClient },
-        // ]);
-        // setNewClientName("");
-        // setIsAddingNew(false);
-        // alert("Client added successfully!");
-      }
-    } catch (error) {
-      toggleIsLoading();
-      console.error("Error saving client", error);
-      alert("Failed to add client.");
-    }
+    // try {
+    //   toggleIsLoading();
+    // const response = await getClient();
+    // const response = await addClient(newData);
+    // if (response) {
+    //   console.log(response, "Create new Client");
+    //   toggleIsLoading();
+    // setClientOptions((prevState) => [
+    //   ...prevState,
+    //   { id: response.id, name: newClient },
+    // ]);
+    // setNewClientName("");
+    // setIsAddingNew(false);
+    // alert("Client added successfully!");
+    // }
+    // } catch (error) {
+    // toggleIsLoading();
+    // console.error("Error saving client", error);
+    // alert("Failed to add client.");
+    // }
   };
   function onSubmit(data: ProjectType) {
     console.log("Form Submitted!", data); // Debugging

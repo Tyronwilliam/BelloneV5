@@ -26,6 +26,7 @@ export function DateInput<T extends FieldValues>({
   name,
   label,
   isTasksDialog,
+  changeDate,
   ...props
 }: DatePickerFormProps<T>) {
   return (
@@ -76,9 +77,12 @@ export function DateInput<T extends FieldValues>({
               <Calendar
                 mode="single"
                 selected={field.value}
-                onSelect={field.onChange}
-                // disabled={(date: Date) =>
-                // }
+                onSelect={(date) => {
+                  changeDate && changeDate(date as Date, name);
+                  field.onChange();
+                  console.log(field.value, "IN DATE NPUT");
+                }}
+           
                 initialFocus
               />
             </PopoverContent>

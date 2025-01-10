@@ -61,7 +61,6 @@ export async function getColumnsWithTasks(projectId: string) {
   try {
     const tasksData = await fetchTasksByProject(projectId);
     const columnsData = await getColumnsByProjectId(projectId);
-    console.log(columnsData);
 
     const columnsWithTasks = columnsData.map((column: ColumnsType) => {
       const tasksForColumn = tasksData.filter(

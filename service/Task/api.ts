@@ -1,6 +1,7 @@
 import { toast } from "@/hooks/use-toast";
 import {
   CREATE_TASK_MUTATION,
+  DELETE_TASK,
   UPDATE_TASK_MUTATION,
 } from "@/service/Task/query";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
@@ -21,8 +22,8 @@ export type TaskInput = {
   column_id?: string;
   project_id?: string;
   order?: number;
-  id?: string; 
-  pseudo_id?: string; 
+  id?: string;
+  pseudo_id?: string;
 };
 export async function createTask(variables: TaskInput) {
   return await axios
@@ -40,7 +41,7 @@ export async function createTask(variables: TaskInput) {
     })
     .catch((error) => {
       console.error("Erreur capturée dans updateTask:", error);
-      throw error; 
+      throw error;
     });
 }
 
@@ -60,7 +61,26 @@ export async function updateTask(variables: TaskInput) {
     })
     .catch((error) => {
       console.error("Erreur capturée dans updateTask:", error);
-      throw error; 
+      throw error;
+    });
+}
+export async function deleteTask(variables: { id: string }) {
+  return await axios
+    .post(`${process.env.NEXT_PUBLIC_PROTECTED_URL}/task`, {
+      query: DELETE_TASK,
+      variables: variables,
+    })
+    .then((response) => {
+      if (response.data.errors) {
+        throw new Error(
+          response.data.errors.map((error: any) => error.message).join(", ")
+        );
+      }
+      return response.data.data.deleteTask;
+    })
+    .catch((error) => {
+      console.error("Error deleting task:", error);
+      throw error;
     });
 }
 
@@ -106,6 +126,30 @@ export const Task = {
             title: "Task updated successfully!",
           });
           console.log(data, ": DATA TASK LEVEL 2 TASK UPDATE");
+          return data;
+        },
+        ...options,
+      });
+    },
+  },
+  DeleteTask: {
+    useMutation: (
+      options?: UseMutationOptions<any, AxiosError, { id: string }>
+    ) => {
+      return useMutation<any, AxiosError, { id: string }>({
+        mutationFn: (variables: { id: string }) => deleteTask(variables),
+        onError: (error: AxiosError) => {
+          console.error("Failed to delete task:", error);
+          toast({
+            variant: "destructive",
+            title: `Failed to delete task: ${error.message}`,
+          });
+        },
+        onSuccess: (data: any) => {
+          toast({
+            variant: "default",
+            title: "Task deleted successfully!",
+          });
           return data;
         },
         ...options,

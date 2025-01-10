@@ -1,16 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Timer } from "lucide-react";
+import { Trash } from "lucide-react";
 import { BiDuplicate } from "react-icons/bi";
 
 import { DateInput } from "@/app/(fonctionnality)/project/Form/reusable/DateInput";
 import { toast } from "@/hooks/use-toast";
 import useClickOutside from "@/hooks/useClickOutside";
-import { useToggle } from "@/hooks/useToggle";
+import { useMembers } from "@/hooks/useMembers";
+import { useTask } from "@/hooks/useTask";
 import ApiRequest from "@/service";
-import { customFormatDate } from "@/utils/date";
-import { CollaboratorType } from "@/zodSchema/Collaborators/collabo";
 import {
   TaskFormDialogSchema,
   TaskFormDialogType,
@@ -18,41 +17,26 @@ import {
 } from "@/zodSchema/Project/tasks";
 import z from "@/zodSchema/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dispatch, SetStateAction, useMemo, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
-import MembersModal from "./RightSIdeItem/MembersModal";
-import { TaskDialogInterface } from "./TaskDialog";
-import { TaskInput } from "@/service/Task/api";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { revalidateTag } from "next/cache";
-import { getColumnsWithTasks } from "@/service/Task/uncommon";
 import { DNDType } from "../../Kanban/KanbanView";
+import MembersModal from "./RightSIdeItem/MembersModal";
 
-const RightSide = ({
+interface RightSideProps {
+  task: TaskInterfaceType;
+  setContainers: Dispatch<SetStateAction<[] | DNDType[]>>;
+  close: () => void;
+}
+
+const RightSide: React.FC<RightSideProps> = ({
   task,
   setContainers,
-}: {
-  task: TaskInterfaceType;
-  setContainers?: Dispatch<SetStateAction<[] | DNDType[]>>;
-}) => {
+  close,
+}: RightSideProps) => {
   const pathname = usePathname();
   const projectId = pathname.split("/project/")[1];
-
-  console.log(projectId, "HELLO ");
   const creatorId = "6763f8583ddd86e73e00a11b";
-  const { data: collaboByCreator } =
-    ApiRequest.Collabo.GetCollaboByCreatorId.useQuery(creatorId);
-  const { mutateAsync: updateTaskMutation } =
-    ApiRequest.Task.UpdateTask.useMutation();
-  const {
-    mutateAsync: createTaskMutation,
-    isPending: createTaskPending,
-    isSuccess: createTaskSuccess,
-    isError: createTaskError,
-  } = ApiRequest.Task.CreateTask.useMutation();
-  const { value: openMembers, toggleValue: toggleMembers } = useToggle();
-  const memberModalRef = useRef<HTMLDivElement | null>(null);
-  const [currentTask, setCurrentTask] = useState<TaskInterfaceType>(task);
   const form = useForm<z.infer<typeof TaskFormDialogSchema>>({
     resolver: zodResolver(TaskFormDialogSchema),
     defaultValues: {
@@ -63,8 +47,6 @@ const RightSide = ({
       time: task?.time || 0,
     },
   });
-  const { watch } = form;
-  const member = watch("member");
   const resetForm = (arg: string, value: any | undefined) => {
     form.reset(
       {
@@ -76,103 +58,50 @@ const RightSide = ({
       }
     );
   };
-  const removeMember = async (id: string) => {
-    if (!id) return;
-    const updatedMembers = currentTask?.members?.filter(
-      (item) => item.id !== id
-    );
-    try {
-      const res = await updateTaskMutation({
-        id: task?.id,
-        members: updatedMembers,
-      });
-      setCurrentTask((prev) => ({ ...prev, members: updatedMembers }));
-    } catch (error) {
-      console.error("Error removing member:", error);
-    }
-  };
-  const addMember = async (id: string, email: string) => {
-    const newMember = { id, email };
-    const updatedMembers = [...(currentTask?.members || []), newMember];
-    try {
-      const res = await updateTaskMutation({
-        id: task?.id,
-        members: updatedMembers,
-      });
-      setCurrentTask((prev) => ({ ...prev, members: updatedMembers }));
-    } catch (error) {
-      console.error("Error adding member:", error);
-    }
-  };
-  const handleCloseMembersModal = () => {
-    resetForm("member", undefined);
-    toggleMembers();
-  };
-  const changeDate = async (date: Date, arg: string) => {
-    const timestamp: number = date?.getTime();
-    try {
-      await updateTaskMutation({
-        id: task?.id,
-        [arg]: timestamp,
-      });
-      resetForm(arg, date);
-    } catch (error) {
-      console.error("Error update date:", error);
-    }
-  };
-  const duplicateTask = async () => {
-    try {
-      const duplicatedTaskData = {
-        ...task,
-        id: undefined,
-        title: `${task.title} (Copy)`,
-        column_id: task?.column_id!,
-      };
-      const newTask = await createTaskMutation(duplicatedTaskData);
-      const columnsWithTasks = await getColumnsWithTasks(projectId);
-      setContainers && setContainers(columnsWithTasks);
-    } catch (error) {
-      console.error("Error duplicating task:", error);
-    }
-  };
+  const { watch } = form;
+  const member = watch("member");
 
-  // const stickerForm = useForm<z.infer<typeof StickerFormInterface>>({
-  //   resolver: zodResolver(StickerFormInterface),
-  //   defaultValues: {
-  //     hexcode: "",
-  //     title: "",
-  //     taskId: [],
-  //   },
-  // });
-  const filteredCollaborators: CollaboratorType[] = useMemo(() => {
-    if (member) {
-      const existingMemberIds = new Set(currentTask?.members?.map((m) => m.id));
+  const { data: collaboByCreator } =
+    ApiRequest.Collabo.GetCollaboByCreatorId.useQuery(creatorId);
 
-      return (
-        collaboByCreator?.filter(
-          (collabo: CollaboratorType) =>
-            !existingMemberIds.has(collabo.userId) &&
-            collabo?.email
-              ?.trim()
-              .toLowerCase()
-              .includes(member.trim().toLowerCase())
-        ) || []
-      );
-    }
-    return [];
-  }, [member, collaboByCreator, currentTask?.members]);
+  const {
+    updateTask,
+    deleteTask,
+    createTask,
+    changeDate,
+    currentTask,
+    setCurrentTask,
+  } = useTask(task, task.id, setContainers, projectId, close, resetForm);
 
-  function onSubmit(data: TaskFormDialogType) {
+  const {
+    filteredCollaborators,
+    addMember,
+    removeMember,
+    toggleMembers,
+    openMembers,
+    handleCloseMembersModal,
+    memberModalRef,
+  } = useMembers(
+    task,
+    collaboByCreator,
+    member,
+    updateTask,
+    currentTask,
+    setCurrentTask,
+    resetForm
+  );
+
+  useClickOutside(memberModalRef, handleCloseMembersModal, openMembers);
+
+  const onSubmit = (data: TaskFormDialogType) => {
     toast({
-      title: "You submitted the following values:",
-      description: "Sucess",
+      title: "Task updated",
+      description: "Successfully submitted task values.",
     });
-  }
-
-  useClickOutside(memberModalRef, () => handleCloseMembersModal(), openMembers);
+  };
 
   return (
-    <section className="w-1/4 h-full  p-2">
+    <section className="w-1/4 h-full p-2">
       <section className="w-full flex flex-col gap-4">
         <Form {...form}>
           <form
@@ -185,7 +114,7 @@ const RightSide = ({
               label={"Start Date"}
               isTasksDialog={true}
               changeDate={changeDate}
-            />{" "}
+            />
             <MembersModal
               control={form.control}
               name={"member"}
@@ -212,41 +141,22 @@ const RightSide = ({
               label={"Complete At"}
               isTasksDialog={true}
               changeDate={changeDate}
-            />{" "}
-            {/* <Button
-              variant="outline"
-              className="w-full text-wrap flex justify-start "
-            >
-              <Timer /> Timer
-            </Button> */}
+            />
             <Button
               variant="outline"
-              className="w-full text-wrap flex justify-start "
-              onClick={duplicateTask}
-              type="button"
+              className="w-full flex justify-start"
+              onClick={createTask}
             >
               <BiDuplicate /> Dupliquer
             </Button>
+            <Button
+              variant="destructive"
+              className="w-full flex justify-start"
+              onClick={deleteTask}
+            >
+              <Trash /> Delete
+            </Button>
           </form>
-          {/* <SelectableWithCreation
-            control={stickerForm.control}
-            name="stickers"
-            label="Labels"
-            placeholder="Look for label"
-            options={task?.members}
-            isLoading={isLoading}
-            addToDatabase={addClientToDatabase}
-            isAddingNew={isAddingNew}
-            newData={newData}
-            handleChange={handleChange}
-            toggleValue={toggleValue}
-            inputPlaceholder="Add a label"
-            addButtonLabel="Add New Label"
-            saveButtonLabel="Save Label"
-            cancelButtonLabel="Cancel"
-            isPopover={true}
-            icon={<Ticket />}
-          /> */}
         </Form>
       </section>
     </section>

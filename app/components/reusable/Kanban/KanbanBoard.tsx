@@ -100,7 +100,7 @@ const KanbanBoard = ({
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={containers.map((container) => container.pseudo_id!)}
+          items={containers?.map((container) => container.pseudo_id!)}
         >
           {containers
             .sort((a, b) => a.order - b.order)

@@ -107,3 +107,8 @@ query GetTasksByProject($project_id: String!) {
   }
 }
 `;
+export const DELETE_TASK = `
+mutation deleteTask($id: String!) {
+  deleteTask(id: $id)
+}
+`;

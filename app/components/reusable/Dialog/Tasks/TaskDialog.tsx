@@ -109,7 +109,7 @@ export function TaskDialog({
             <EditorView isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
             <div>Remarques : Text area pour annoter</div>
           </section>
-          <RightSide task={task} setContainers={setContainers} />
+          <RightSide task={task} setContainers={setContainers!} close={close} />
         </section>
         <DialogFooter className="flex items-center gap-2 w-full">
           <Button type="button" variant="secondary" onClick={close}>
